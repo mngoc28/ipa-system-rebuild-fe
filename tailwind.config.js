@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        roboto: ['Roboto', 'sans-serif'],
-        sans: ["Be Vietnam Pro", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
+        title: ["Be Vietnam Pro", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

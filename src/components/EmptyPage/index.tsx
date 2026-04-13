@@ -1,25 +1,25 @@
-import React from "react";
+import * as React from "react";
+import { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { XCircle } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
 import { EmptyPageProps } from "../type";
 
-const EmptyPage: React.FC<EmptyPageProps> = ({title ="common.empty_title", description = "common.empty_description", icon = <XCircle className="mr-2 size-10" />, loading = true}) => {
-  const {t} = useTranslation();
+const EmptyPage: FC<EmptyPageProps> = ({ 
+  title = "common.empty_title", 
+  description = "common.empty_description", 
+  icon = <XCircle className="size-10 text-slate-300" />,
+  action 
+}) => {
+  const { t } = useTranslation();
+  
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-      <div className="text-lg font-semibold text-slate-800">{t(title)}</div>
-      <p className="mt-1 text-sm text-slate-500">{t(description)}</p>
-      <div className="mt-4 flex items-center gap-2">
-        <Label 
-         onClick={() => !loading && window.location.reload()}
-         className={`flex flex-col items-center justify-center border-slate-700 text-sm text-slate-500 ${!loading && "cursor-pointer"}`}>
-          {icon}
-        </Label>
-      </div>
+    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center transition-all hover:bg-slate-50">
+      <div className="mb-4 flex justify-center">{icon}</div>
+      <h3 className="text-lg font-bold text-slate-800">{t(title)}</h3>
+      <p className="mt-2 max-w-xs text-sm text-slate-500">{t(description)}</p>
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
 };
-
 
 export default EmptyPage;

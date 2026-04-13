@@ -1,18 +1,18 @@
+import * as React from "react";
+import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PublicPaginationProps } from "../type";
 
-// PublicPagination Component
 const PublicPagination = ({
   currentPage,
   totalPages,
   onPageChange,
-  perPage,
-  onPerPageChange,
+  pageSize,
+  onPageSizeChange,
   totalItems,
   maxVisiblePages = 5,
-  perPageOptions = [10, 20, 30, 50],
   className,
 }: PublicPaginationProps) => {
   const { t } = useTranslation();
@@ -23,18 +23,15 @@ const PublicPagination = ({
     }
   };
 
-  // Handle change in items per page
-  const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onPerPageChange?.(Number(e.target.value));
+  const handlePerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    onPageSizeChange?.(Number(e.target.value));
   };
 
-  // Determine visible page numbers with ellipsis
   const getVisiblePages = (): (number | "ellipsis")[] => {
     if (totalPages <= maxVisiblePages) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
-    // Generate page numbers with ellipsis
     const pages: (number | "ellipsis")[] = [];
     const half = Math.floor(maxVisiblePages / 2);
     let start = Math.max(2, currentPage - half);
@@ -62,56 +59,45 @@ const PublicPagination = ({
 
   return (
     <div className={cn("flex flex-col items-center justify-between gap-4 sm:flex-row", className)}>
-      {/* Items per page and total count */}
       <div className="flex items-center gap-3">
-        {onPerPageChange && perPage && (
+        {onPageSizeChange && pageSize && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-700">
-              {t("pagination.show", { defaultValue: "Show" })}
-            </span>
+            <span className="text-sm font-medium text-slate-700">{t("pagination.show")}</span>
             <select
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 hover:border-slate-400"
-              value={perPage}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm"
+              value={pageSize}
               onChange={handlePerPageChange}
-              aria-label={t("pagination.items_per_page", { defaultValue: "Items per page" })}
             >
-              {perPageOptions.map((option) => (
+              {[10, 20, 30, 50].map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
               ))}
             </select>
-            <span className="text-sm font-medium text-slate-700">
-              {t("pagination.per_page", { defaultValue: "per page" })}
-            </span>
           </div>
         )}
         {totalItems !== undefined && (
           <span className="text-sm text-slate-600">
-            {t("pagination.total", { count: totalItems, defaultValue: `${totalItems} total` })}
+            {totalItems} {t("pagination.total")}
           </span>
         )}
       </div>
 
-      {/* Page navigation */}
-      <nav aria-label="Pagination navigation" className="flex items-center gap-1">
-        {/* Previous button */}
+      <nav className="flex items-center gap-1">
         <button
           onClick={() => handlePageClick(currentPage - 1)}
           disabled={isPreviousDisabled}
-          aria-label="Previous page"
           className={cn(
             "flex h-10 min-w-[100px] items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all",
             isPreviousDisabled
               ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-              : "border-slate-300 bg-white text-slate-700 shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+              : "border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50"
           )}
         >
           <ChevronLeft className="h-4 w-4" />
-          <span>{t("pagination.previous", { defaultValue: "Previous" })}</span>
+          <span>{t("pagination.previous")}</span>
         </button>
 
-        {/* Page numbers */}
         <div className="flex items-center gap-1">
           {getVisiblePages().map((page, idx) => {
             if (page === "ellipsis") {
@@ -121,40 +107,35 @@ const PublicPagination = ({
                 </span>
               );
             }
-            const pageNumber = page as number;
-            const isActive = pageNumber === currentPage;
+            const isActive = page === currentPage;
             return (
               <button
-                key={pageNumber}
-                onClick={() => handlePageClick(pageNumber)}
-                aria-label={`Page ${pageNumber}`}
-                aria-current={isActive ? "page" : undefined}
+                key={page as number}
+                onClick={() => handlePageClick(page as number)}
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold transition-all",
                   isActive
-                    ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-                    : "bg-white text-slate-700 shadow-sm hover:bg-blue-50 hover:text-blue-700 border border-slate-200 hover:border-blue-300"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-blue-50"
                 )}
               >
-                {pageNumber}
+                {page}
               </button>
             );
           })}
         </div>
 
-        {/* Next button */}
         <button
           onClick={() => handlePageClick(currentPage + 1)}
           disabled={isNextDisabled}
-          aria-label="Next page"
           className={cn(
             "flex h-10 min-w-[100px] items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all",
             isNextDisabled
               ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-              : "border-slate-300 bg-white text-slate-700 shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+              : "border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50"
           )}
         >
-          <span>{t("pagination.next", { defaultValue: "Next" })}</span>
+          <span>{t("pagination.next")}</span>
           <ChevronRight className="h-4 w-4" />
         </button>
       </nav>

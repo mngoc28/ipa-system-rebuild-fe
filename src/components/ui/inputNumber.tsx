@@ -1,46 +1,42 @@
-import React, { useState } from "react";
-import { PropsInput } from "../type";
+import * as React from "react";
+import { ChangeEvent, useState } from "react";
+import { PropsInput } from "../type.ts";
 
-export default function InputNumber({ value, onChange, placeholder }: PropsInput) {
+export default function InputNumber({ value, onChange, placeholder, ...props }: PropsInput) {
   const [isFocused, setIsFocused] = useState(false);
-  const formatNumber = (str: string) => {
-    if (!str) return "";
+
+  const formatNumber = (val: any) => {
+    if (val === undefined || val === null || val === "") return "";
+    const str = val.toString();
     const cleaned = str.replace(/,/g, "");
-    if (!/^\d+$/.test(cleaned)) return "";
+    if (!/^\d+$/.test(cleaned)) return cleaned;
     return Number(cleaned).toLocaleString("en-US");
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value.replace(/,/g, "");
-    
+
     if (raw === "") {
-      onChange("");
+      onChange?.("");
       return;
     }
     if (!/^\d+$/.test(raw)) return;
-    
-    onChange(raw);
+
+    onChange?.(raw);
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-  
   const displayValue = isFocused ? value : formatNumber(value);
 
   return (
     <input
       type="text"
-      value={displayValue}
+      value={displayValue || ""}
       onChange={handleChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
       placeholder={placeholder}
       className="flex h-12 w-full border border-slate-300 bg-white px-4 py-3 text-base text-slate-700 rounded transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-slate-500 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+      {...props}
     />
   );
 }

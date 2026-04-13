@@ -1,22 +1,22 @@
+import * as React from "react";
+import { ButtonHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
-import React from "react";
 
-interface ButtonDetailProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonDetailProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   variant?: "default" | "outline";
 }
 
-const ButtonDetail = React.forwardRef<HTMLButtonElement, ButtonDetailProps>(
+const ButtonDetail = forwardRef<HTMLButtonElement, ButtonDetailProps>(
   ({ className, variant = "outline", children, ...props }, ref) => {
     return (
       <button
         ref={ref}
         className={cn(
-          "px-3 py-1.5 text-xs font-bold rounded-md border transition-colors",
-          variant === "outline"
-            ? "border-blue-600 text-blue-600 hover:bg-blue-50"
-            : "bg-blue-600 text-white hover:bg-blue-700 border-transparent",
+          "rounded-md border px-3 py-1.5 text-xs font-bold transition-colors",
+          variant === "outline" 
+            ? "border-blue-600 text-blue-600 hover:bg-blue-50" 
+            : "border-transparent bg-blue-600 text-white hover:bg-blue-700",
           className
         )}
         {...props}
@@ -28,5 +28,4 @@ const ButtonDetail = React.forwardRef<HTMLButtonElement, ButtonDetailProps>(
 );
 
 ButtonDetail.displayName = "ButtonDetail";
-
 export default ButtonDetail;

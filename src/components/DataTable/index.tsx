@@ -1,11 +1,13 @@
+import * as React from "react";
+import { ReactNode } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export interface Column<T> {
-  header: React.ReactNode;
+  header: ReactNode;
   accessorKey: keyof T | string;
-  cell?: (item: T) => React.ReactNode;
+  cell?: (item: T) => ReactNode;
   className?: string;
   hideOnMobile?: boolean;
 }
@@ -19,7 +21,14 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
 }
 
-const DataTable = <T extends object>({ data, columns, isLoading = false, isError = false, noDataMessage, onRowClick }: DataTableProps<T>) => {
+const DataTable = <T extends object>({
+  data,
+  columns,
+  isLoading = false,
+  isError = false,
+  noDataMessage,
+  onRowClick,
+}: DataTableProps<T>) => {
   const { t } = useTranslation();
 
   const renderCell = (item: T, column: Column<T>) => {
@@ -28,7 +37,7 @@ const DataTable = <T extends object>({ data, columns, isLoading = false, isError
     }
 
     const value = item[column.accessorKey as keyof T];
-    return value as React.ReactNode;
+    return value as ReactNode;
   };
 
   return (
@@ -46,7 +55,10 @@ const DataTable = <T extends object>({ data, columns, isLoading = false, isError
           <TableHeader className="bg-slate-100">
             <TableRow className="whitespace-nowrap">
               {columns.map((column, index) => (
-                <TableHead key={index} className={`${column.className} ${column.hideOnMobile ? "hidden md:table-cell" : ""}`}>
+                <TableHead
+                  key={index}
+                  className={`${column.className} ${column.hideOnMobile ? "hidden md:table-cell" : ""}`}
+                >
                   {column.header}
                 </TableHead>
               ))}
@@ -61,9 +73,16 @@ const DataTable = <T extends object>({ data, columns, isLoading = false, isError
               </TableRow>
             ) : (
               data.map((item, rowIndex) => (
-                <TableRow key={rowIndex} className="border-b border-blue-100" onClick={() => onRowClick?.(item)}>
+                <TableRow
+                  key={rowIndex}
+                  className="border-b border-blue-100 cursor-pointer hover:bg-slate-50"
+                  onClick={() => onRowClick?.(item)}
+                >
                   {columns.map((column, colIndex) => (
-                    <TableCell key={colIndex} className={`${column.className} ${column.hideOnMobile ? "hidden md:table-cell" : ""}`}>
+                    <TableCell
+                      key={colIndex}
+                      className={`${column.className} ${column.hideOnMobile ? "hidden md:table-cell" : ""}`}
+                    >
                       {renderCell(item, column)}
                     </TableCell>
                   ))}

@@ -1,4 +1,2 @@
-import StatusBadge from "./StatusBadge";
-
-export default StatusBadge;
-export type { StatusType } from "./StatusBadge";
+export { default } from "./StatusBadge";
+export * from "./StatusBadge";

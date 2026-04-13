@@ -1,5 +1,15 @@
+import * as React from "react";
+import { ChangeEvent, MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, Pagination as UIPagination } from "../ui/pagination";
+import { 
+  PaginationContent, 
+  PaginationEllipsis, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious, 
+  Pagination as UIPagination 
+} from "../ui/pagination";
 
 interface PaginationProps {
   currentPage: number;
@@ -13,15 +23,25 @@ interface PaginationProps {
   resultsText?: string;
 }
 
-const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageChange, totalItems, maxVisiblePages = 5, perPageOptions = [5, 10, 20, 50], resultsText }: PaginationProps) => {
+const Pagination = ({ 
+  currentPage, 
+  totalPages, 
+  onPageChange, 
+  perPage, 
+  onPerPageChange, 
+  totalItems, 
+  maxVisiblePages = 5, 
+  perPageOptions = [5, 10, 20, 50], 
+  resultsText 
+}: PaginationProps) => {
   const { t } = useTranslation();
 
-  const handlePageClick = (e: React.MouseEvent, page: number) => {
+  const handlePageClick = (e: MouseEvent<HTMLAnchorElement>, page: number) => {
     e.preventDefault();
     onPageChange(page);
   };
 
-  const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePerPageChange = (e: ChangeEvent<HTMLSelectElement>) => {
     onPerPageChange?.(Number(e.target.value));
   };
 
@@ -60,7 +80,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageC
             <PaginationPrevious
               href="#"
               className="size-8 min-w-8 rounded bg-slate-100 p-0"
-              onClick={(e: React.MouseEvent) => {
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 if (currentPage > 1) onPageChange(currentPage - 1);
               }}
@@ -70,7 +90,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageC
           {getVisiblePages(currentPage, totalPages, maxVisiblePages).map((page, idx) => {
             if (page === "start-ellipsis" || page === "end-ellipsis") {
               return (
-                <PaginationItem key={page + idx}>
+                <PaginationItem key={page + (idx as any)}>
                   <PaginationEllipsis className="text-slate-500 opacity-70" />
                 </PaginationItem>
               );
@@ -82,7 +102,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageC
                   href="#"
                   className={`size-8 min-w-8 rounded ${pageNumber === currentPage ? "bg-slate-100 font-bold" : "p-0 text-slate-500 opacity-70"}`}
                   isActive={pageNumber === currentPage}
-                  onClick={(e: React.MouseEvent) => handlePageClick(e, pageNumber)}
+                  onClick={(e: MouseEvent<HTMLAnchorElement>) => handlePageClick(e, pageNumber)}
                 >
                   {pageNumber}
                 </PaginationLink>
@@ -94,7 +114,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageC
             <PaginationNext
               href="#"
               className="size-8 min-w-8 rounded bg-slate-100 p-0"
-              onClick={(e: React.MouseEvent) => {
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 if (currentPage < totalPages) onPageChange(currentPage + 1);
               }}
@@ -106,7 +126,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange, perPage, onPerPageC
       {onPerPageChange && perPage && (
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 rounded bg-slate-100 px-3 py-1.5">
-            <select className="bg-transparent text-sm text-slate-700 outline-none" value={perPage} onChange={handlePerPageChange} aria-label={t("pagination.items_per_page")}>
+            <select
+              className="bg-transparent text-sm text-slate-700 outline-none"
+              value={perPage}
+              onChange={handlePerPageChange}
+              aria-label={t("pagination.items_per_page")}
+            >
               {perPageOptions.map((option) => (
                 <option key={option} value={option}>
                   {option}

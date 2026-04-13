@@ -1,6 +1,7 @@
+import * as React from "react";
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
-import { BreadcrumbProps } from "../type";
+import { BreadcrumbProps } from "../type.ts";
 
 const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
   if (!items.length) return null;
@@ -22,7 +23,11 @@ const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
               ) : (
                 <span className={isLast ? "text-slate-400" : "text-slate-500"}>{item.label}</span>
               )}
-              {!isLast && <span aria-hidden="true" className="text-slate-400">/</span>}
+              {!isLast && (
+                <span aria-hidden="true" className="text-slate-400">
+                  /
+                </span>
+              )}
             </li>
           );
         })}

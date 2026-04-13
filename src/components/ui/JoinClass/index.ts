@@ -1,3 +1,1 @@
-import JoinClass from "./JoinClass";
-
-export default JoinClass;
+export { default } from "./JoinClass";

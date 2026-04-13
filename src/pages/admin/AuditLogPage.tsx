@@ -11,6 +11,36 @@ const mockLogs = [
 ];
 
 export default function AuditLogPage() {
+  const [logs, setLogs] = React.useState(mockLogs);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [showOnlySystem, setShowOnlySystem] = React.useState(false);
+
+  const visibleLogs = logs.filter((log) => {
+    const keyword = searchTerm.trim().toLowerCase();
+    const byKeyword = keyword ? log.action.toLowerCase().includes(keyword) || log.detail.toLowerCase().includes(keyword) || log.user.toLowerCase().includes(keyword) : true;
+    const byType = showOnlySystem ? log.type === "system" : true;
+    return byKeyword && byType;
+  });
+
+  const handleExport = () => {
+    const headers = ["ID", "User", "Action", "Detail", "Time", "Type"];
+    const rows = visibleLogs.map((log) => [log.id, log.user, log.action, log.detail, log.time, log.type]);
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `audit-log-${Date.now()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success(`Đã xuất ${visibleLogs.length} bản ghi nhật ký.`);
+  };
+
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       {/* Header */}
@@ -24,7 +54,7 @@ export default function AuditLogPage() {
             <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi và truy vết hoạt động vận hành trên toàn bộ hệ thống IPA.</p>
           </div>
         </div>
-        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95">
+        <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95">
           <Download size={14} /> XUẤT NHẬT KÝ (EXCEL)
         </button>
       </div>
@@ -37,10 +67,12 @@ export default function AuditLogPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               <input 
                 placeholder="Tìm kiếm hành động, người dùng hoặc sự kiện..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-transparent py-2 pl-11 pr-4 text-xs font-medium outline-none placeholder:text-slate-400" 
               />
             </div>
-            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="p-2 text-slate-400 hover:text-primary transition-colors">
+            <button onClick={() => setShowOnlySystem((prev) => !prev)} className={cn("p-2 transition-colors", showOnlySystem ? "text-primary" : "text-slate-400 hover:text-primary") }>
               <Filter size={18} />
             </button>
           </div>
@@ -49,7 +81,7 @@ export default function AuditLogPage() {
             {/* Timeline line */}
             <div className="absolute bottom-0 left-[23px] top-0 hidden w-px bg-slate-100 md:block" />
             
-            {mockLogs.map((log) => (
+            {visibleLogs.map((log) => (
               <div key={log.id} className="group relative overflow-hidden rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:ml-12">
                 {/* Log node indicator */}
                 <div
@@ -91,7 +123,16 @@ export default function AuditLogPage() {
             ))}
           </div>
           
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="flex w-full items-center justify-center gap-2 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all hover:text-primary active:scale-95">
+          <button
+            onClick={() => {
+              const nextId = logs.length + 1;
+              setLogs([
+                ...logs,
+                { id: nextId, user: "System", action: "Đồng bộ nền", detail: `Đã đồng bộ batch #${nextId}`, time: "Vừa xong", type: "system" },
+              ]);
+            }}
+            className="flex w-full items-center justify-center gap-2 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all hover:text-primary active:scale-95"
+          >
             TẢI THÊM NHẬT KÝ HỆ THỐNG <ArrowRight size={14} />
           </button>
         </div>

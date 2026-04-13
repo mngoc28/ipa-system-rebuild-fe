@@ -3,6 +3,17 @@ import { Target, TrendingUp, Download, FileText, Filter, BarChart3, ShieldCheck,
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 export default function CityReportsPage() {
+  const [showTemplateEditor, setShowTemplateEditor] = React.useState(false);
+  const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false);
+  const [showForecastDetail, setShowForecastDetail] = React.useState(false);
+  const [lastExportAt, setLastExportAt] = React.useState<string | null>(null);
+
+  const handleExportReport = () => {
+    const timestamp = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    setLastExportAt(timestamp);
+    toast.success("Đã tạo gói xuất báo cáo chiến lược.");
+  };
+
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -11,14 +22,18 @@ export default function CityReportsPage() {
           <p className="mt-1 text-sm font-medium text-slate-500">Các báo cáo định kỳ về tình hình xúc tiến đầu tư và kinh tế đối ngoại của Đà Nẵng.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => toast.info("Đang mở chỉnh sửa mẫu báo cáo.")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95">
+          <button onClick={() => setShowTemplateEditor((prev) => !prev)} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95">
             CHỈNH SỬA MẪU
           </button>
-          <button onClick={() => toast.success("Đang xuất báo cáo chiến lược tổng hợp.")} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
+          <button onClick={handleExportReport} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
             XUẤT BÁO CÁO TỔNG HỢP
           </button>
         </div>
       </div>
+
+      {lastExportAt && <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-700">Lần xuất gần nhất: {lastExportAt}</div>}
+
+      {showTemplateEditor && <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-[11px] font-semibold text-slate-600">Mẫu đang dùng: Strategic_Report_v3. Có thể sửa mục KPI, bố cục trang bìa và phần phụ lục.</div>}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         <StatItem title="Số dự án mới" value="12" sub="QUÝ I/2026" icon={<Globe size={18} />} color="blue" />
@@ -33,8 +48,10 @@ export default function CityReportsPage() {
             <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
               <BarChart3 size={20} className="text-primary" /> Tập tin báo cáo chiến lược
             </h2>
-            <button onClick={() => toast.info("Đã mở bộ lọc nâng cao.")} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Bộ lọc nâng cao</button>
+            <button onClick={() => setShowAdvancedFilter((prev) => !prev)} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Bộ lọc nâng cao</button>
           </div>
+
+          {showAdvancedFilter && <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-primary">Đang lọc báo cáo theo thị trường Nhật Bản và giai đoạn 2026.</div>}
           
           <div className="space-y-3">
             {[
@@ -77,9 +94,10 @@ export default function CityReportsPage() {
             </div>
           </div>
           <div className="relative z-10 pt-8 mt-4 border-t border-white/5">
-            <button onClick={() => toast.info("Đang mở chi tiết dự báo tăng trưởng 2026.")} className="w-full rounded-lg bg-primary py-3.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.98]">
+            <button onClick={() => setShowForecastDetail((prev) => !prev)} className="w-full rounded-lg bg-primary py-3.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.98]">
               XEM CHI TIẾT DỰ BÁO
             </button>
+            {showForecastDetail && <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-white/70">Chi tiết: kịch bản cơ sở 1.5 tỷ USD, kịch bản tích cực 1.9 tỷ USD.</p>}
           </div>
           {/* Graphic decoration */}
           <div className="absolute top-[-20%] right-[-10%] h-48 w-48 rounded-full bg-primary/10 blur-[60px]" />

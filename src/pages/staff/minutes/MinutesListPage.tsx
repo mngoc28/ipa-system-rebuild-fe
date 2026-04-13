@@ -3,16 +3,19 @@ import { FileText, Plus, Search, Download, Share2, Eye, MoreVertical, CheckCircl
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function MinutesListPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSignedOnly, setShowSignedOnly] = useState(false);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
 
-  const minutes = [
+  const [minutes, setMinutes] = useState([
     { id: 1, title: "Biên bản làm việc - Samsung Electronics", date: "10/04/2026", type: "Ghi nhớ (MoU)", status: "Signed", author: "Trần Thu Hà", size: "1.2MB" },
     { id: 2, title: "Biên bản khảo sát - KCN Thung lũng Silicon", date: "08/04/2026", type: "Khảo sát thực địa", status: "Pending", author: "Nguyễn Văn A", size: "2.5MB" },
     { id: 3, title: "Biên bản họp nội bộ - Chuẩn bị đón đoàn HQ", date: "05/04/2026", type: "Nội bộ", status: "Draft", author: "Trần Thu Hà", size: "850KB" },
-  ];
+  ]);
 
   const handleShare = (title: string) => {
     toast.success(`Đã gửi liên kết truy cập biên bản "${title}" cho đối tác!`);
@@ -27,28 +30,72 @@ export default function MinutesListPage() {
   };
 
   const handleOpenHistory = () => {
-    toast.info("Đang mở lịch sử ký số.");
+    setShowHistoryPanel((prev) => !prev);
+    toast.info(!showHistoryPanel ? "Đã bật bảng lịch sử ký số." : "Đã ẩn bảng lịch sử ký số.");
   };
 
   const handleCreateMinutes = () => {
-    toast.success("Đã mở luồng tạo biên bản mới.");
+    const newItem = {
+      id: Date.now(),
+      title: `Biên bản mới #${minutes.length + 1}`,
+      date: "Vừa xong",
+      type: "Nội bộ",
+      status: "Draft",
+      author: "Bạn",
+      size: "640KB",
+    };
+    setMinutes([newItem, ...minutes]);
+    toast.success("Đã tạo bản nháp biên bản mới.");
   };
 
   const handleTemplate = (name: string) => {
-    toast.info(`Đã chọn mẫu: ${name}`);
+    const templated = {
+      id: Date.now(),
+      title: `${name} - Bản mới`,
+      date: "Vừa xong",
+      type: "Mẫu chuẩn",
+      status: "Draft",
+      author: "Bạn",
+      size: "700KB",
+    };
+    setMinutes([templated, ...minutes]);
+    toast.success(`Đã tạo biên bản từ mẫu: ${name}`);
   };
 
   const handleFilter = () => {
-    toast.info("Đã mở bộ lọc biên bản.");
+    setShowSignedOnly((prev) => !prev);
+    toast.info(!showSignedOnly ? "Đang lọc chỉ biên bản đã ký." : "Đã bỏ lọc trạng thái ký.");
   };
 
-  const handleRowOptions = (title: string) => {
-    toast.info(`Tùy chọn biên bản: ${title}`);
+  const handleDuplicateRow = (id: number) => {
+    const row = minutes.find((item) => item.id === id);
+    if (!row) return;
+    setMinutes([{ ...row, id: Date.now(), title: `${row.title} (Bản sao)`, status: "Draft", date: "Vừa xong", author: "Bạn" }, ...minutes]);
+    toast.success("Đã nhân bản biên bản.");
+  };
+
+  const handleToggleStatus = (id: number) => {
+    setMinutes(
+      minutes.map((item) => {
+        if (item.id !== id) return item;
+        if (item.status === "Draft") return { ...item, status: "Pending" };
+        if (item.status === "Pending") return { ...item, status: "Signed" };
+        return { ...item, status: "Draft" };
+      }),
+    );
+    toast.success("Đã cập nhật trạng thái biên bản.");
   };
 
   const handlePagination = (page: number) => {
     toast.info(`Đang chuyển sang trang ${page}`);
   };
+
+  const visibleMinutes = minutes.filter((item) => {
+    const byStatus = showSignedOnly ? item.status === "Signed" : true;
+    const keyword = searchQuery.trim().toLowerCase();
+    const byKeyword = keyword ? item.title.toLowerCase().includes(keyword) || item.author.toLowerCase().includes(keyword) : true;
+    return byStatus && byKeyword;
+  });
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
@@ -90,6 +137,16 @@ export default function MinutesListPage() {
 
       {/* Main List Area */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        {showHistoryPanel && (
+          <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-700">Lịch sử ký số gần đây</h3>
+            <div className="mt-3 space-y-2 text-[11px] font-semibold text-slate-600">
+              <p>10:15 - Biên bản Samsung được ký bởi Nguyễn Minh Châu.</p>
+              <p>09:42 - Biên bản khảo sát KCN được gửi duyệt.</p>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6 flex items-center justify-between">
           <div className="flex flex-1 items-center gap-3">
             <div className="group relative w-full max-w-sm">
@@ -108,7 +165,7 @@ export default function MinutesListPage() {
         </div>
 
         <div className="space-y-3">
-          {minutes.map((item) => (
+          {visibleMinutes.map((item) => (
             <div
               key={item.id}
               className="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-md lg:flex-row lg:items-center"
@@ -147,9 +204,19 @@ export default function MinutesListPage() {
                 <button onClick={() => handleShare(item.title)} className="rounded border border-primary/20 bg-primary/5 p-2 text-primary transition-all hover:bg-primary hover:text-white shadow-sm">
                   <Share2 size={16} />
                 </button>
-                <button onClick={() => handleRowOptions(item.title)} className="p-2 text-slate-300 transition-all hover:text-slate-600">
-                  <MoreVertical size={16} />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-2 text-slate-300 transition-all hover:text-slate-600">
+                      <MoreVertical size={16} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleToggleStatus(item.id)}>Đổi trạng thái</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDuplicateRow(item.id)}>Nhân bản</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleShare(item.title)}>Chia sẻ nhanh</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ))}

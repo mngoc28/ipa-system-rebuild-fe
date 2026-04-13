@@ -1,15 +1,49 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, Zap, Filter, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function SchedulePage() {
-  const monthOptions = ["Tháng 03, 2026", "Tháng 04, 2026", "Tháng 05, 2026"];
+  const monthOptions = [
+    { label: "Tháng 03, 2026", month: 2, year: 2026 },
+    { label: "Tháng 04, 2026", month: 3, year: 2026 },
+    { label: "Tháng 05, 2026", month: 4, year: 2026 },
+  ];
   const [monthIndex, setMonthIndex] = useState(1);
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
   const [joinedEventIds, setJoinedEventIds] = useState<number[]>([]);
+  const [selectedDay, setSelectedDay] = useState<number | null>(10);
+  const [showOnlyJoined, setShowOnlyJoined] = useState(false);
+  const [outlookConnected, setOutlookConnected] = useState(false);
+  const [upcomingEvents, setUpcomingEvents] = useState([
+    { id: 1, time: "08:30 - 10:00", title: "Đón đoàn Samsung tại T2", location: "Sân bay Đà Nẵng", type: "Event" },
+    { id: 2, time: "14:00 - 16:30", title: "Họp trù bị đoàn Nhật Bản", location: "Phòng họp 1 - IPA", type: "Meeting" },
+    { id: 3, time: "19:00 - 21:00", title: "Tiệc tối xã giao đối tác ICT", location: "Sheraton Grand Resort", type: "Gala" },
+  ]);
   const currentMonth = monthOptions[monthIndex];
+
+  const calendarCells = useMemo(() => {
+    const firstDay = new Date(currentMonth.year, currentMonth.month, 1).getDay();
+    const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
+    const cells: Array<number | null> = [];
+
+    for (let i = 0; i < firstDay; i += 1) {
+      cells.push(null);
+    }
+
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      cells.push(day);
+    }
+
+    while (cells.length % 7 !== 0) {
+      cells.push(null);
+    }
+
+    return cells;
+  }, [currentMonth.month, currentMonth.year]);
+
+  const filteredEvents = upcomingEvents.filter((event) => (showOnlyJoined ? joinedEventIds.includes(event.id) : true));
 
   const handlePrevMonth = () => {
     setMonthIndex((prev) => (prev - 1 + monthOptions.length) % monthOptions.length);
@@ -19,11 +53,17 @@ export default function SchedulePage() {
     setMonthIndex((prev) => (prev + 1) % monthOptions.length);
   };
 
-  const upcomingEvents = [
-    { id: 1, time: "08:30 - 10:00", title: "Đón đoàn Samsung tại T2", location: "Sân bay Đà Nẵng", type: "Event" },
-    { id: 2, time: "14:00 - 16:30", title: "Họp trù bị đoàn Nhật Bản", location: "Phòng họp 1 - IPA", type: "Meeting" },
-    { id: 3, time: "19:00 - 21:00", title: "Tiệc tối xã giao đối tác ICT", location: "Sheraton Grand Resort", type: "Gala" },
-  ];
+  const handleCreateSchedule = () => {
+    const newEvent = {
+      id: Date.now(),
+      time: "09:00 - 10:00",
+      title: `Lịch mới #${upcomingEvents.length + 1}`,
+      location: "IPA Đà Nẵng",
+      type: "Meeting",
+    };
+    setUpcomingEvents([newEvent, ...upcomingEvents]);
+    toast.success("Đã tạo lịch công tác mới.");
+  };
 
   const handleEventAction = async (action: "detail" | "copy" | "reschedule", event: (typeof upcomingEvents)[number]) => {
     if (action === "detail") {
@@ -69,7 +109,7 @@ export default function SchedulePage() {
             <button onClick={() => setViewMode("week")} className={cn("rounded-md px-5 py-2 text-[10px] font-black uppercase transition-all", viewMode === "week" ? "border border-slate-200/50 bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}>Lịch tuần</button>
             <button onClick={() => setViewMode("month")} className={cn("rounded-md px-5 py-2 text-[10px] font-black uppercase transition-all", viewMode === "month" ? "border border-slate-200/50 bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}>Lịch tháng</button>
           </div>
-          <button onClick={() => toast.info("Mở form tạo lịch công tác mới")} className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95 active:scale-95">
+          <button onClick={handleCreateSchedule} className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95 active:scale-95">
             <Plus size={14} />
             THÊM LỊCH MỚI
           </button>
@@ -81,7 +121,7 @@ export default function SchedulePage() {
         <div className="space-y-6 lg:col-span-1">
           <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth}</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</h3>
               <div className="flex gap-2">
                 <button onClick={handlePrevMonth} className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
                   <ChevronLeft size={16} />
@@ -99,14 +139,19 @@ export default function SchedulePage() {
                   {d}
                 </span>
               ))}
-              {Array.from({ length: 35 }).map((_, i) => (
+              {calendarCells.map((day, i) => (
                 <button
-                  key={i}
-                  onClick={() => toast.info(`Đã chọn ngày ${i + 1 > 30 ? i - 29 : i + 1}`)}
-                  className={cn("relative flex h-8 w-8 items-center justify-center rounded-lg text-[10px] font-bold transition-all", i + 1 === 10 ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50 active:scale-90")}
+                  key={`${day ?? "blank"}-${i}`}
+                  onClick={() => day && setSelectedDay(day)}
+                  disabled={!day}
+                  className={cn(
+                    "relative flex h-8 w-8 items-center justify-center rounded-lg text-[10px] font-bold transition-all",
+                    !day && "cursor-default opacity-0",
+                    day && selectedDay === day ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50 active:scale-90",
+                  )}
                 >
-                  {i + 1 > 30 ? i - 29 : i + 1}
-                  {(i + 1 === 12 || i + 1 === 15) && <div className="absolute bottom-1.5 h-1 w-1 rounded-full bg-amber-400" />}
+                  {day}
+                  {(day === 12 || day === 15) && <div className="absolute bottom-1.5 h-1 w-1 rounded-full bg-amber-400" />}
                 </button>
               ))}
             </div>
@@ -118,8 +163,14 @@ export default function SchedulePage() {
               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Tính năng mới</p>
               <h4 className="font-title text-sm font-black text-slate-100 leading-tight tracking-tight uppercase">Đồng bộ lịch Outlook</h4>
             </div>
-            <button onClick={() => toast.info("Đang thiết lập tích hợp lịch Outlook")} className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 text-[9px] font-black uppercase tracking-widest text-white transition-all hover:bg-white hover:text-slate-900 active:scale-95">
-              KHÁM PHÁ NGAY
+            <button
+              onClick={() => {
+                setOutlookConnected((prev) => !prev);
+                toast.success(!outlookConnected ? "Đã kết nối Outlook." : "Đã ngắt kết nối Outlook.");
+              }}
+              className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 text-[9px] font-black uppercase tracking-widest text-white transition-all hover:bg-white hover:text-slate-900 active:scale-95"
+            >
+              {outlookConnected ? "ĐÃ KẾT NỐI" : "KHÁM PHÁ NGAY"}
             </button>
           </div>
         </div>
@@ -133,14 +184,14 @@ export default function SchedulePage() {
                 Lịch trình sắp diễn ra
               </h2>
               <div className="flex gap-2">
-                <button onClick={() => toast.info("Bộ lọc lịch sẽ có ở bản tiếp theo")} className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-primary active:scale-95">
+                <button onClick={() => setShowOnlyJoined((prev) => !prev)} className={cn("rounded-lg border border-slate-200 bg-white p-2 transition-all active:scale-95", showOnlyJoined ? "text-primary" : "text-slate-400 hover:text-primary")}>
                   <Filter size={16} />
                 </button>
               </div>
             </div>
 
             <div className="relative space-y-8 before:absolute before:bottom-2 before:left-[105px] before:top-2 before:w-px before:bg-slate-100">
-              {upcomingEvents.map((event) => (
+              {filteredEvents.map((event) => (
                 <div key={event.id} className="group flex gap-8">
                   <div className="w-20 space-y-1 pt-2 text-right">
                     <p className="text-xs font-black text-slate-900">{event.time.split(" - ")[0]}</p>
@@ -210,6 +261,11 @@ export default function SchedulePage() {
                   </div>
                 </div>
               ))}
+              {filteredEvents.length === 0 && (
+                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Không có lịch phù hợp bộ lọc hiện tại.
+                </div>
+              )}
             </div>
           </div>
 

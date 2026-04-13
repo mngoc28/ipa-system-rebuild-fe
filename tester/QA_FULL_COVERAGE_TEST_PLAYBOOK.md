@@ -1,26 +1,23 @@
 # Sổ Tay QA Full Coverage (Áp Dụng Cho Mọi Dự Án)
 
 ## 1) Mục tiêu
-Tài liệu này là bộ quy tắc chung để bất kỳ tester nào cũng có thể kiểm thử toàn diện một dự án, không bỏ sót:
-- Bất kỳ chức năng nào
-- Bất kỳ nút bấm/hành động nào
-- Bất kỳ luồng CRUD nào
-- Bất kỳ ràng buộc quyền/role nào
+Tài liệu này dùng theo chế độ BUG-ONLY REPORT:
+- Tester vẫn kiểm thử đầy đủ theo role/route/action/tab/button.
+- Nhưng đầu ra chỉ in lỗi theo từng màn hình.
+- Không yêu cầu in toàn bộ kết quả pass/coverage nếu không có yêu cầu riêng.
 
 Nguyên tắc cốt lõi:
-Không được kết luận "đã test xong" nếu chưa có bảng đối soát đầy đủ: Route -> Màn hình -> Thành phần -> Hành động -> Kết quả.
+Không được kết luận "đã test xong" nếu chưa có báo cáo lỗi theo từng màn hình đã đi qua.
 
 ---
 
 ## 2) Định nghĩa Done (bắt buộc)
 Chỉ được đánh dấu Done khi thỏa tất cả điều kiện sau:
-1. Có inventory đầy đủ toàn bộ route/màn hình trong phạm vi test.
-2. Mỗi màn hình có danh sách đầy đủ button/link/icon action/menu action/modal action/keyboard action.
-3. Mỗi action có kết quả Pass/Fail và bằng chứng (ảnh, video, log, request, response).
-4. Mỗi module có ma trận CRUD đầy đủ.
-5. Có ma trận quyền theo role.
-6. Có báo cáo bug theo mức độ nghiêm trọng, có bước tái hiện rõ ràng.
-7. Có danh sách Not Tested (nếu có), kèm lý do và người chịu trách nhiệm follow-up.
+1. Có danh sách màn hình đã test (theo role + route).
+2. Mỗi màn hình có kết luận: Có lỗi / Không lỗi.
+3. Nếu có lỗi, phải ghi đầy đủ bug theo mẫu ở mục 8.
+4. Nếu không có lỗi ở màn đó, chỉ cần ghi "No issue".
+5. Có danh sách Not Tested (nếu có), kèm lý do.
 
 Thiếu bất kỳ mục nào ở trên => Chưa đạt Done.
 
@@ -43,19 +40,18 @@ Thiếu bất kỳ mục nào ở trên => Chưa đạt Done.
 ## 4) Prompt chuẩn để giao cho tester khác
 Sao chép prompt dưới đây khi bàn giao nhiệm vụ:
 
-"Bạn là Senior QA Tester. Nhiệm vụ: kiểm thử full coverage cho [TÊN DỰ ÁN/PHẠM VI].
+"Bạn là Senior QA Tester. Nhiệm vụ: kiểm thử theo role-route-action-tab-button cho [TÊN DỰ ÁN/PHẠM VI] ở chế độ BUG-ONLY REPORT.
 Yêu cầu bắt buộc:
-1) Tạo inventory: Route -> Screen -> Component -> Tất cả action.
-2) Kiểm thử đầy đủ theo ma trận: CRUD, UI states, validation, permission, API mapping.
-3) Không bỏ sót bất kỳ action nào (bao gồm icon, context action, modal action, keyboard submit).
-4) Mỗi action phải có kết quả Pass/Fail + evidence.
-5) Báo cáo bug theo severity: Critical/High/Medium/Low, có bước reproduce.
-6) Có bảng coverage cuối: Tested/Not Tested + lý do.
+1) Test đầy đủ các action theo role-route-action-tab-button (card/button/arrow button).
+2) Chỉ in kết quả lỗi theo từng màn hình.
+3) Với màn không có lỗi: ghi một dòng No issue.
+4) Với màn có lỗi: ghi bug theo severity + steps + expected + actual + evidence.
+5) Có danh sách Not Tested (nếu có).
 Trả kết quả theo format trong tài liệu QA_FULL_COVERAGE_TEST_PLAYBOOK.md."
 
 ---
 
-## 5) Quy trình kiểm thử full coverage
+## 5) Quy trình kiểm thử (output bug-only)
 
 ### Giai đoạn A - Lập inventory (chống sót chức năng)
 1. Liệt kê toàn bộ routes trong phạm vi.
@@ -98,7 +94,10 @@ Kiểm thử theo nhóm:
 
 ---
 
-## 6) Ma trận bắt buộc
+## 6) Ma trận tham khảo (tùy chọn)
+
+Lưu ý: ở chế độ BUG-ONLY REPORT, các ma trận dưới đây không bắt buộc phải in ra báo cáo cuối.
+Chỉ dùng nội bộ để tránh sót trong lúc test.
 
 ### 6.1 CRUD matrix (mỗi module)
 | Module | Create | Read (List/Detail) | Update | Delete | Kết luận |
@@ -116,8 +115,9 @@ Kiểm thử theo nhóm:
 | Screen | Tổng action | Đã test | Chưa test | % Coverage |
 |---|---|---|---|---|
 
-Quy định pass:
-Coverage action phải đạt 100% trong phạm vi đã cam kết.
+Quy định pass trong chế độ bug-only:
+- Đã đi qua các màn trong phạm vi cam kết.
+- Đã in lỗi theo từng màn (hoặc No issue).
 
 ---
 
@@ -154,29 +154,24 @@ Mẫu:
 
 ## 9) Mẫu báo cáo tổng kết chuẩn
 Báo cáo cuối phải có:
-1. Phạm vi đã test
-2. Coverage theo module
-3. Coverage theo button/action
-4. Danh sách bug theo severity
-5. Danh sách Not Tested + lý do
-6. Các rủi ro còn tồn đọng
-7. Khuyến nghị Go/No-Go
+1. Danh sách màn hình đã test (Role + Route + Screen)
+2. Kết quả từng màn: No issue hoặc số lượng lỗi
+3. Danh sách bug chi tiết (chỉ các lỗi phát hiện)
+4. Danh sách Not Tested + lý do
+5. Khuyến nghị Go/No-Go
 
-### 9.1 Executive summary
-- Tổng số module trong phạm vi:
-- Tổng số action phát hiện:
-- Tổng số action đã test:
-- Tỷ lệ coverage action:
-- Tổng số bug:
-- Số bug Critical/High còn mở:
-- Khuyến nghị: GO / NO-GO
+### 9.1 Bảng kết quả lỗi theo từng màn (bắt buộc)
+| Role | Route | Screen | Kết quả | Số lỗi | Ghi chú |
+|---|---|---|---|---|---|
+| Staff | /documents | Document List | No issue | 0 | - |
+| Manager | /teams | Teams | Có lỗi | 2 | BUG-021, BUG-022 |
 
-### 9.2 Coverage table
-| Module | Actions | Tested | Not Tested | Coverage |
-|---|---|---|---|---|
+### 9.2 Danh sách bug chi tiết (chỉ in lỗi)
+| Bug ID | Role | Route | Screen | Severity | Title | Steps | Expected | Actual | Evidence |
+|---|---|---|---|---|---|---|---|---|---|
 
-### 9.3 Open risks
-| Risk | Impact | Mitigation | Owner |
+### 9.3 Not Tested
+| Role | Route | Screen | Lý do chưa test |
 |---|---|---|---|
 
 ---
@@ -189,15 +184,17 @@ Báo cáo cuối phải có:
 - [ ] Xác nhận môi trường ổn định
 
 ### Trong khi test
-- [ ] Cập nhật Action Registry liên tục
-- [ ] Mỗi action có kết quả + evidence
-- [ ] Mỗi module có CRUD matrix
-- [ ] Mỗi màn hình có UI state matrix
+- [ ] Đi đủ route theo role trong phạm vi
+- [ ] Mỗi màn hình ghi kết luận nhanh: No issue / Có lỗi
+- [ ] Với màn có tab con: bắt buộc click và kiểm tra từng tab, không để tab nào chỉ hiện trạng thái chờ/placeholder
+- [ ] Nếu có lỗi thì tạo bug đầy đủ trường
+- [ ] Lưu evidence cho từng bug
 
 ### Trước khi đóng task
-- [ ] Coverage action = 100% trong phạm vi
-- [ ] Bug report đầy đủ trường
+- [ ] Có bảng kết quả lỗi theo từng màn
+- [ ] Chỉ in bug phát hiện, không cần in toàn bộ pass case
 - [ ] Có danh sách Not Tested + lý do
+- [ ] Chạy guard chống placeholder: npm run guard:ui-placeholder
 - [ ] Có khuyến nghị GO/NO-GO
 
 ---
@@ -221,10 +218,12 @@ Bắt buộc test 3 nhóm:
 ---
 
 ## 13) Cam kết chất lượng
-"Không sót chức năng" phải được chứng minh bằng dữ liệu:
-- Action Registry đầy đủ
-- Coverage action 100%
-- Evidence đầy đủ
-- Ma trận CRUD/State/Role đầy đủ
+"Không sót lỗi nghiêm trọng" trong chế độ bug-only phải được chứng minh bằng dữ liệu:
+- Danh sách màn đã test theo role/route
+- Bảng kết quả lỗi theo từng màn
+- Bug report đầy đủ cho mọi lỗi phát hiện
+- Evidence đầy đủ cho bug
 
 Thiếu bất kỳ thành phần nào ở trên => Báo cáo mặc định chưa đạt.
+
+

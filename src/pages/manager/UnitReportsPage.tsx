@@ -3,6 +3,10 @@ import { PieChart, TrendingUp, Calendar, Download, FileText, ChevronRight, Filte
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 export default function UnitReportsPage() {
+  const [showChartPanel, setShowChartPanel] = React.useState(false);
+  const [showReportFilter, setShowReportFilter] = React.useState(false);
+  const [lastExportAt, setLastExportAt] = React.useState<string | null>(null);
+
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex items-center justify-between">
@@ -10,10 +14,19 @@ export default function UnitReportsPage() {
           <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Báo cáo Đơn vị</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Tổng hợp báo cáo tuần, tháng và KPI của phòng ban.</p>
         </div>
-        <button onClick={() => toast.success("Đang xuất toàn bộ báo cáo đơn vị.")} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
+        <button
+          onClick={() => {
+            const now = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+            setLastExportAt(now);
+            toast.success("Đã tạo gói xuất báo cáo đơn vị.");
+          }}
+          className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
+        >
           <Download size={16} /> XUẤT TẤT CẢ
         </button>
       </div>
+
+      {lastExportAt && <p className="text-[10px] font-black uppercase tracking-widest text-primary">Lần xuất gần nhất: {lastExportAt}</p>}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Monthly KPI card */}
@@ -46,19 +59,27 @@ export default function UnitReportsPage() {
             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 leading-none">Phân tích mảng việc</h4>
             <p className="text-[10px] font-medium text-slate-400">Tự động hóa báo cáo tháng</p>
           </div>
-          <button onClick={() => toast.info("Đang mở biểu đồ phân tích mảng việc.")} className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:border-primary/50 hover:text-primary active:scale-95">Xem biểu đồ</button>
+          <button onClick={() => setShowChartPanel((prev) => !prev)} className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:border-primary/50 hover:text-primary active:scale-95">Xem biểu đồ</button>
         </div>
       </div>
+
+      {showChartPanel && (
+        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-600 shadow-sm">
+          Biểu đồ KPI: Đoàn công tác đạt 125%, tỉ lệ duyệt hồ sơ 98%, mức hài lòng tăng theo tuần.
+        </div>
+      )}
 
       <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:p-10">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
             <FileText size={20} className="text-primary" /> Lịch sử Báo cáo
           </h2>
-          <button onClick={() => toast.info("Đã mở bộ lọc lịch sử báo cáo.")} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary border border-slate-100">
+          <button onClick={() => setShowReportFilter((prev) => !prev)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary border border-slate-100">
             <Filter size={18} />
           </button>
         </div>
+
+        {showReportFilter && <p className="text-[10px] font-black uppercase tracking-widest text-primary">Đang lọc báo cáo theo chu kỳ Tuần và Tháng.</p>}
 
         <div className="space-y-3">
           {[

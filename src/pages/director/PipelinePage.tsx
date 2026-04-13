@@ -3,6 +3,17 @@ import { TrendingUp, BarChart3, Filter, Download, Target, Zap, ChevronRight, Arr
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 export default function PipelinePage() {
+  const [showFilterNote, setShowFilterNote] = React.useState(false);
+  const [showDashboardInsights, setShowDashboardInsights] = React.useState(false);
+  const [showDeepAnalysis, setShowDeepAnalysis] = React.useState(false);
+  const [lastExportAt, setLastExportAt] = React.useState<string | null>(null);
+
+  const handleExportPipeline = () => {
+    const timestamp = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    setLastExportAt(timestamp);
+    toast.success("Đã tạo gói xuất báo cáo pipeline.");
+  };
+
   const funnelStages = [
     { title: "Tiếp cận & Kết nối", count: 124, value: "$2.4B", color: "bg-blue-600" },
     { title: "Khảo sát thực địa", count: 48, value: "$1.1B", color: "bg-indigo-600" },
@@ -19,14 +30,18 @@ export default function PipelinePage() {
           <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi phễu dòng vốn đầu tư vào Đà Nẵng theo các giai đoạn chiến lược.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => toast.info("Đã mở bộ lọc dữ liệu pipeline.")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 active:scale-95 shadow-sm">
+          <button onClick={() => setShowFilterNote((prev) => !prev)} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 active:scale-95 shadow-sm">
             <Filter size={14} /> LỌC DỮ LIỆU
           </button>
-          <button onClick={() => toast.success("Đang xuất báo cáo pipeline.")} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
+          <button onClick={handleExportPipeline} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
             <Download size={14} /> XUẤT BÁO CÁO
           </button>
         </div>
       </div>
+
+      {lastExportAt && <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-700">Lần xuất gần nhất: {lastExportAt}</div>}
+
+      {showFilterNote && <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary">Đang áp dụng lọc dự án có xác suất thành công từ 60% trở lên.</div>}
 
       {/* Funnel Visualization */}
       <div className="relative overflow-hidden rounded-xl bg-slate-950 p-6 shadow-xl shadow-slate-950/20 lg:p-10 border border-slate-900">
@@ -70,10 +85,16 @@ export default function PipelinePage() {
             <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
               <Target size={20} className="text-primary" /> Dự án Pipeline Trọng điểm
             </h2>
-            <button onClick={() => toast.info("Đang mở dashboard phân tích pipeline.")} className="p-2 text-slate-400 transition-all hover:text-primary rounded-lg border border-slate-100 shadow-sm">
+            <button onClick={() => setShowDashboardInsights((prev) => !prev)} className="p-2 text-slate-400 transition-all hover:text-primary rounded-lg border border-slate-100 shadow-sm">
               <BarChart3 size={18} />
             </button>
           </div>
+
+          {showDashboardInsights && (
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] font-semibold text-slate-600">
+              Insight: nhóm dự án giai đoạn đàm phán có tỷ lệ chuyển đổi tốt nhất trong 30 ngày gần đây.
+            </div>
+          )}
           
           <div className="space-y-3">
             {[
@@ -146,9 +167,10 @@ export default function PipelinePage() {
               </div>
             </div>
             
-            <button onClick={() => toast.info("Đang mở phân tích sâu pipeline.")} className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">
+            <button onClick={() => setShowDeepAnalysis((prev) => !prev)} className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">
               Phân tích sâu <ArrowUpRight size={14} />
             </button>
+            {showDeepAnalysis && <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-white/70">Đã mở chế độ so sánh xu hướng pipeline theo quý.</p>}
           </div>
 
           <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

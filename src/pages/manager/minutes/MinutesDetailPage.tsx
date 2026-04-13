@@ -4,12 +4,20 @@ import { ChevronLeft, Download, Printer, Share2, Edit3, CheckCircle2, MessageSqu
 import { minutesDocs } from "@/dataHelper/ui-system.data";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function MinutesDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeRightTab, setActiveRightTab] = useState<"tasks" | "comments" | "history">("tasks");
   const [comment, setComment] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [tasks, setTasks] = useState([
+    { title: "Chuẩn bị tài liệu Gift & Welcome", status: "done" },
+    { title: "Đặt xe di chuyển ngày 15/04", status: "pending" },
+    { title: "Gửi email xác nhận danh mục họp", status: "pending" },
+  ] as Array<{ title: string; status: "done" | "pending" }>);
+  const [attachments, setAttachments] = useState(["Phieu_Khao_Sat.pdf", "Anh_Khao_Sat_KCNC.zip"]);
 
   const doc = minutesDocs.find((d) => d.id === Number(id)) || minutesDocs[0];
 
@@ -26,11 +34,16 @@ export default function MinutesDetailPage() {
   };
 
   const handleEdit = () => {
-    toast.info("Đã mở chế độ chỉnh sửa biên bản.");
+    setIsEditing((prev) => !prev);
+    toast.info(!isEditing ? "Đã bật chế độ chỉnh sửa biên bản." : "Đã tắt chế độ chỉnh sửa biên bản.");
   };
 
-  const handleOptions = () => {
-    toast.info("Đã mở tùy chọn biên bản.");
+  const handleDuplicateVersion = () => {
+    toast.success("Đã tạo phiên bản mới từ tài liệu hiện tại.");
+  };
+
+  const handleToggleApproval = () => {
+    toast.success("Đã cập nhật trạng thái phê duyệt biên bản.");
   };
 
   const handleFullscreen = () => {
@@ -38,7 +51,8 @@ export default function MinutesDetailPage() {
   };
 
   const handleAddTask = () => {
-    toast.success("Đã mở form thêm đầu việc.");
+    setTasks([{ title: `Đầu việc mới #${tasks.length + 1}`, status: "pending" }, ...tasks]);
+    toast.success("Đã thêm đầu việc mới.");
   };
 
   const handleSendComment = () => {
@@ -51,7 +65,9 @@ export default function MinutesDetailPage() {
   };
 
   const handleAttachmentUpload = () => {
-    toast.info("Đã mở khu vực tải tệp đính kèm.");
+    const fileName = `Tai_lieu_bo_sung_${attachments.length + 1}.pdf`;
+    setAttachments([fileName, ...attachments]);
+    toast.success("Đã thêm tệp đính kèm.");
   };
 
   const handleAttachmentDownload = (name: string) => {
@@ -92,18 +108,28 @@ export default function MinutesDetailPage() {
           </button>
           <button onClick={handleEdit} className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90">
             <Edit3 size={16} />
-            Chỉnh sửa
+            {isEditing ? "Đang chỉnh sửa" : "Chỉnh sửa"}
           </button>
-          <button onClick={handleOptions} className="rounded-xl p-2 text-slate-400 hover:bg-slate-50">
-            <MoreVertical size={20} />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-xl p-2 text-slate-400 hover:bg-slate-50">
+                <MoreVertical size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleDuplicateVersion}>Nhân bản phiên bản</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleToggleApproval}>Đổi trạng thái phê duyệt</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleShare}>Chia sẻ nhanh</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Main Content (Split Screen) */}
       <div className="flex min-h-0 flex-1 flex-col gap-6 lg:flex-row">
         {/* Left: Document View */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[40px] border border-slate-100 bg-white shadow-xl shadow-slate-200/40">
+        <div className={cn("flex min-h-0 flex-1 flex-col overflow-hidden rounded-[40px] border border-slate-100 bg-white shadow-xl shadow-slate-200/40", isEditing && "ring-2 ring-primary/20") }>
           <div className="flex shrink-0 items-center justify-between border-b border-slate-50 p-6">
             <div className="flex items-center gap-3">
               <FileText size={20} className="text-primary" />
@@ -197,11 +223,7 @@ export default function MinutesDetailPage() {
             <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-6">
               {activeRightTab === "tasks" && (
                 <div className="space-y-3">
-                  {[
-                    { title: "Chuẩn bị tài liệu Gift & Welcome", status: "done" },
-                    { title: "Đặt xe di chuyển ngày 15/04", status: "pending" },
-                    { title: "Gửi email xác nhận danh mục họp", status: "pending" },
-                  ].map((task, i) => (
+                  {tasks.map((task, i) => (
                     <div key={i} className="group flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-primary/20 hover:bg-white">
                       <div
                         className={cn("mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all", task.status === "done" ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-300")}
@@ -266,27 +288,20 @@ export default function MinutesDetailPage() {
           <div className="space-y-4 rounded-[32px] border border-slate-100 bg-white p-6 shadow-xl shadow-slate-200/40">
             <h3 className="flex items-center justify-between text-sm font-black text-slate-900">
               <span>Tệp đính kèm</span>
-              <span className="text-[10px] font-bold text-slate-400">3 files</span>
+              <span className="text-[10px] font-bold text-slate-400">{attachments.length} files</span>
             </h3>
             <div className="space-y-2">
-              <div className="group flex items-center justify-between rounded-xl p-2 transition-all hover:bg-slate-50">
-                <div className="flex items-center gap-3">
-                  <FileText size={16} className="text-red-500" />
-                  <span className="max-w-[200px] truncate text-[11px] font-bold text-slate-700">Phieu_Khao_Sat.pdf</span>
+              {attachments.map((file, index) => (
+                <div key={file} className="group flex items-center justify-between rounded-xl p-2 transition-all hover:bg-slate-50">
+                  <div className="flex items-center gap-3">
+                    {index % 2 === 0 ? <FileText size={16} className="text-red-500" /> : <History size={16} className="text-blue-500" />}
+                    <span className="max-w-[200px] truncate text-[11px] font-bold text-slate-700">{file}</span>
+                  </div>
+                  <button onClick={() => handleAttachmentDownload(file)} className="options-btn p-1 opacity-0 group-hover:opacity-100">
+                    <Download size={14} />
+                  </button>
                 </div>
-                <button onClick={() => handleAttachmentDownload("Phieu_Khao_Sat.pdf")} className="options-btn p-1 opacity-0 group-hover:opacity-100">
-                  <Download size={14} />
-                </button>
-              </div>
-              <div className="group flex items-center justify-between rounded-xl p-2 transition-all hover:bg-slate-50">
-                <div className="flex items-center gap-3">
-                  <History size={16} className="text-blue-500" />
-                  <span className="max-w-[200px] truncate text-[11px] font-bold text-slate-700">Anh_Khao_Sat_KCNC.zip</span>
-                </div>
-                <button onClick={() => handleAttachmentDownload("Anh_Khao_Sat_KCNC.zip")} className="options-btn p-1 opacity-0 group-hover:opacity-100">
-                  <Download size={14} />
-                </button>
-              </div>
+              ))}
             </div>
             <button onClick={handleAttachmentUpload} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 py-2.5 text-[10px] font-black text-slate-400 transition-all hover:border-primary/40 hover:text-primary">
               <Paperclip size={14} /> TẢI LÊN TÀI LIỆU

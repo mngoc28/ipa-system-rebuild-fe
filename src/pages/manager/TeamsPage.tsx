@@ -10,6 +10,9 @@ const teamMembers = [
 ];
 
 export default function TeamsPage() {
+  const [members, setMembers] = React.useState(teamMembers);
+  const [lastAction, setLastAction] = React.useState<string | null>(null);
+
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -17,13 +20,31 @@ export default function TeamsPage() {
           <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Đội nhóm & Nhân sự</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Quản lý hiệu suất và lịch trình làm việc của phòng ban.</p>
         </div>
-        <button onClick={() => toast.success("Đã mở form thêm thành viên.")} className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95">
+        <button
+          onClick={() => {
+            const newMember = {
+              id: Date.now().toString(),
+              name: `Nhân sự mới #${members.length + 1}`,
+              role: "Chuyên viên",
+              email: "new.member@danang.gov.vn",
+              status: "In Office",
+              tasks: 0,
+              performance: 70,
+            };
+            setMembers([newMember, ...members]);
+            setLastAction(`Đã thêm ${newMember.name}`);
+            toast.success("Đã thêm thành viên mới vào đội.");
+          }}
+          className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95"
+        >
           <UserPlus size={16} /> THÊM THÀNH VIÊN
         </button>
       </div>
 
+      {lastAction && <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary">{lastAction}</div>}
+
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {teamMembers.map((member) => (
+        {members.map((member) => (
           <div key={member.id} className="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
             <div className="relative mb-4 inline-block">
               <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md">
@@ -57,13 +78,13 @@ export default function TeamsPage() {
             </div>
 
             <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-50">
-              <button onClick={() => toast.info(`Đang mở email cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <button onClick={() => setLastAction(`Đã tạo email cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <Mail size={16} />
               </button>
-              <button onClick={() => toast.info(`Đang mở chat nội bộ với ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <button onClick={() => setLastAction(`Đã mở chat nội bộ với ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <MessageSquare size={16} />
               </button>
-              <button onClick={() => toast.info(`Đang mở phân quyền cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <button onClick={() => setLastAction(`Đã mở phân quyền cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <Shield size={16} />
               </button>
             </div>

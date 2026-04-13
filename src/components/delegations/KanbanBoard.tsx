@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DndContext, DragOverlay, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragStartEvent, DragOverEvent, DragEndEvent, defaultDropAnimationSideEffects } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { DelegationItem, StatusTone } from "@/dataHelper/ui-system.data";
@@ -43,6 +43,10 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
   const [items, setItems] = useState(initialDelegations);
   const [activeItem, setActiveItem] = useState<DelegationItem | null>(null);
 
+  useEffect(() => {
+    setItems(initialDelegations);
+  }, [initialDelegations]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
@@ -67,12 +71,28 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
 
     if (activeId === overId) return;
 
-    // Check if dragging over a column or another item
-    const isActiveInItems = items.some((i) => i.id === activeId);
-    const isOverAColumn = COLUMNS.some((c) => c.id === overId);
+    const dragged = items.find((i) => i.id === activeId);
+    if (!dragged) return;
 
-    // Logic for moving between columns or sorting within column
-    // ... Simplified for this draft
+    const isOverAColumn = COLUMNS.some((c) => c.id === overId);
+    const overItem = items.find((i) => i.id === overId);
+    const targetStatus = isOverAColumn ? (overId as StatusTone) : overItem?.status;
+
+    if (!targetStatus) return;
+
+    if (targetStatus !== dragged.status) {
+      setItems((prev) => prev.map((item) => (item.id === dragged.id ? { ...item, status: targetStatus } : item)));
+      return;
+    }
+
+    if (!overItem) return;
+
+    const oldIndex = items.findIndex((i) => i.id === activeId);
+    const newIndex = items.findIndex((i) => i.id === overId);
+
+    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+      setItems((prev) => arrayMove(prev, oldIndex, newIndex));
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -98,7 +118,7 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
       // Validate transition
       if (VALID_TRANSITIONS[activeItem.status].includes(targetStatus)) {
         setItems((prev) => prev.map((item) => (item.id === activeItem.id ? { ...item, status: targetStatus! } : item)));
-        toast.success(`Đã cập nhật trạng thái đoànsang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
+        toast.success(`Đã cập nhật trạng thái đoàn sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
       } else {
         toast.error(`Không thể chuyển trực tiếp từ ${COLUMNS.find((c) => c.id === activeItem.status)?.label} sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
       }
@@ -109,7 +129,7 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
 
   return (
     <div className="scrollbar-hide overflow-x-auto pb-8">
-      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         <div className="flex min-w-max gap-4">
           {COLUMNS.map((column) => (
             <KanbanColumn key={column.id} id={column.id} label={column.label} color={column.color} items={items.filter((i) => i.status === column.id)} />

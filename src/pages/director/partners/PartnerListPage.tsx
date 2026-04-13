@@ -2,13 +2,79 @@ import * as React from "react";
 import { Plus, Search, Filter, Globe, Mail, Building2, MoreVertical, Star, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 export default function PartnerListPage() {
-  const partners = [
+  const [showActiveOnly, setShowActiveOnly] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedPartnerId, setSelectedPartnerId] = React.useState<number | null>(null);
+  const [pinnedPartnerIds, setPinnedPartnerIds] = React.useState<number[]>([]);
+  const [emailedPartnerIds, setEmailedPartnerIds] = React.useState<number[]>([]);
+  const [partners, setPartners] = React.useState([
     { id: 1, name: "Samsung Electronics", category: "Công nghệ cao", country: "Hàn Quốc", representative: "Lee Jae-yong", score: 4.9, status: "Active", projects: 5 },
     { id: 2, name: "Sumitomo Mitsui", category: "Tài chính / NH", country: "Nhật Bản", representative: "Akio Toyoda", score: 4.7, status: "Lead", projects: 2 },
     { id: 3, name: "Intel Vietnam", category: "Bán dẫn", country: "Hoa Kỳ", representative: "Brian Krzanich", score: 4.8, status: "Active", projects: 8 },
     { id: 4, name: "Tập đoàn BRG", category: "Bất động sản", country: "Việt Nam", representative: "Nguyễn Thị Nga", score: 4.5, status: "Partner", projects: 12 },
-  ];
+  ]);
+
+  const handleSync = () => {
+    setPartners((prev) => prev.map((item) => ({ ...item, score: Math.min(5, Number((item.score + 0.1).toFixed(1))) })));
+    toast.success("Đã đồng bộ dữ liệu CRM và cập nhật điểm đánh giá.");
+  };
+
+  const handleAddPartner = () => {
+    const newPartner = {
+      id: Date.now(),
+      name: `Đối tác mới #${partners.length + 1}`,
+      category: "Công nghệ",
+      country: "Hàn Quốc",
+      representative: "Đang cập nhật",
+      score: 4.6,
+      status: "Lead",
+      projects: 0,
+    };
+    setPartners([newPartner, ...partners]);
+    toast.success("Đã thêm đối tác mới vào danh sách.");
+  };
+
+  const handlePromoteStatus = (id: number) => {
+    setPartners(
+      partners.map((partner) => {
+        if (partner.id !== id) return partner;
+        if (partner.status === "Lead") return { ...partner, status: "Partner" };
+        if (partner.status === "Partner") return { ...partner, status: "Active" };
+        return partner;
+      }),
+    );
+    toast.success("Đã cập nhật trạng thái đối tác.");
+  };
+
+  const handlePinPartner = (id: number) => {
+    if (pinnedPartnerIds.includes(id)) {
+      setPinnedPartnerIds(pinnedPartnerIds.filter((partnerId) => partnerId !== id));
+      toast.info("Đã bỏ ghim đối tác.");
+      return;
+    }
+    setPinnedPartnerIds([...pinnedPartnerIds, id]);
+    toast.success("Đã ghim đối tác.");
+  };
+
+  const handleQuickMail = (id: number) => {
+    if (!emailedPartnerIds.includes(id)) {
+      setEmailedPartnerIds([...emailedPartnerIds, id]);
+    }
+    toast.success("Đã tạo email nháp gửi đối tác.");
+  };
+
+  const visiblePartners = partners.filter((partner) => {
+    const byStatus = showActiveOnly ? partner.status === "Active" : true;
+    const keyword = searchTerm.trim().toLowerCase();
+    const bySearch = keyword
+      ? partner.name.toLowerCase().includes(keyword) || partner.category.toLowerCase().includes(keyword) || partner.country.toLowerCase().includes(keyword) || partner.representative.toLowerCase().includes(keyword)
+      : true;
+    return byStatus && bySearch;
+  });
+  const selectedPartner = partners.find((partner) => partner.id === selectedPartnerId) ?? null;
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -18,13 +84,13 @@ export default function PartnerListPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => toast.info("Đang đồng bộ dữ liệu từ hệ thống CRM trung ương...")}
+            onClick={handleSync}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:bg-slate-50"
           >
             Đồng bộ dữ liệu
           </button>
           <button
-            onClick={() => toast.info("Chức năng thêm đối tác mới đang được thiết lập.")}
+            onClick={handleAddPartner}
             className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95"
           >
             <Plus size={16} /> Thêm đối tác mới
@@ -68,18 +134,22 @@ export default function PartnerListPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               placeholder="Tìm tên công ty, lĩnh vực..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
             />
           </div>
           <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all hover:text-primary">
+            <button onClick={() => setShowActiveOnly((prev) => !prev)} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all hover:text-primary">
               <Filter size={16} /> Bộ lọc
             </button>
           </div>
         </div>
 
+        {showActiveOnly && <p className="mb-4 text-[10px] font-black uppercase tracking-widest text-primary">Đang hiển thị đối tác trạng thái Active.</p>}
+
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {partners.map((partner) => (
+          {visiblePartners.map((partner) => (
             <div
               key={partner.id}
               className="group relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/30 p-5 transition-all hover:border-primary/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.99]"
@@ -96,9 +166,18 @@ export default function PartnerListPage() {
                     </span>
                   </div>
                 </div>
-                <button className="rounded-lg p-2 text-slate-300 transition-all hover:bg-slate-50 hover:text-slate-600">
-                  <MoreVertical size={16} />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="rounded-lg p-2 text-slate-300 transition-all hover:bg-slate-50 hover:text-slate-600">
+                      <MoreVertical size={16} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handlePromoteStatus(partner.id)}>Nâng trạng thái</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handlePinPartner(partner.id)}>{pinnedPartnerIds.includes(partner.id) ? "Bỏ ghim đối tác" : "Ghim đối tác"}</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               <div className="mb-6 grid grid-cols-3 gap-2">
@@ -124,10 +203,16 @@ export default function PartnerListPage() {
                   <span className="text-[10px] font-black text-slate-900">{partner.score} / 5</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:bg-slate-950 hover:text-white active:scale-90">
+                  <button
+                    onClick={() => handleQuickMail(partner.id)}
+                    className={cn(
+                      "rounded-lg border border-slate-200 bg-white p-2 shadow-sm transition-all active:scale-90",
+                      emailedPartnerIds.includes(partner.id) ? "text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100" : "text-slate-400 hover:bg-slate-950 hover:text-white",
+                    )}
+                  >
                     <Mail size={14} />
                   </button>
-                  <button className="flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2.5 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-slate-950/20 transition-all hover:bg-slate-800 active:scale-95 leading-none">
+                  <button onClick={() => setSelectedPartnerId(partner.id)} className="flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2.5 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-slate-950/20 transition-all hover:bg-slate-800 active:scale-95 leading-none">
                     HỒ SƠ GỐC <ExternalLink size={12} />
                   </button>
                 </div>
@@ -136,6 +221,35 @@ export default function PartnerListPage() {
           ))}
         </div>
       </div>
+
+      <Dialog open={selectedPartner !== null} onOpenChange={(open) => !open && setSelectedPartnerId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedPartner?.name}</DialogTitle>
+            <DialogDescription>Hồ sơ đối tác - thông tin cơ bản và trạng thái hợp tác hiện tại.</DialogDescription>
+          </DialogHeader>
+          {selectedPartner && (
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</p>
+                <p className="mt-1 font-semibold text-slate-800">{selectedPartner.country}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lĩnh vực</p>
+                <p className="mt-1 font-semibold text-slate-800">{selectedPartner.category}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Liên hệ</p>
+                <p className="mt-1 font-semibold text-slate-800">{selectedPartner.representative}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
+                <p className="mt-1 font-semibold text-slate-800">{selectedPartner.status}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

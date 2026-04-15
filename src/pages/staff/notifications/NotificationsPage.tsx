@@ -9,9 +9,46 @@ const mockNotifications = [
   { id: 4, type: "system", title: "Bảo trì hệ thống", description: "Hệ thống sẽ tạm ngưng hoạt động từ 23:00 tối nay để nâng cấp.", time: "5 giờ trước", read: true },
 ];
 export default function NotificationsPage() {
+  const [notifications, setNotifications] = React.useState(mockNotifications);
+  const [activeTab, setActiveTab] = React.useState<"all" | "unread" | "assignment" | "system">("all");
+  const [visibleCount, setVisibleCount] = React.useState(4);
+
+  const unreadCount = notifications.filter((item) => !item.read).length;
+
+  const visibleNotifications = notifications
+    .filter((item) => {
+      if (activeTab === "all") return true;
+      if (activeTab === "unread") return !item.read;
+      return item.type === activeTab;
+    })
+    .slice(0, visibleCount);
+
   const handleReadAll = () => {
+    setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
     toast.success("Đã đánh dấu đọc tất cả thông báo!");
   };
+
+  const handleMarkRead = (id: number) => {
+    setNotifications((prev) => prev.map((item) => (item.id === id ? { ...item, read: true } : item)));
+    toast.success("Đã đánh dấu đã đọc.");
+  };
+
+  const handleDeleteRead = () => {
+    setNotifications((prev) => prev.filter((item) => !item.read));
+    toast.success("Đã xóa thông báo đã đọc.");
+  };
+
+  const handleOpenDetail = (title: string) => {
+    toast.info(`Chi tiết thông báo: ${title}`);
+  };
+
+  const tabs = [
+    { key: "all", label: "Tất cả" },
+    { key: "unread", label: "Chưa đọc" },
+    { key: "assignment", label: "Nhiệm vụ" },
+    { key: "system", label: "Hệ thống" },
+  ] as const;
+
   return (
     <div className="mx-auto max-w-4xl space-y-6 pb-20 duration-500 animate-in fade-in slide-in-from-bottom-2">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -28,7 +65,7 @@ export default function NotificationsPage() {
             <Check size={14} />
             Đánh dấu đọc tất cả
           </button>
-          <button className="rounded border border-slate-200 bg-white p-2.5 text-slate-400 transition-all hover:bg-slate-900 hover:text-white hover:border-slate-900">
+          <button onClick={handleDeleteRead} className="rounded border border-slate-200 bg-white p-2.5 text-slate-400 transition-all hover:bg-slate-900 hover:text-white hover:border-slate-900">
             <Trash2 size={16} />
           </button>
         </div>
@@ -36,23 +73,24 @@ export default function NotificationsPage() {
 
       {/* Tabs / Filter */}
       <div className="flex gap-4 border-b border-slate-200">
-        {["Tất cả", "Chưa đọc", "Nhiệm vụ", "Hệ thống"].map((tab, i) => (
+        {tabs.map((tab) => (
           <button 
-            key={i} 
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
             className={cn(
               "relative px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all", 
-              i === 0 ? "border-b-2 border-slate-900 text-slate-900" : "text-slate-400 hover:text-slate-600"
+              activeTab === tab.key ? "border-b-2 border-slate-900 text-slate-900" : "text-slate-400 hover:text-slate-600"
             )}
           >
-            {tab}
-            {i === 1 && <span className="ml-2 inline-flex h-4 w-4 items-center justify-center rounded bg-rose-600 text-[8px] font-black text-white">2</span>}
+            {tab.label}
+            {tab.key === "unread" && unreadCount > 0 && <span className="ml-2 inline-flex h-4 w-4 items-center justify-center rounded bg-rose-600 px-1 text-[8px] font-black text-white">{unreadCount}</span>}
           </button>
         ))}
       </div>
 
       {/* Notification List */}
       <div className="space-y-3">
-        {mockNotifications.map((notification) => (
+        {visibleNotifications.map((notification) => (
           <div
             key={notification.id}
             className={cn(
@@ -101,12 +139,12 @@ export default function NotificationsPage() {
               </p>
               
               <div className="flex items-center gap-4 pt-3">
-                <button className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary/80 transition-colors">
+                <button onClick={() => handleOpenDetail(notification.title)} className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary/80 transition-colors">
                   Xem chi tiết
                   <ChevronRight size={10} />
                 </button>
                 {!notification.read && (
-                  <button className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600 transition-colors">
+                  <button onClick={() => handleMarkRead(notification.id)} className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600 transition-colors">
                     Đánh dấu đã đọc
                   </button>
                 )}
@@ -121,7 +159,7 @@ export default function NotificationsPage() {
       </div>
 
       <div className="py-8 text-center">
-        <button className="rounded border border-slate-200 bg-white px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 transition-all hover:bg-slate-950 hover:text-white hover:border-slate-950">
+        <button onClick={() => setVisibleCount((prev) => prev + 4)} className="rounded border border-slate-200 bg-white px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 transition-all hover:bg-slate-950 hover:text-white hover:border-slate-950">
           Xem các thông báo cũ hơn
         </button>
       </div>

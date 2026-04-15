@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "guard:ui-placeholder": "node scripts/check_placeholder_actions.cjs",
+    "guard:vi-diacritics": "node scripts/check_vietnamese_diacritics.cjs",
     "preview": "vite preview",
     "generate:icon-types": "node scripts/generateIconType.mjs"
   },

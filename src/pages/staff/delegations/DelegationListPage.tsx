@@ -13,21 +13,57 @@ export default function DelegationListPage() {
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [calendarQuickFilter, setCalendarQuickFilter] = useState<"all" | "thisWeek" | "thisMonth">("all");
+
+  const parseDate = (value: string) => {
+    const [day, month, year] = value.split("/").map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const intersectsRange = (start: Date, end: Date, rangeStart: Date, rangeEnd: Date) => start <= rangeEnd && end >= rangeStart;
 
   const filteredDelegations = useMemo(() => {
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
     return delegations.filter(
-      (item) =>
-        item.type === activeTab &&
-        (item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.code.toLowerCase().includes(searchTerm.toLowerCase()) || item.country.toLowerCase().includes(searchTerm.toLowerCase())),
+      (item) => {
+        const byTab = item.type === activeTab;
+        const bySearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.code.toLowerCase().includes(searchTerm.toLowerCase()) || item.country.toLowerCase().includes(searchTerm.toLowerCase());
+
+        if (calendarQuickFilter === "all") {
+          return byTab && bySearch;
+        }
+
+        const start = parseDate(item.startDate);
+        const end = parseDate(item.endDate);
+        const byTime =
+          calendarQuickFilter === "thisWeek"
+            ? intersectsRange(start, end, weekStart, weekEnd)
+            : intersectsRange(start, end, currentMonthStart, currentMonthEnd);
+
+        return byTab && bySearch && byTime;
+      },
     );
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, calendarQuickFilter]);
 
   const handleExport = () => {
     toast.success("Đã bắt đầu xuất dữ liệu đoàn công tác.");
   };
 
   const handleCalendarFilter = () => {
-    toast.info("Đã mở bộ lọc theo thời gian.");
+    const nextFilter = calendarQuickFilter === "all" ? "thisWeek" : calendarQuickFilter === "thisWeek" ? "thisMonth" : "all";
+    setCalendarQuickFilter(nextFilter);
+    toast.info(nextFilter === "thisWeek" ? "Đang lọc đoàn trong tuần này." : nextFilter === "thisMonth" ? "Đang lọc đoàn trong tháng này." : "Đã bỏ lọc thời gian.");
   };
 
   const handleApplyFilters = () => {
@@ -36,6 +72,7 @@ export default function DelegationListPage() {
 
   const handleResetFilters = () => {
     setSearchTerm("");
+    setCalendarQuickFilter("all");
     toast.info("Đã xóa bộ lọc.");
   };
 
@@ -136,6 +173,12 @@ export default function DelegationListPage() {
           </div>
         </div>
       </div>
+
+      {calendarQuickFilter !== "all" && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary">
+          Đang áp dụng bộ lọc thời gian: {calendarQuickFilter === "thisWeek" ? "Tuần này" : "Tháng này"}
+        </div>
+      )}
 
       {/* Advanced Filter Panel (Collapsible) */}
       {isFilterOpen && (

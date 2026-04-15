@@ -27,6 +27,41 @@ const mockData: Record<string, any[]> = {
 
 export default function MasterDataPage() {
   const [activeTab, setActiveTab] = useState("countries");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recordsByTab, setRecordsByTab] = useState<Record<string, any[]>>(mockData);
+  const [requestSent, setRequestSent] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
+
+  const currentRecords = recordsByTab[activeTab] || recordsByTab.countries || [];
+  const filteredRecords = currentRecords.filter((item) => {
+    const keyword = searchTerm.trim().toLowerCase();
+    return keyword ? item.name.toLowerCase().includes(keyword) || item.code.toLowerCase().includes(keyword) : true;
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / pageSize));
+  const normalizedPage = Math.min(page, totalPages);
+  const pagedRecords = filteredRecords.slice((normalizedPage - 1) * pageSize, normalizedPage * pageSize);
+
+  const updateCurrentTabRecords = (updater: (items: any[]) => any[]) => {
+    setRecordsByTab((prev) => ({ ...prev, [activeTab]: updater(prev[activeTab] || []) }));
+  };
+
+  const handleAddRecord = () => {
+    const next = (recordsByTab[activeTab] || []).length + 1;
+    updateCurrentTabRecords((items) => [{ id: Date.now(), name: `Bản ghi mới ${next}`, code: `NEW_${next}`, status: "active" }, ...items]);
+    setPage(1);
+    toast.success("Đã thêm bản ghi mới.");
+  };
+
+  const handleEditRecord = (id: number) => {
+    updateCurrentTabRecords((items) => items.map((item) => (item.id === id ? { ...item, name: `${item.name} (Đã sửa)` } : item)));
+    toast.success("Đã cập nhật bản ghi.");
+  };
+
+  const handleDeleteRecord = (id: number) => {
+    updateCurrentTabRecords((items) => items.filter((item) => item.id !== id));
+    toast.success("Đã xóa bản ghi.");
+  };
 
   return (
     <div className="flex flex-col gap-6 duration-500 animate-in fade-in lg:flex-row">
@@ -72,8 +107,14 @@ key={cat.id}
             <p className="text-xs font-black uppercase tracking-tight text-white">Yêu cầu bổ sung dữ liệu?</p>
             <p className="text-[10px] font-medium leading-relaxed text-slate-500 uppercase tracking-widest">Liên hệ IT để cấu hình thêm các trường dữ liệu tùy chỉnh.</p>
           </div>
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="w-full py-2.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors">
-            GỬI YÊU CẦU IT
+          <button
+            onClick={() => {
+              setRequestSent(true);
+              toast.success("Đã gửi yêu cầu bổ sung dữ liệu cho IT.");
+            }}
+            className="w-full py-2.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
+          >
+            {requestSent ? "ĐÃ GỬI YÊU CẦU" : "GỬI YÊU CẦU IT"}
           </button>
         </div>
       </aside>
@@ -86,10 +127,15 @@ key={cat.id}
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
               placeholder="Tìm kiếm bản ghi..." 
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
               className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5 shadow-sm" 
             />
           </div>
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
+          <button onClick={handleAddRecord} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
             <Plus size={16} />
             THÊM MỚI BẢN GHI
           </button>
@@ -106,7 +152,7 @@ key={cat.id}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {(mockData[activeTab] || mockData.countries).map((item) => (
+              {pagedRecords.map((item) => (
                 <tr key={item.id} className="group transition-all hover:bg-slate-50/50">
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">{item.name}</span>
@@ -122,10 +168,10 @@ key={cat.id}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-10 md:opacity-0 transition-opacity group-hover:opacity-100">
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-primary/5 hover:text-primary border border-transparent hover:border-primary/10">
+                      <button onClick={() => handleEditRecord(item.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-primary/5 hover:text-primary border border-transparent hover:border-primary/10">
                         <Edit3 size={14} />
                       </button>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 border border-transparent hover:border-rose-100">
+                      <button onClick={() => handleDeleteRecord(item.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 border border-transparent hover:border-rose-100">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -139,10 +185,12 @@ key={cat.id}
         {/* Footer Pagination */}
         <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Tổng cộng <span className="text-slate-900">{(mockData[activeTab] || mockData.countries).length}</span> bản ghi hệ thống
+            Tổng cộng <span className="text-slate-900">{filteredRecords.length}</span> bản ghi hệ thống
           </p>
           <div className="flex gap-1">
-            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success("Thao tác đang được xử lý!"); }} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors">Trang kế</button>
+            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled={normalizedPage === 1}>Trang trước</button>
+            <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white">{normalizedPage}</button>
+            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled={normalizedPage === totalPages}>Trang kế</button>
           </div>
         </div>
       </main>

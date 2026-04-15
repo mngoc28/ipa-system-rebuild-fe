@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { getAuthToken } from "@/store/useAuthStore";
+import { getAccessToken, removeAccessToken } from "@/utils/storage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -13,8 +15,8 @@ const axiosInstance = axios.create({
 // Thêm interceptor cho request
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Lấy token từ localStorage
-    const token = localStorage.getItem("token");
+    // Prefer in-memory auth token, fallback to persisted access token.
+    const token = getAuthToken() || getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,8 +36,8 @@ axiosInstance.interceptors.response.use(
     // Xử lý lỗi: 401 Unauthorized, 403 Forbidden, v.v.
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       // Redirect đến trang đăng nhập hoặc xử lý lỗi xác thực
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      removeAccessToken();
+      window.location.href = "/auth/login";
     }
     return Promise.reject(error);
   },

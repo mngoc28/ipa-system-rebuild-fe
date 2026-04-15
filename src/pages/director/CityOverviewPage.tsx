@@ -3,6 +3,9 @@ import { Building2, MapPin, TrendingUp, Users, PieChart as PieChartIcon, ArrowUp
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 export default function CityOverviewPage() {
+  const [mapMode, setMapMode] = React.useState<"heat" | "digital">("digital");
+  const [showPciAnalysis, setShowPciAnalysis] = React.useState(false);
+
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -11,10 +14,12 @@ export default function CityOverviewPage() {
           <p className="mt-1 text-sm font-medium text-slate-500">Bản đồ số và dữ liệu vĩ mô về hạ tầng đầu tư của Đà Nẵng.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => toast.info("Đang bật lớp hiển thị bản đồ nhiệt.")} className="rounded-lg border border-slate-200 bg-white px-5 py-2 text-[10px] font-black uppercase tracking-wider text-slate-800 shadow-sm transition-all hover:bg-slate-50 active:scale-95">Bản đồ nhiệt</button>
-          <button onClick={() => toast.info("Đang chuyển sang chế độ dữ liệu số.")} className="rounded-lg bg-slate-900 px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg transition-all hover:bg-slate-800 active:scale-95">Dữ liệu số</button>
+          <button onClick={() => setMapMode("heat")} className={cn("rounded-lg border border-slate-200 px-5 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all active:scale-95", mapMode === "heat" ? "bg-slate-900 text-white" : "bg-white text-slate-800 hover:bg-slate-50")}>Bản đồ nhiệt</button>
+          <button onClick={() => setMapMode("digital")} className={cn("rounded-lg px-5 py-2 text-[10px] font-black uppercase tracking-wider shadow-lg transition-all active:scale-95", mapMode === "digital" ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-white text-slate-800 border border-slate-200 hover:bg-slate-50")}>Dữ liệu số</button>
         </div>
       </div>
+
+      <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600">Chế độ hiển thị hiện tại: {mapMode === "heat" ? "Bản đồ nhiệt" : "Dữ liệu số"}</div>
 
       {/* Map Interactive Placeholder */}
       <div className="group relative h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-xl shadow-slate-200/50">
@@ -125,9 +130,15 @@ export default function CityOverviewPage() {
               <p className="mt-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 truncate">Toàn quốc / 63 tỉnh thành</p>
             </div>
           </div>
-          <button onClick={() => toast.info("Đang mở phân tích chi tiết PCI 2026.")} className="mt-6 w-full rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">XEM PHÂN TÍCH</button>
+          <button onClick={() => setShowPciAnalysis((prev) => !prev)} className="mt-6 w-full rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">XEM PHÂN TÍCH</button>
         </div>
       </div>
+
+      {showPciAnalysis && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm font-semibold text-slate-700">
+          Phân tích PCI: điểm mạnh nổi bật ở tính minh bạch thủ tục và tốc độ xử lý hồ sơ đầu tư, cần cải thiện chỉ số chi phí không chính thức.
+        </div>
+      )}
     </div>
   );
 }

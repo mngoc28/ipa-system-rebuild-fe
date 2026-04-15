@@ -2,28 +2,66 @@ import { useState } from "react";
 import { FileStack, Upload, FolderPlus, Search, Filter, Grid, List, MoreVertical, FileText, FileImage, FileCode, Download, Share2, Trash2, ChevronRight, Folder } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function DocumentListPage() {
   const [viewMode, setViewMode] = useState("grid"); // grid, list
+  const [showPdfOnly, setShowPdfOnly] = useState(false);
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [documents, setDocuments] = useState([
+    { id: 1, name: "Chính sách ưu đãi đầu tư 2026.pdf", type: "pdf", size: "2.4MB", updated: "2 giờ trước", owner: "Trần Thu Hà" },
+    { id: 2, name: "Bản đồ quy hoạch KCN SmartCity.png", type: "image", size: "12.8MB", updated: "1 ngày trước", owner: "Nguyễn Văn A" },
+    { id: 3, name: "Danh sách doanh nghiệp HQ (Draft).docx", type: "docx", size: "850KB", updated: "Hôm qua", owner: "Trần Thu Hà" },
+    { id: 4, name: "Biên bản thỏa thuận Samsung.pdf", type: "pdf", size: "1.5MB", updated: "3 ngày trước", owner: "Hồ Kỳ Minh" },
+  ]);
+  const [folders, setFolders] = useState([
+    { id: 1, name: "Dự án Bán dẫn", count: 12 },
+    { id: 2, name: "Tài liệu Pháp lý", count: 8 },
+    { id: 3, name: "Hình ảnh thực địa", count: 24 },
+  ]);
 
   const handleCreateFolder = () => {
-    toast.success("Đã mở form tạo thư mục mới.");
+    const nextIndex = folders.length + 1;
+    const newFolder = { id: Date.now(), name: `Thư mục mới ${nextIndex}`, count: 0 };
+    setFolders([newFolder, ...folders]);
+    toast.success(`Đã tạo ${newFolder.name}`);
   };
 
   const handleUploadDocument = () => {
-    toast.success("Đã mở khu vực tải tài liệu lên.");
+    const newDoc = {
+      id: Date.now(),
+      name: `Tai_lieu_moi_${documents.length + 1}.pdf`,
+      type: "pdf",
+      size: "1.1MB",
+      updated: "Vừa xong",
+      owner: "Bạn",
+    };
+    setDocuments([newDoc, ...documents]);
+    toast.success("Đã tải lên 1 tài liệu mới.");
   };
 
   const handleOpenFolder = (folderName: string) => {
-    toast.info(`Đang mở thư mục: ${folderName}`);
+    setActiveFolder(folderName);
+    toast.info(`Đang xem: ${folderName}`);
   };
 
   const handleFilter = () => {
-    toast.info("Đã mở bộ lọc tài liệu.");
+    setShowPdfOnly((prev) => !prev);
+    toast.info(!showPdfOnly ? "Đang lọc chỉ file PDF." : "Đã bỏ lọc PDF.");
   };
 
-  const handleMoreOptions = (name: string) => {
-    toast.info(`Tùy chọn tài liệu: ${name}`);
+  const handleDuplicate = (name: string) => {
+    const target = documents.find((d) => d.name === name);
+    if (!target) return;
+    const duplicated = { ...target, id: Date.now(), name: `${target.name} (Bản sao)`, updated: "Vừa xong", owner: "Bạn" };
+    setDocuments([duplicated, ...documents]);
+    toast.success(`Đã nhân bản: ${target.name}`);
+  };
+
+  const handleRename = (name: string) => {
+    setDocuments(documents.map((doc) => (doc.name === name ? { ...doc, name: `${doc.name} (Đã cập nhật)` } : doc)));
+    toast.success("Đã đổi tên tài liệu.");
   };
 
   const handleDownload = (name: string) => {
@@ -35,21 +73,16 @@ export default function DocumentListPage() {
   };
 
   const handleDelete = (name: string) => {
-    toast.error(`Đã đưa vào hàng chờ xóa: ${name}`);
+    setDocuments(documents.filter((doc) => doc.name !== name));
+    toast.error(`Đã xóa: ${name}`);
   };
-
-  const documents = [
-    { id: 1, name: "Chính sách ưu đãi đầu tư 2026.pdf", type: "pdf", size: "2.4MB", updated: "2 giờ trước", owner: "Trần Thu Hà" },
-    { id: 2, name: "Bản đồ quy hoạch KCN SmartCity.png", type: "image", size: "12.8MB", updated: "1 ngày trước", owner: "Nguyễn Văn A" },
-    { id: 3, name: "Danh sách doanh nghiệp HQ (Draft).docx", type: "docx", size: "850KB", updated: "Hôm qua", owner: "Trần Thu Hà" },
-    { id: 4, name: "Biên bản thỏa thuận Samsung.pdf", type: "pdf", size: "1.5MB", updated: "3 ngày trước", owner: "Hồ Kỳ Minh" },
-  ];
-
-  const folders = [
-    { id: 1, name: "Dự án Bán dẫn", count: 12 },
-    { id: 2, name: "Tài liệu Pháp lý", count: 8 },
-    { id: 3, name: "Hình ảnh thực địa", count: 24 },
-  ];
+  const visibleDocuments = documents.filter((doc) => {
+    const byType = showPdfOnly ? doc.type === "pdf" : true;
+    const bySearch = searchTerm.trim()
+      ? doc.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) || doc.owner.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      : true;
+    return byType && bySearch;
+  });
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
@@ -91,6 +124,12 @@ export default function DocumentListPage() {
         ))}
       </div>
 
+      {activeFolder && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary">
+          Đang xem thư mục: {activeFolder}
+        </div>
+      )}
+
       {/* Main Content Card */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -98,6 +137,8 @@ export default function DocumentListPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               placeholder="Tìm tài liệu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:shadow-sm"
             />
           </div>
@@ -126,15 +167,25 @@ export default function DocumentListPage() {
         {/* Document Grid */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {documents.map((doc) => (
+            {visibleDocuments.map((doc) => (
               <div
                 key={doc.id}
                 className="group relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/20 p-4 text-center transition-all hover:border-primary/20 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 active:scale-95"
               >
                 <div className="absolute right-1 top-1">
-                  <button onClick={() => handleMoreOptions(doc.name)} className="rounded-lg p-1.5 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-50 hover:text-slate-600">
-                    <MoreVertical size={14} />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="rounded-lg p-1.5 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-50 hover:text-slate-600">
+                        <MoreVertical size={14} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleRename(doc.name)}>Đổi tên</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(doc.name)}>Nhân bản</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleDelete(doc.name)}>Xóa</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className="mb-4 flex flex-col items-center">
@@ -161,7 +212,7 @@ export default function DocumentListPage() {
           </div>
         ) : (
           <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
-            {documents.map((doc) => (
+            {visibleDocuments.map((doc) => (
               <div key={doc.id} className="group flex items-center justify-between bg-white px-5 py-4 transition-all hover:bg-slate-50/80 active:bg-slate-100">
                 <div className="flex items-center gap-4">
                   <div className="flex h-8 w-8 items-center justify-center rounded border border-slate-100 bg-slate-50 text-slate-400 group-hover:text-primary transition-colors">
@@ -172,9 +223,19 @@ export default function DocumentListPage() {
                 <div className="flex items-center gap-8">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{doc.updated}</span>
                   <span className="w-24 text-right text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.owner}</span>
-                  <button onClick={() => handleMoreOptions(doc.name)} className="rounded-lg p-2 text-slate-300 transition-all hover:bg-white hover:text-slate-600 active:scale-90 shadow-sm">
-                    <MoreVertical size={16} />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="rounded-lg p-2 text-slate-300 transition-all hover:bg-white hover:text-slate-600 active:scale-90 shadow-sm">
+                        <MoreVertical size={16} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleRename(doc.name)}>Đổi tên</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(doc.name)}>Nhân bản</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleDelete(doc.name)}>Xóa</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             ))}

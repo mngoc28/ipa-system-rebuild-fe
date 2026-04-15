@@ -39,7 +39,7 @@ export default function ChangePasswordFirstTime() {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Đã cập nhật mật khẩu mới thành công!");
-      navigate("/ui/dashboard");
+      navigate("/dashboard");
     }, 1500);
   };
 

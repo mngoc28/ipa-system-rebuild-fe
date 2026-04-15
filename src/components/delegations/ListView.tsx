@@ -22,10 +22,13 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
 export default function ListView({ delegations }: ListViewProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const itemsPerPage = 8;
 
-  const totalPages = Math.ceil(delegations.length / itemsPerPage);
-  const paginatedItems = delegations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const visibleDelegations = delegations.filter((item) => !deletedIds.includes(item.id));
+  const totalPages = Math.max(1, Math.ceil(visibleDelegations.length / itemsPerPage));
+  const normalizedPage = Math.min(currentPage, totalPages);
+  const paginatedItems = visibleDelegations.slice((normalizedPage - 1) * itemsPerPage, normalizedPage * itemsPerPage);
 
   const handleView = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
     e.stopPropagation();
@@ -34,12 +37,14 @@ export default function ListView({ delegations }: ListViewProps) {
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
+    navigate(`/delegations/${item.id}`, { state: { mode: "edit" } });
     toast.info(`Đang mở chỉnh sửa: ${item.name}`);
   };
 
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
-    toast.error(`Đã đưa vào hàng chờ xóa: ${item.name}`);
+    setDeletedIds((prev) => [...prev, item.id]);
+    toast.success(`Đã xóa khỏi danh sách: ${item.name}`);
   };
 
   return (
@@ -121,13 +126,13 @@ export default function ListView({ delegations }: ListViewProps) {
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
           HIỂN THỊ{" "}
           <span className="text-slate-900">
-            {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, delegations.length)}
+            {visibleDelegations.length === 0 ? "0 - 0" : `${(normalizedPage - 1) * itemsPerPage + 1} - ${Math.min(normalizedPage * itemsPerPage, visibleDelegations.length)}`}
           </span>{" "}
-          TRÊN <span className="text-slate-900">{delegations.length}</span> KẾT QUẢ
+          TRÊN <span className="text-slate-900">{visibleDelegations.length}</span> KẾT QUẢ
         </p>
 
         <div className="flex items-center gap-1">
-          <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} className="rotate-180" />
           </button>
 
@@ -136,14 +141,14 @@ export default function ListView({ delegations }: ListViewProps) {
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={cn("h-7 w-7 rounded-md text-[10px] font-black transition-all", currentPage === i + 1 ? "bg-primary text-white shadow-sm shadow-primary/20" : "text-slate-400 hover:bg-slate-100")}
+                className={cn("h-7 w-7 rounded-md text-[10px] font-black transition-all", normalizedPage === i + 1 ? "bg-primary text-white shadow-sm shadow-primary/20" : "text-slate-400 hover:bg-slate-100")}
               >
                 {i + 1}
               </button>
             ))}
           </div>
 
-          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} />
           </button>
         </div>

@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const isDev = import.meta.env.DEV;
 
   const handleLogin = (e: any) => {
     e.preventDefault();
@@ -236,7 +237,7 @@ export default function LoginPage() {
                 <span className="text-[11px] uppercase font-black tracking-widest text-slate-600 group-hover/vneid:text-[#003fb1] transition-colors">Đăng nhập bằng VNeID</span>
               </button>
 
-              <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+              {isDev && <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Đăng nhập nhanh (Mock QA)</p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -269,7 +270,7 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <p className="text-[10px] font-semibold text-slate-400">Tài khoản nhập tay: staff, manager, director, admin (mật khẩu bất kỳ).</p>
-              </div>
+              </div>}
             </form>
           </div>
 

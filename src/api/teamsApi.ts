@@ -1,0 +1,71 @@
+import axiosClient from "@/api/axiosClient";
+import { ApiEnvelope } from "@/types/api";
+
+export type TeamMemberStatus = "In Office" | "On Field" | "On Leave";
+
+export interface TeamMemberItem {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  status: TeamMemberStatus;
+  tasks: number;
+  performance: number;
+  unitName?: string;
+  avatarUrl?: string | null;
+}
+
+export interface TeamActivityItem {
+  user: string;
+  action: string;
+  time: string;
+}
+
+export interface TeamSummary {
+  totalMembers: number;
+  inOffice: number;
+  onField: number;
+  onLeave: number;
+}
+
+export interface TeamDashboardData {
+  members: TeamMemberItem[];
+  activities: TeamActivityItem[];
+  summary: TeamSummary;
+}
+
+export interface OrgUnitItem {
+  id: string;
+  unitCode: string;
+  unitName: string;
+  unitType: string;
+  parentUnitId?: string | null;
+  managerUserId?: string | null;
+}
+
+export interface TeamCreateMemberPayload {
+  fullName: string;
+  email: string;
+  username?: string;
+  phone?: string;
+  positionTitle?: string;
+  unitId?: number;
+}
+
+export const teamsApi = {
+  getDashboard: async (query?: { unitId?: number; page?: number; pageSize?: number }) => {
+    const response = await axiosClient.get<ApiEnvelope<TeamDashboardData>>("/api/v1/teams", {
+      params: query,
+    });
+
+    return response.data;
+  },
+  createMember: async (payload: TeamCreateMemberPayload) => {
+    const response = await axiosClient.post<ApiEnvelope<TeamMemberItem>>("/api/v1/teams/members", payload);
+    return response.data;
+  },
+  listUnits: async () => {
+    const response = await axiosClient.get<ApiEnvelope<{ items: OrgUnitItem[] }>>("/api/v1/teams/units");
+    return response.data;
+  },
+};

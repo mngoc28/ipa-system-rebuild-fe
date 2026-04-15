@@ -1,4 +1,4 @@
-import { JwtPayload, RefreshTokenResponse } from "@/dataHelper/auth.dataHelper";
+import { JwtPayload } from "@/dataHelper/auth.dataHelper";
 import { getAccessToken, setAccessToken } from "./storage";
 import { authApi } from "@/api/authApi";
 import { TOKEN_EXPIRATION_BUFFER_MS, TOKEN_REFRESH_THRESHOLD_MINUTES } from "@/constant";
@@ -84,9 +84,9 @@ export const refreshAccessToken = async (): Promise<string | null> => {
       return null;
     }
 
-    const response = (await authApi.refresh()) as RefreshTokenResponse;
+    const response = await authApi.refresh(token);
 
-    const newAccessToken = response?.data?.token;
+    const newAccessToken = response?.data?.accessToken;
 
     if (newAccessToken) {
       setAccessToken(newAccessToken);

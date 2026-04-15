@@ -1,25 +1,91 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, Download, Printer, Share2, Edit3, CheckCircle2, MessageSquare, History, Paperclip, Plus, ArrowRight, MoreVertical, Maximize2, FileText } from "lucide-react";
-import { minutesDocs } from "@/dataHelper/ui-system.data";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, Download, Printer, Share2, Edit3, CheckCircle2, MessageSquare, History, Paperclip, Plus, ArrowRight, MoreVertical, Maximize2, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
+import { minutesAttachments, minutesTasks } from "@/dataHelper/minutesDetail.dataHelper";
 
 export default function MinutesDetailPage() {
+  const queryClient = useQueryClient();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeRightTab, setActiveRightTab] = useState<"tasks" | "comments" | "history">("tasks");
   const [comment, setComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [tasks, setTasks] = useState([
-    { title: "Chuẩn bị tài liệu Gift & Welcome", status: "done" },
-    { title: "Đặt xe di chuyển ngày 15/04", status: "pending" },
-    { title: "Gửi email xác nhận danh mục họp", status: "pending" },
-  ] as Array<{ title: string; status: "done" | "pending" }>);
-  const [attachments, setAttachments] = useState(["Phieu_Khao_Sat.pdf", "Anh_Khao_Sat_KCNC.zip"]);
+  const [tasks, setTasks] = useState(minutesTasks);
+  const [attachments, setAttachments] = useState(minutesAttachments);
 
-  const doc = minutesDocs.find((d) => d.id === Number(id)) || minutesDocs[0];
+  const detailQuery = useQuery({
+    queryKey: ["minutes", "detail", id],
+    queryFn: () => minutesApi.getById(String(id)),
+    enabled: Boolean(id),
+  });
+
+  const detailData = detailQuery.data?.data;
+  const minutesItem = detailData?.minutes;
+  const versions = detailData?.versions ?? [];
+  const comments = detailData?.comments ?? [];
+  const currentVersion = versions[versions.length - 1];
+  const approvals = detailData?.approvals ?? [];
+  const versionHistory = [...versions].sort((left, right) => right.versionNo - left.versionNo);
+
+  const addCommentMutation = useMutation({
+    mutationFn: (commentText: string) => minutesApi.createComment(String(id), { commentText }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["minutes", "detail", id] });
+      toast.success("Đã gửi phản hồi.");
+      setComment("");
+    },
+    onError: () => {
+      toast.error("Không thể gửi phản hồi.");
+    },
+  });
+
+  const createVersionMutation = useMutation({
+    mutationFn: () =>
+      minutesApi.createVersion(String(id), {
+        contentText: `Version generated at ${new Date().toISOString()}`,
+        changeSummary: "Duplicate from current version",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["minutes", "detail", id] });
+      toast.success("Đã tạo phiên bản mới từ tài liệu hiện tại.");
+    },
+    onError: () => {
+      toast.error("Không thể tạo phiên bản mới.");
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: () => minutesApi.approve(String(id), { decision: "APPROVE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["minutes", "detail", id] });
+      toast.success("Đã cập nhật trạng thái phê duyệt biên bản.");
+    },
+    onError: () => {
+      toast.error("Không thể cập nhật trạng thái phê duyệt.");
+    },
+  });
+
+  if (detailQuery.isLoading) {
+    return <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">Đang tải biên bản...</div>;
+  }
+
+  if (detailQuery.isError || !detailData) {
+    return <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6 text-sm font-semibold text-rose-600">Không thể tải chi tiết biên bản.</div>;
+  }
+
+  const doc = {
+    title: minutesItem?.title || "Biên bản chưa có dữ liệu",
+    delegation: minutesItem?.delegationId || "N/A",
+    version: currentVersion?.versionNo ?? minutesItem?.currentVersionNo ?? 1,
+    updatedAt: currentVersion?.editedAt ? new Date(currentVersion.editedAt).toLocaleString("vi-VN") : "--",
+    status: mapMinutesStatus(minutesItem?.status),
+  };
+
 
   const handlePrint = () => {
     toast.info(`Đang mở chế độ in: ${doc.title}`);
@@ -39,11 +105,15 @@ export default function MinutesDetailPage() {
   };
 
   const handleDuplicateVersion = () => {
-    toast.success("Đã tạo phiên bản mới từ tài liệu hiện tại.");
+    createVersionMutation.mutate();
   };
 
   const handleToggleApproval = () => {
-    toast.success("Đã cập nhật trạng thái phê duyệt biên bản.");
+    if (doc.status === "Signed") {
+      toast.info("Biên bản đã finalized.");
+      return;
+    }
+    approveMutation.mutate();
   };
 
   const handleFullscreen = () => {
@@ -60,8 +130,7 @@ export default function MinutesDetailPage() {
       toast.error("Vui lòng nhập nội dung phản hồi.");
       return;
     }
-    toast.success("Đã gửi phản hồi.");
-    setComment("");
+    addCommentMutation.mutate(comment.trim());
   };
 
   const handleAttachmentUpload = () => {
@@ -74,6 +143,10 @@ export default function MinutesDetailPage() {
     toast.success(`Đang tải tệp: ${name}`);
   };
 
+  const isCreatingVersion = createVersionMutation.isPending;
+  const isApproving = approveMutation.isPending;
+  const isFinalized = doc.status === "Signed";
+
   return (
     <div className="flex h-[calc(100vh-140px)] flex-col gap-6 duration-500 animate-in fade-in">
       {/* Top Header */}
@@ -84,7 +157,7 @@ export default function MinutesDetailPage() {
           </button>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-600">Bản chính thức</span>
+              <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-black uppercase", doc.status === "Signed" ? "border border-emerald-100 bg-emerald-50 text-emerald-600" : "border border-amber-100 bg-amber-50 text-amber-600")}>{doc.status === "Signed" ? "Bản chính thức" : "Bản nháp"}</span>
               <span className="text-[10px] font-bold text-slate-400">
                 Phiên bản {doc.version} • Cập nhật {doc.updatedAt}
               </span>
@@ -102,6 +175,22 @@ export default function MinutesDetailPage() {
               <Download size={18} />
             </button>
           </div>
+          <button
+            onClick={handleDuplicateVersion}
+            disabled={isCreatingVersion || isFinalized}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isCreatingVersion ? <Loader2 size={16} className="animate-spin" /> : <History size={16} />}
+            Tạo phiên bản
+          </button>
+          <button
+            onClick={handleToggleApproval}
+            disabled={isApproving || isFinalized}
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isApproving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+            {isFinalized ? "Đã phê duyệt" : "Phê duyệt"}
+          </button>
           <button onClick={handleShare} className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50">
             <Share2 size={16} />
             Chia sẻ
@@ -197,7 +286,7 @@ export default function MinutesDetailPage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveRightTab(tab.id as any)}
+                onClick={() => setActiveRightTab(tab.id as "tasks" | "comments" | "history")}
                 className={cn(
                   "flex flex-1 items-center justify-center gap-2 rounded-2xl py-2.5 text-[10px] font-black uppercase tracking-wider transition-all",
                   activeRightTab === tab.id ? "bg-primary text-white" : "text-slate-400 hover:bg-white/5 hover:text-white",
@@ -245,27 +334,52 @@ export default function MinutesDetailPage() {
 
               {activeRightTab === "comments" && (
                 <div className="space-y-6">
-                  <div className="flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CH</div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900">Nguyễn Minh Châu</span>
-                        <span className="text-[9px] font-medium text-slate-400">10:15 - Hôm nay</span>
-                      </div>
-                      <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-xs leading-normal text-slate-600">
-                        Thư ký kiểm tra lại phần III mục 2, cần làm rõ hơn trách nhiệm của bên KOTRA về việc gửi danh bạ.
+                  {comments.length === 0 ? <p className="text-xs font-semibold text-slate-500">Chưa có phản hồi nào.</p> : null}
+                  {comments.map((item) => (
+                    <div key={item.id} className="flex gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900">Người dùng</span>
+                          <span className="text-[9px] font-medium text-slate-400">{item.createdAt ? new Date(item.createdAt).toLocaleString("vi-VN") : "Vừa xong"}</span>
+                        </div>
+                        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-xs leading-normal text-slate-600">{item.commentText}</div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-black text-white">HA</div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900">Trần Thu Hà</span>
-                        <span className="text-[9px] font-medium text-slate-400">10:45 - Hôm nay</span>
+                  ))}
+                </div>
+              )}
+
+              {activeRightTab === "history" && (
+                <div className="space-y-5">
+                  {versionHistory.length === 0 ? <p className="text-xs font-semibold text-slate-500">Chưa có phiên bản nào.</p> : null}
+                  {versionHistory.map((version) => (
+                    <div key={version.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phiên bản {version.versionNo}</p>
+                          <p className="text-xs font-bold text-slate-900">{version.changeSummary || "Không có mô tả thay đổi."}</p>
+                        </div>
+                        <span className="text-[9px] font-bold uppercase text-slate-400">{version.editedAt ? new Date(version.editedAt).toLocaleString("vi-VN") : "--"}</span>
                       </div>
-                      <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-xs leading-normal text-slate-600">Đã cập nhật và lưu phiên bản v3 ạ. Sếp xem lại nhé!</div>
+                      <div className="mt-3 rounded-xl bg-white p-3 text-[11px] leading-normal text-slate-600">
+                        {version.contentText || "Nội dung phiên bản dưới dạng JSON hoặc trống."}
+                      </div>
                     </div>
+                  ))}
+
+                  <div className="space-y-3 border-t border-slate-100 pt-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phê duyệt</h4>
+                    {approvals.length === 0 ? <p className="text-xs font-semibold text-slate-500">Chưa có lần phê duyệt nào.</p> : null}
+                    {approvals.map((approval) => (
+                      <div key={approval.id} className="flex items-start justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4">
+                        <div className="space-y-1">
+                          <p className={cn("text-xs font-black uppercase tracking-widest", approval.decision === "APPROVE" ? "text-emerald-600" : "text-rose-600")}>{approval.decision === "APPROVE" ? "Phê duyệt" : "Từ chối"}</p>
+                          <p className="text-[11px] font-semibold text-slate-500">{approval.decisionNote || "Không có ghi chú."}</p>
+                        </div>
+                        <span className="text-[9px] font-bold uppercase text-slate-400">{approval.decidedAt ? new Date(approval.decidedAt).toLocaleString("vi-VN") : "--"}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

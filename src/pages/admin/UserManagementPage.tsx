@@ -1,66 +1,238 @@
 import * as React from "react";
 import { toast } from "sonner";
-import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, UserX, Edit2, Trash2, Lock } from "lucide-react";
+import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, Edit2, Trash2, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
-const mockUsers = [
-  { id: "1", name: "Nguyễn Văn Quản Trị", email: "admin@danang.gov.vn", role: "Admin", unit: "Trung tâm Xúc tiến Đầu tư", status: "active", avatar: "https://i.pravatar.cc/150?u=1" },
-  { id: "2", name: "Trần Thu Hà", email: "vth@danang.gov.vn", role: "Staff", unit: "Phòng Xúc tiến 1", status: "active", avatar: "https://i.pravatar.cc/150?u=2" },
-  { id: "3", name: "Nguyễn Minh Châu", email: "nmc@danang.gov.vn", role: "Manager", unit: "Phòng Xúc tiến 1", status: "active", avatar: "https://i.pravatar.cc/150?u=3" },
-  { id: "4", name: "Lê Văn Giám Đốc", email: "lvg@danang.gov.vn", role: "Director", unit: "Ban Giám đốc", status: "active", avatar: "https://i.pravatar.cc/150?u=4" },
-  { id: "5", name: "Phạm Minh Đức", email: "pmd@danang.gov.vn", role: "Staff", unit: "Phòng Pháp chế", status: "inactive" }
-];
+import {
+  useAdminUserQuery,
+  useAdminUsersListQuery,
+  useCreateAdminUserMutation,
+  useLockAdminUserMutation,
+  usePatchAdminUserMutation,
+} from "@/hooks/useAdminUsersQuery";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+interface DisplayUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  unit: string;
+  status: "active" | "inactive";
+  avatar?: string;
+  locked: boolean;
+}
+
+interface UserFormState {
+  username: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  unitId: string;
+  roleIds: string;
+  status: "active" | "inactive";
+}
+
+const defaultCreateForm = (): UserFormState => {
+  const timestamp = Date.now();
+
+  return {
+    username: `user${timestamp}`,
+    fullName: `Người dùng mới #${String(timestamp).slice(-4)}`,
+    email: `user${timestamp}@danang.gov.vn`,
+    phone: "0900000000",
+    unitId: "UNIT-ROOT",
+    roleIds: "staff",
+    status: "active",
+  };
+};
+
+const buildEditForm = (user: DisplayUser): UserFormState => ({
+  username: user.email.split("@")[0] || `user${user.id}`,
+  fullName: user.name,
+  email: user.email,
+  phone: "0900000000",
+  unitId: user.unit === "UNIT-UNKNOWN" ? "UNIT-ROOT" : user.unit,
+  roleIds: user.role ? user.role.toLowerCase() : "staff",
+  status: user.status,
+});
+
+const buildEditFormFromApi = (user: {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  roles?: string[];
+  unit: { id: string; unit_code?: string; unit_name?: string } | null;
+  status: string;
+  locked: boolean;
+}): UserFormState => ({
+  username: user.email.split("@")[0] || `user${user.id}`,
+  fullName: user.fullName,
+  email: user.email,
+  phone: user.phone || "",
+  unitId: user.unit?.unit_code || user.unit?.unit_name || user.unit?.id || "UNIT-ROOT",
+  roleIds: user.roles?.join(",") || "staff",
+  status: user.status === "active" && !user.locked ? "active" : "inactive",
+});
 
 export default function UserManagementPage() {
-  const [users, setUsers] = React.useState(mockUsers);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [activeOnly, setActiveOnly] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [editingUserId, setEditingUserId] = React.useState<string | null>(null);
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [lockOpen, setLockOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<DisplayUser | null>(null);
+  const [createForm, setCreateForm] = React.useState<UserFormState>(defaultCreateForm());
+  const [editForm, setEditForm] = React.useState<UserFormState>(defaultCreateForm());
   const pageSize = 5;
 
-  const filteredUsers = users.filter((user) => {
-    const keyword = searchTerm.trim().toLowerCase();
-    const byKeyword = keyword ? user.name.toLowerCase().includes(keyword) || user.email.toLowerCase().includes(keyword) || user.unit.toLowerCase().includes(keyword) : true;
-    const byStatus = activeOnly ? user.status === "active" : true;
-    return byKeyword && byStatus;
+  const usersQuery = useAdminUsersListQuery({
+    keyword: searchTerm || undefined,
+    status: activeOnly ? "active" : undefined,
+    page,
+    pageSize,
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
+  const createMutation = useCreateAdminUserMutation();
+  const patchMutation = usePatchAdminUserMutation();
+  const lockMutation = useLockAdminUserMutation();
+  const adminUserQuery = useAdminUserQuery(editingUserId ?? undefined, editOpen);
+
+  const users: DisplayUser[] = React.useMemo(() => {
+    const rawUsers = usersQuery.data?.data?.items || [];
+    return rawUsers.map((user) => {
+      const roleCode = (user.roles[0] || "admin").toLowerCase();
+      const role = roleCode.charAt(0).toUpperCase() + roleCode.slice(1);
+      return {
+        id: user.id,
+        name: user.fullName,
+        email: user.email,
+        role,
+        unit: user.unit?.unit_code || user.unit?.unit_name || user.unit?.id || "UNIT-UNKNOWN",
+        status: user.status === "active" && !user.locked ? "active" : "inactive",
+        locked: user.locked,
+      };
+    });
+  }, [usersQuery.data]);
+
+  const filteredUsers = users;
+  const totalPages = Math.max(1, usersQuery.data?.meta?.totalPages || 1);
   const normalizedPage = Math.min(page, totalPages);
-  const pagedUsers = filteredUsers.slice((normalizedPage - 1) * pageSize, normalizedPage * pageSize);
+  const pagedUsers = filteredUsers;
   const activeUsers = users.filter((user) => user.status === "active").length;
   const inactiveUsers = users.length - activeUsers;
   const units = new Set(users.map((user) => user.unit)).size;
+  const isBusy = createMutation.isPending || patchMutation.isPending || lockMutation.isPending;
 
-  const handleAddUser = () => {
-    const newUser = {
-      id: Date.now().toString(),
-      name: `Người dùng mới #${users.length + 1}`,
-      email: `user${users.length + 1}@danang.gov.vn`,
-      role: "Staff",
-      unit: "Phòng Xúc tiến 1",
-      status: "inactive",
-      avatar: `https://i.pravatar.cc/150?u=${Date.now()}`,
-    };
-    setUsers([newUser, ...users]);
-    setPage(1);
-    toast.success("Đã thêm người dùng mới.");
+  React.useEffect(() => {
+    if (!createOpen) {
+      setCreateForm(defaultCreateForm());
+    }
+  }, [createOpen]);
+
+  React.useEffect(() => {
+    if (editOpen && selectedUser) {
+      setEditForm(buildEditForm(selectedUser));
+    }
+  }, [editOpen, selectedUser]);
+
+  React.useEffect(() => {
+    if (editOpen && adminUserQuery.data?.data) {
+      setEditForm(buildEditFormFromApi(adminUserQuery.data.data));
+    }
+  }, [editOpen, adminUserQuery.data]);
+
+  const handleOpenCreate = () => {
+    setCreateForm(defaultCreateForm());
+    setCreateOpen(true);
   };
 
-  const handleEditUser = (id: string) => {
-    setEditingUserId(id);
-    setUsers(users.map((user) => (user.id === id ? { ...user, name: `${user.name} (Đã sửa)` } : user)));
-    toast.success("Đã cập nhật hồ sơ người dùng.");
+  const handleAddUser = async () => {
+    try {
+      await createMutation.mutateAsync({
+        username: createForm.username,
+        fullName: createForm.fullName,
+        email: createForm.email,
+        phone: createForm.phone,
+        unitId: createForm.unitId,
+        roleIds: createForm.roleIds.split(",").map((item) => item.trim()).filter(Boolean),
+      });
+      setPage(1);
+      setCreateOpen(false);
+      toast.success("Đã thêm người dùng mới.");
+    } catch (error) {
+      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(message || "Không thể thêm người dùng.");
+    }
   };
 
-  const handleToggleLock = (id: string) => {
-    setUsers(users.map((user) => (user.id === id ? { ...user, status: user.status === "active" ? "inactive" : "active" } : user)));
-    toast.success("Đã cập nhật trạng thái tài khoản.");
+  const handleOpenEdit = (user: DisplayUser) => {
+    setEditingUserId(user.id);
+    setSelectedUser(user);
+    setEditForm(buildEditForm(user));
+    setEditOpen(true);
+  };
+
+  const handleEditUser = async () => {
+    if (!selectedUser) {
+      return;
+    }
+
+    setEditingUserId(selectedUser.id);
+    try {
+      await patchMutation.mutateAsync({
+        userId: selectedUser.id,
+        payload: {
+          fullName: editForm.fullName,
+          phone: editForm.phone,
+          unitId: editForm.unitId,
+          roleIds: editForm.roleIds.split(",").map((item) => item.trim()).filter(Boolean),
+          status: editForm.status,
+          username: editForm.username,
+          email: editForm.email,
+        },
+      });
+      setEditOpen(false);
+      setSelectedUser(null);
+      toast.success("Đã cập nhật hồ sơ người dùng.");
+    } catch (error) {
+      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(message || "Không thể cập nhật người dùng.");
+    }
+  };
+
+  const handleOpenLock = (user: DisplayUser) => {
+    setSelectedUser(user);
+    setLockOpen(true);
+  };
+
+  const handleToggleLock = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await lockMutation.mutateAsync({ userId: selectedUser.id, locked: !selectedUser.locked });
+      setLockOpen(false);
+      setSelectedUser(null);
+      toast.success("Đã cập nhật trạng thái tài khoản.");
+    } catch (error) {
+      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(message || "Không thể cập nhật trạng thái tài khoản.");
+    }
   };
 
   const handleDeleteUser = (id: string) => {
-    setUsers(users.filter((user) => user.id !== id));
-    toast.success("Đã xóa tài khoản người dùng.");
+    void id;
+    toast.info("API hiện chưa có endpoint xóa người dùng. Đã bỏ qua thao tác xóa.");
   };
 
   return (
@@ -76,7 +248,7 @@ export default function UserManagementPage() {
             <p className="mt-1 text-sm font-medium text-slate-500">Phân quyền, quản lý tài khoản cán bộ và đơn vị công tác toàn hệ thống.</p>
           </div>
         </div>
-        <button onClick={handleAddUser} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
+        <button onClick={handleOpenCreate} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
           <UserPlus size={16} /> THÊM NGƯỜI DÙNG
         </button>
       </div>
@@ -165,10 +337,10 @@ export default function UserManagementPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-10 md:opacity-0 transition-opacity group-hover:opacity-100">
-                      <button onClick={() => handleEditUser(user.id)} className={cn("rounded-lg p-2 transition-all active:scale-90 border border-transparent", editingUserId === user.id ? "text-primary bg-primary/5 border-primary/10" : "text-slate-400 hover:bg-primary/5 hover:text-primary hover:border-primary/10") }>
+                      <button onClick={() => handleOpenEdit(user)} className={cn("rounded-lg p-2 transition-all active:scale-90 border border-transparent", editingUserId === user.id ? "text-primary bg-primary/5 border-primary/10" : "text-slate-400 hover:bg-primary/5 hover:text-primary hover:border-primary/10") }>
                         <Edit2 size={14} />
                       </button>
-                      <button onClick={() => handleToggleLock(user.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-amber-50 hover:text-amber-600 active:scale-90 border border-transparent hover:border-amber-100">
+                      <button onClick={() => handleOpenLock(user)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-amber-50 hover:text-amber-600 active:scale-90 border border-transparent hover:border-amber-100">
                         <Lock size={14} />
                       </button>
                       <button onClick={() => handleDeleteUser(user.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-90 border border-transparent hover:border-rose-100">
@@ -193,12 +365,132 @@ export default function UserManagementPage() {
           </div>
         </div>
       </div>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Thêm người dùng</DialogTitle>
+            <DialogDescription>Tạo nhanh tài khoản quản trị mới để test luồng admin-users.</DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Username" htmlFor="create-username">
+              <input id="create-username" value={createForm.username} onChange={(event) => setCreateForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Họ và tên" htmlFor="create-fullName">
+              <input id="create-fullName" value={createForm.fullName} onChange={(event) => setCreateForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Email" htmlFor="create-email">
+              <input id="create-email" value={createForm.email} onChange={(event) => setCreateForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Số điện thoại" htmlFor="create-phone">
+              <input id="create-phone" value={createForm.phone} onChange={(event) => setCreateForm((prev) => ({ ...prev, phone: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Đơn vị" htmlFor="create-unitId">
+              <input id="create-unitId" value={createForm.unitId} onChange={(event) => setCreateForm((prev) => ({ ...prev, unitId: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Role IDs" htmlFor="create-roleIds">
+              <input id="create-roleIds" value={createForm.roleIds} onChange={(event) => setCreateForm((prev) => ({ ...prev, roleIds: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setCreateOpen(false)} disabled={isBusy}>Hủy</Button>
+            <Button type="button" onClick={handleAddUser} disabled={isBusy}>
+              {createMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+              Tạo mới
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
+            <DialogDescription>Cập nhật hồ sơ, vai trò và trạng thái cho bản ghi đang chọn.</DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Username" htmlFor="edit-username">
+              <input id="edit-username" value={editForm.username} onChange={(event) => setEditForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Họ và tên" htmlFor="edit-fullName">
+              <input id="edit-fullName" value={editForm.fullName} onChange={(event) => setEditForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Email" htmlFor="edit-email">
+              <input id="edit-email" value={editForm.email} onChange={(event) => setEditForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Số điện thoại" htmlFor="edit-phone">
+              <input id="edit-phone" value={editForm.phone} onChange={(event) => setEditForm((prev) => ({ ...prev, phone: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Đơn vị" htmlFor="edit-unitId">
+              <input id="edit-unitId" value={editForm.unitId} onChange={(event) => setEditForm((prev) => ({ ...prev, unitId: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Role IDs" htmlFor="edit-roleIds">
+              <input id="edit-roleIds" value={editForm.roleIds} onChange={(event) => setEditForm((prev) => ({ ...prev, roleIds: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            </Field>
+            <Field label="Trạng thái" htmlFor="edit-status" className="md:col-span-2">
+              <select id="edit-status" value={editForm.status} onChange={(event) => setEditForm((prev) => ({ ...prev, status: event.target.value as "active" | "inactive" }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm">
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </select>
+            </Field>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setEditOpen(false)} disabled={isBusy}>Hủy</Button>
+            <Button type="button" onClick={handleEditUser} disabled={isBusy}>
+              {patchMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+              Lưu thay đổi
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={lockOpen} onOpenChange={setLockOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500" /> Xác nhận thay đổi trạng thái</DialogTitle>
+            <DialogDescription>
+              {selectedUser ? `${selectedUser.status === "active" ? "Khóa" : "Mở khóa"} tài khoản ${selectedUser.name}?` : "Xác nhận thao tác này."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setLockOpen(false)} disabled={isBusy}>Hủy</Button>
+            <Button type="button" onClick={handleToggleLock} disabled={isBusy}>
+              {lockMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+              {selectedUser?.locked ? "Mở khóa" : "Khóa"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function QuickStat({ title, value, icon, color }: any) {
-  const colors: any = { 
+function Field({
+  label,
+  htmlFor,
+  className,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className={cn("space-y-1.5", className)} htmlFor={htmlFor}>
+      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function QuickStat({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: "blue" | "emerald" | "amber" | "slate" }) {
+  const colors: Record<"blue" | "emerald" | "amber" | "slate", string> = {
     blue: "bg-blue-50 text-blue-600 border-blue-100 shadow-blue-100/20", 
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-100/20", 
     amber: "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-100/20", 

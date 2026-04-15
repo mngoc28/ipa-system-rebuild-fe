@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DelegationItem } from "@/dataHelper/ui-system.data";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, MoreVertical, ArrowUpDown, Eye, Edit2, Trash2 } from "lucide-react";
+import { ChevronRight, ArrowUpDown, Eye, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -22,7 +22,7 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
 export default function ListView({ delegations }: ListViewProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
+  const [deletedIds, setDeletedIds] = useState<Array<string | number>>([]);
   const itemsPerPage = 8;
 
   const visibleDelegations = delegations.filter((item) => !deletedIds.includes(item.id));
@@ -30,7 +30,7 @@ export default function ListView({ delegations }: ListViewProps) {
   const normalizedPage = Math.min(currentPage, totalPages);
   const paginatedItems = visibleDelegations.slice((normalizedPage - 1) * itemsPerPage, normalizedPage * itemsPerPage);
 
-  const handleView = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+  const handleView = (e: React.MouseEvent<HTMLButtonElement>, id: string | number) => {
     e.stopPropagation();
     navigate(`/delegations/${id}`);
   };

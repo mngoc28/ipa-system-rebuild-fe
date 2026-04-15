@@ -33,7 +33,7 @@ export interface DashboardTask {
 }
 
 export interface DelegationItem {
-  id: number;
+  id: string | number;
   code: string;
   name: string;
   country: string;

@@ -1,57 +1,67 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, User, Globe, ChevronDown } from "lucide-react";
 import { useAuthStore, UserRole } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useLoginMutation } from "@/hooks/useAuthQuery";
+import { getLoginRedirectPath } from "@/lib/routeHelpers";
+import { setAccessToken } from "@/utils/storage";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useAuthStore();
   const navigate = useNavigate();
   const isDev = import.meta.env.DEV;
+  const loginMutation = useLoginMutation();
 
-  const handleLogin = (e: any) => {
+  const mapRole = (roles: string[]): UserRole => {
+    const primaryRole = (roles[0] || "").toLowerCase();
+    if (primaryRole === "staff") return "Staff";
+    if (primaryRole === "manager") return "Manager";
+    if (primaryRole === "director") return "Director";
+    return "Admin";
+  };
+
+  const getErrorMessage = (error: unknown): string => {
+    const maybeAxiosError = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+    return maybeAxiosError?.response?.data?.error?.message || maybeAxiosError?.message || "Đăng nhập thất bại.";
+  };
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      // Determine role based on username
-      let role: UserRole = "Admin";
-      let fullName = "Nguyễn Văn Quản Trị";
-      let email = "admin@danang.gov.vn";
+    try {
+      const result = await loginMutation.mutateAsync({
+        usernameOrEmail: username.trim(),
+        password,
+      });
 
-      const lowerUser = username.toLowerCase();
-      if (lowerUser === "staff") {
-        role = "Staff";
-        fullName = "Trần Thu Hà";
-        email = "staff@danang.gov.vn";
-      } else if (lowerUser === "manager") {
-        role = "Manager";
-        fullName = "Nguyễn Minh Châu";
-        email = "manager@danang.gov.vn";
-      } else if (lowerUser === "director") {
-        role = "Director";
-        fullName = "Hồ Kỳ Minh";
-        email = "director@danang.gov.vn";
-      }
-
-      const mockUser = {
-        id: Math.random().toString(36).substr(2, 9),
-        username: lowerUser,
-        fullName,
-        email,
+      const payload = result.data;
+      const role = mapRole(payload.user.roles || []);
+      const normalizedUser = {
+        id: payload.user.id,
+        username: username.trim().toLowerCase(),
+        fullName: payload.user.fullName,
+        email: payload.user.email,
         role,
-        unit: "IPA Đà Nẵng",
+        unit: payload.user.unit?.id,
+        permissions: payload.user.permissions || [],
       };
 
-      login(mockUser, "mock-jwt-token-123");
-      setIsLoading(false);
+      setAccessToken(payload.accessToken);
+      login(normalizedUser, payload.accessToken);
       toast.success(`Đăng nhập thành công với quyền ${role}!`);
-      navigate("/dashboard");
-    }, 1500);
+      navigate(getLoginRedirectPath(role), { replace: true });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleMockLogin = (role: UserRole, fullName: string) => {
@@ -68,9 +78,11 @@ export default function LoginPage() {
       login(mockUser, "mock-jwt-token-xyz");
       setIsLoading(false);
       toast.success(`Đăng nhập bằng quyền ${role} thành công!`);
-      navigate("/dashboard");
+      navigate(getLoginRedirectPath(role), { replace: true });
     }, 800);
   };
+
+  const isSubmitting = loginMutation.isPending || isLoading;
 
   return (
     <main className="flex min-h-screen bg-slate-50 font-sans antialiased overflow-hidden">
@@ -82,7 +94,7 @@ export default function LoginPage() {
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdvmaQVFgFiYfS03odpVko0lSI8HS3ffl5sxvKJGDEe8uLq7p2eV_CquvvvmJYbHqHR09I_2fwkczFcmQyuu4yhoGBaOYM3HZz_50QIq7Lq8S6jjUy4QWtPLTkyWEetaOLTId-ShTFh0B_dQvLndVEwd1tqiTOkVNLDml0dU10NclFPQjoHpZ_dyYAB2hpbhFB3N4HmSVynGEnKApctxlYUPiO0OTnL33R3C_832kvEiQtK4Ssato8OwHEmrunQoicP4gBk6t0a00"
             alt="Da Nang Skyline"
           />
-          {/* @ts-ignore */}
+          {/* Decorative overlay for branding column */}
           <div className="absolute inset-0 bg-gradient-to-tr from-[#003fb1]/90 to-[#003fb1]/40 mix-blend-multiply"></div>
         </div>
 
@@ -181,6 +193,8 @@ export default function LoginPage() {
                     className="block w-full pl-12 pr-12 py-4 bg-[#eff3ff] border-none rounded-xl text-slate-900 placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20 transition-all outline-none text-sm font-medium" 
                     id="password" 
                     name="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••" 
                     type={showPassword ? "text" : "password"}
                     required
@@ -205,13 +219,13 @@ export default function LoginPage() {
               <button 
                 className={cn(
                   "w-full bg-[#003fb1] text-white font-black text-xs uppercase tracking-[0.15em] py-4 rounded-xl shadow-lg shadow-blue-900/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3",
-                  isLoading && "opacity-80 cursor-not-allowed"
+                  isSubmitting && "opacity-80 cursor-not-allowed"
                 )}
                 type="submit"
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
-                {isLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
-                {isLoading ? "Đang xác thực..." : "Đăng nhập"}
+                {isSubmitting && <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
+                {isSubmitting ? "Đang xác thực..." : "Đăng nhập"}
               </button>
 
               {/* Social Divider */}

@@ -1,26 +1,82 @@
 import { useMemo, useState } from "react";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, MapPin, Users, Zap, Filter, MoreHorizontal } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, MapPin, Users, Zap, Filter, MoreHorizontal } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { eventsApi } from "@/api/eventsApi";
+import { useAuthStore } from "@/store/useAuthStore";
+
+interface UiEvent {
+  id: string;
+  time: string;
+  title: string;
+  location: string;
+  type: string;
+  startAt: string;
+  endAt: string;
+  isJoined: boolean;
+}
+
+const toTimeRange = (startAt: string, endAt: string) => {
+  const start = new Date(startAt);
+  const end = new Date(endAt);
+  const startLabel = start.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  const endLabel = end.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  return `${startLabel} - ${endLabel}`;
+};
 
 export default function SchedulePage() {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
   const monthOptions = [
     { label: "Tháng 03, 2026", month: 2, year: 2026 },
     { label: "Tháng 04, 2026", month: 3, year: 2026 },
     { label: "Tháng 05, 2026", month: 4, year: 2026 },
   ];
+
   const [monthIndex, setMonthIndex] = useState(1);
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
-  const [joinedEventIds, setJoinedEventIds] = useState<number[]>([]);
   const [selectedDay, setSelectedDay] = useState<number | null>(10);
   const [showOnlyJoined, setShowOnlyJoined] = useState(false);
   const [outlookConnected, setOutlookConnected] = useState(false);
-  const [upcomingEvents, setUpcomingEvents] = useState([
-    { id: 1, time: "08:30 - 10:00", title: "Đón đoàn Samsung tại T2", location: "Sân bay Đà Nẵng", type: "Event" },
-    { id: 2, time: "14:00 - 16:30", title: "Họp trù bị đoàn Nhật Bản", location: "Phòng họp 1 - IPA", type: "Meeting" },
-    { id: 3, time: "19:00 - 21:00", title: "Tiệc tối xã giao đối tác ICT", location: "Sheraton Grand Resort", type: "Gala" },
-  ]);
+
+  const organizerId = user?.id || "u-staff";
+
+  const eventsQuery = useQuery({
+    queryKey: ["events", organizerId],
+    queryFn: () => eventsApi.list({ organizerId, page: 1, pageSize: 100 }),
+  });
+  const isLoadingEvents = eventsQuery.isLoading;
+  const hasError = eventsQuery.isError;
+  const errorMessage = eventsQuery.error instanceof Error ? eventsQuery.error.message : "Không thể tải lịch công tác.";
+
+  const createEventMutation = useMutation({
+    mutationFn: eventsApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Đã tạo lịch công tác mới.");
+    },
+    onError: () => toast.error("Không thể tạo lịch công tác."),
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: ({ id, joined }: { id: string; joined: boolean }) => eventsApi.join(id, joined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+
+  const rescheduleMutation = useMutation({
+    mutationFn: ({ id, startAt, endAt }: { id: string; startAt: string; endAt: string }) =>
+      eventsApi.requestReschedule(id, {
+        proposedStartAt: startAt,
+        proposedEndAt: endAt,
+        reason: "Điều phối lại lịch tác nghiệp",
+      }),
+  });
+
   const currentMonth = monthOptions[monthIndex];
 
   const calendarCells = useMemo(() => {
@@ -28,44 +84,50 @@ export default function SchedulePage() {
     const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
     const cells: Array<number | null> = [];
 
-    for (let i = 0; i < firstDay; i += 1) {
-      cells.push(null);
-    }
-
-    for (let day = 1; day <= daysInMonth; day += 1) {
-      cells.push(day);
-    }
-
-    while (cells.length % 7 !== 0) {
-      cells.push(null);
-    }
+    for (let i = 0; i < firstDay; i += 1) cells.push(null);
+    for (let day = 1; day <= daysInMonth; day += 1) cells.push(day);
+    while (cells.length % 7 !== 0) cells.push(null);
 
     return cells;
   }, [currentMonth.month, currentMonth.year]);
 
-  const filteredEvents = upcomingEvents.filter((event) => (showOnlyJoined ? joinedEventIds.includes(event.id) : true));
+  const upcomingEvents: UiEvent[] = useMemo(() => {
+    const items = eventsQuery.data?.data?.items ?? [];
+    return items.map((event) => ({
+      id: event.id,
+      time: toTimeRange(event.startAt, event.endAt),
+      title: event.title,
+      location: event.locationId || "Địa điểm cập nhật sau",
+      type: event.eventType || "Event",
+      startAt: event.startAt,
+      endAt: event.endAt,
+      isJoined: event.joinStates?.[organizerId] === "JOINED",
+    }));
+  }, [eventsQuery.data, organizerId]);
 
-  const handlePrevMonth = () => {
-    setMonthIndex((prev) => (prev - 1 + monthOptions.length) % monthOptions.length);
-  };
+  const filteredEvents = upcomingEvents.filter((event) => (showOnlyJoined ? event.isJoined : true));
 
-  const handleNextMonth = () => {
-    setMonthIndex((prev) => (prev + 1) % monthOptions.length);
-  };
+  const handlePrevMonth = () => setMonthIndex((prev) => (prev - 1 + monthOptions.length) % monthOptions.length);
+  const handleNextMonth = () => setMonthIndex((prev) => (prev + 1) % monthOptions.length);
 
   const handleCreateSchedule = () => {
-    const newEvent = {
-      id: Date.now(),
-      time: "09:00 - 10:00",
+    const now = new Date();
+    const start = new Date(now.getTime() + 60 * 60 * 1000);
+    const end = new Date(start.getTime() + 90 * 60 * 1000);
+
+    createEventMutation.mutate({
       title: `Lịch mới #${upcomingEvents.length + 1}`,
-      location: "IPA Đà Nẵng",
-      type: "Meeting",
-    };
-    setUpcomingEvents([newEvent, ...upcomingEvents]);
-    toast.success("Đã tạo lịch công tác mới.");
+      eventType: "MEETING",
+      status: "PLANNED",
+      startAt: start.toISOString(),
+      endAt: end.toISOString(),
+      organizerUserId: organizerId,
+      participantUserIds: [organizerId],
+      locationId: "IPA_DA_NANG",
+    });
   };
 
-  const handleEventAction = async (action: "detail" | "copy" | "reschedule", event: (typeof upcomingEvents)[number]) => {
+  const handleEventAction = async (action: "detail" | "copy" | "reschedule", event: UiEvent) => {
     if (action === "detail") {
       toast.info(`Chi tiết: ${event.title} | ${event.time} | ${event.location}`);
       return;
@@ -82,18 +144,30 @@ export default function SchedulePage() {
       return;
     }
 
-    toast.success(`Đã gửi đề xuất đổi lịch cho: ${event.title}`);
+    rescheduleMutation.mutate(
+      {
+        id: event.id,
+        startAt: new Date(new Date(event.startAt).getTime() + 30 * 60 * 1000).toISOString(),
+        endAt: new Date(new Date(event.endAt).getTime() + 30 * 60 * 1000).toISOString(),
+      },
+      {
+        onSuccess: () => toast.success(`Đã gửi đề xuất đổi lịch cho: ${event.title}`),
+        onError: () => toast.error("Không thể gửi đề xuất đổi lịch."),
+      },
+    );
   };
 
-  const toggleJoinEvent = (event: (typeof upcomingEvents)[number]) => {
-    const hasJoined = joinedEventIds.includes(event.id);
-    if (hasJoined) {
-      setJoinedEventIds(joinedEventIds.filter((id) => id !== event.id));
-      toast.info(`Đã hủy tham gia: ${event.title}`);
-      return;
-    }
-    setJoinedEventIds([...joinedEventIds, event.id]);
-    toast.success(`Đã tham gia: ${event.title}`);
+  const toggleJoinEvent = (event: UiEvent) => {
+    const nextJoined = !event.isJoined;
+    joinMutation.mutate(
+      { id: event.id, joined: nextJoined },
+      {
+        onSuccess: () => {
+          toast[nextJoined ? "success" : "info"](`${nextJoined ? "Đã tham gia" : "Đã hủy tham gia"}: ${event.title}`);
+        },
+        onError: () => toast.error("Không thể cập nhật trạng thái tham gia."),
+      },
+    );
   };
 
   return (
@@ -117,7 +191,6 @@ export default function SchedulePage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        {/* Calendar Navigation Sidebar */}
         <div className="space-y-6 lg:col-span-1">
           <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
@@ -132,7 +205,6 @@ export default function SchedulePage() {
               </div>
             </div>
 
-            {/* Simple Calendar Grid mockup */}
             <div className="grid grid-cols-7 gap-1 text-center">
               {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
                 <span key={d} className="py-1 text-[10px] font-black uppercase text-slate-300">
@@ -175,7 +247,6 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* Weekly Schedule View */}
         <div className="space-y-6 lg:col-span-3">
           <div className="space-y-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-50 pb-6">
@@ -191,7 +262,23 @@ export default function SchedulePage() {
             </div>
 
             <div className="relative space-y-8 before:absolute before:bottom-2 before:left-[105px] before:top-2 before:w-px before:bg-slate-100">
-              {filteredEvents.map((event) => (
+              {isLoadingEvents && (
+                <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-6 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Đang tải lịch công tác...
+                </div>
+              )}
+
+              {hasError && !isLoadingEvents && (
+                <div className="rounded-xl border border-rose-100 bg-rose-50 p-5 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-rose-600">Không thể tải lịch công tác</p>
+                  <p className="mt-2 text-sm text-rose-500">{errorMessage}</p>
+                  <button onClick={() => eventsQuery.refetch()} className="mt-4 rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-500">
+                    Thử lại
+                  </button>
+                </div>
+              )}
+
+              {!isLoadingEvents && !hasError && filteredEvents.map((event) => (
                 <div key={event.id} className="group flex gap-8">
                   <div className="w-20 space-y-1 pt-2 text-right">
                     <p className="text-xs font-black text-slate-900">{event.time.split(" - ")[0]}</p>
@@ -199,22 +286,12 @@ export default function SchedulePage() {
                   </div>
 
                   <div className="relative flex-1">
-                    <div
-                      className={cn(
-                        "absolute left-[-45px] top-[18px] z-10 h-2.5 w-2.5 rounded-sm ring-4 ring-white transition-all shadow-sm",
-                        event.type === "Meeting" ? "bg-blue-500" : event.type === "Gala" ? "bg-amber-500" : "bg-primary",
-                      )}
-                    />
+                    <div className={cn("absolute left-[-45px] top-[18px] z-10 h-2.5 w-2.5 rounded-sm ring-4 ring-white transition-all shadow-sm", event.type === "MEETING" ? "bg-blue-500" : event.type === "GALA" ? "bg-amber-500" : "bg-primary")} />
 
                     <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/40 p-5 transition-all group-hover:border-primary/20 group-hover:bg-white group-hover:shadow-xl group-hover:shadow-slate-200/40">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              "rounded px-2 py-0.5 text-[8.5px] font-black uppercase tracking-widest border",
-                              event.type === "Meeting" ? "bg-blue-50 text-blue-600 border-blue-100" : event.type === "Gala" ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-primary/5 text-primary border-primary/10",
-                            )}
-                          >
+                          <span className={cn("rounded px-2 py-0.5 text-[8.5px] font-black uppercase tracking-widest border", event.type === "MEETING" ? "bg-blue-50 text-blue-600 border-blue-100" : event.type === "GALA" ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-primary/5 text-primary border-primary/10")}>
                             {event.type}
                           </span>
                         </div>
@@ -226,7 +303,7 @@ export default function SchedulePage() {
                           </div>
                           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tight text-slate-500">
                             <Users size={14} className="text-slate-300" />
-                            04 Thành viên
+                            Thành viên: {event.isJoined ? "Đã tham gia" : "Chưa xác nhận"}
                           </div>
                         </div>
                       </div>
@@ -249,19 +326,18 @@ export default function SchedulePage() {
                           onClick={() => toggleJoinEvent(event)}
                           className={cn(
                             "rounded-lg px-5 py-2.5 text-[10px] font-black uppercase tracking-widest shadow-md transition-all active:scale-95",
-                            joinedEventIds.includes(event.id)
-                              ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                              : "bg-slate-900 text-white hover:bg-slate-800",
+                            event.isJoined ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "bg-slate-900 text-white hover:bg-slate-800",
                           )}
                         >
-                          {joinedEventIds.includes(event.id) ? "ĐÃ THAM GIA" : "THAM GIA"}
+                          {event.isJoined ? "ĐÃ THAM GIA" : "THAM GIA"}
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              {filteredEvents.length === 0 && (
+
+              {!isLoadingEvents && !hasError && filteredEvents.length === 0 && (
                 <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
                   Không có lịch phù hợp bộ lọc hiện tại.
                 </div>
@@ -269,7 +345,6 @@ export default function SchedulePage() {
             </div>
           </div>
 
-          {/* Empty slots indicator */}
           <div className="py-10 text-center opacity-30">
             <div className="mb-4 flex items-center justify-center gap-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-400" />

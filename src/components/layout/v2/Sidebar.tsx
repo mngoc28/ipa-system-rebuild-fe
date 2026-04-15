@@ -35,6 +35,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   // Mọi role
   { title: "Tổng quan", path: "/dashboard", icon: LayoutDashboard, roles: ["Staff", "Manager", "Director", "Admin"] },
+  { title: "Pipeline dự án", path: "/pipeline", icon: PieChart, roles: ["Staff", "Manager", "Director"] },
   { title: "Đoàn đến/đi", path: "/delegations", icon: Briefcase, roles: ["Staff", "Manager", "Director", "Admin"] },
   { title: "Lịch công tác", path: "/schedule", icon: Calendar, roles: ["Staff", "Manager", "Director", "Admin"] },
   { title: "Việc cần làm", path: "/tasks", icon: CheckSquare, roles: ["Staff", "Manager", "Director", "Admin"] },
@@ -50,7 +51,6 @@ const menuItems: MenuItem[] = [
 
   // Director thêm
   { title: "Tổng quan thành phố", path: "/city-overview", icon: Building2, roles: ["Director"] },
-  { title: "Pipeline xúc tiến", path: "/pipeline", icon: PieChart, roles: ["Director"] },
   { title: "Báo cáo thành phố", path: "/reports/city", icon: PieChart, roles: ["Director"] },
 
   // Mọi role (CRM & Tài liệu)

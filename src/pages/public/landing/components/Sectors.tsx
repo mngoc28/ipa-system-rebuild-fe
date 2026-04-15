@@ -1,13 +1,6 @@
-import { Cpu, DollarSign, Plane, Building } from "lucide-react";
+import { landingSectors } from "@/dataHelper/landing.dataHelper";
 
 export default function Sectors() {
-  const sectors = [
-    { icon: Cpu, name: "Công nghệ Thông tin", count: "142 Dự án", color: "bg-indigo-50 text-indigo-600" },
-    { icon: Plane, name: "Du lịch Dịch vụ", count: "89 Dự án", color: "bg-sky-50 text-sky-600" },
-    { icon: Building, name: "Bất động sản Công nghiệp", count: "34 Dự án", color: "bg-emerald-50 text-emerald-600" },
-    { icon: DollarSign, name: "Tài chính Quốc tế", count: "12 Dự án", color: "bg-amber-50 text-amber-600" },
-  ];
-
   return (
     <section className="bg-white py-24">
       <div className="container mx-auto px-4 lg:px-8 flex flex-col md:flex-row items-center gap-16">
@@ -19,7 +12,7 @@ export default function Sectors() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4 md:w-2/3 lg:grid-cols-2">
-          {sectors.map((s, idx) => (
+          {landingSectors.map((s, idx) => (
             <div key={idx} className="group flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50 p-6 transition-all hover:bg-white hover:shadow-md cursor-pointer">
               <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-lg ${s.color}`}> 
                 <s.icon size={26} />

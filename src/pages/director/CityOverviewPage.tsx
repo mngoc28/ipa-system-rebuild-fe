@@ -1,144 +1,521 @@
 import * as React from "react";
-import { Building2, MapPin, TrendingUp, Users, PieChart as PieChartIcon, ArrowUpRight, Globe, Zap } from "lucide-react";
+import {
+  ArrowUpRight,
+  BadgeDollarSign,
+  Briefcase,
+  Building2,
+  CalendarDays,
+  ChevronRight,
+  ClipboardList,
+  Layers3,
+  MapPinned,
+  RefreshCw,
+  Sparkles,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
+
+const currencyFormatter = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+  maximumFractionDigits: 0,
+});
+
+const dateFormatter = new Intl.DateTimeFormat("vi-VN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
+const timeFormatter = new Intl.DateTimeFormat("vi-VN", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 export default function CityOverviewPage() {
-  const [mapMode, setMapMode] = React.useState<"heat" | "digital">("digital");
-  const [showPciAnalysis, setShowPciAnalysis] = React.useState(false);
+  const navigate = useNavigate();
+  const summaryQuery = useDashboardSummaryQuery("director");
+  const tasksQuery = useDashboardTasksQuery("director");
+
+  const summary = summaryQuery.data?.data;
+  const city = summary?.city;
+  const taskItems = tasksQuery.data?.data?.items ?? [];
+  const isLoading = summaryQuery.isLoading || tasksQuery.isLoading;
+  const isError = summaryQuery.isError || tasksQuery.isError;
+
+  const handleRefresh = () => {
+    void summaryQuery.refetch();
+    void tasksQuery.refetch();
+  };
+
+  if (isLoading) {
+    return <CityOverviewSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
+        <div className="max-w-md space-y-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+            <Sparkles size={22} />
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-black uppercase tracking-tight text-slate-950">Không tải được City Overview</h1>
+            <p className="text-sm font-medium text-slate-500">Kiểm tra lại backend dashboard API rồi thử tải lại dữ liệu.</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
+          >
+            <RefreshCw size={14} />
+            Tải lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const stageBreakdown = city?.stageBreakdown ?? [];
+  const totalStages = stageBreakdown.reduce((sum, item) => sum + item.projectCount, 0) || 1;
+  const recentProjects = city?.recentProjects ?? [];
+  const upcomingEvents = city?.upcomingEventsList ?? [];
+  const topPartners = city?.topPartners ?? [];
 
   return (
-    <div className="space-y-6 duration-500 animate-in fade-in">
-      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-        <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Tổng quan Đầu tư Thành phố</h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">Bản đồ số và dữ liệu vĩ mô về hạ tầng đầu tư của Đà Nẵng.</p>
+    <div className="space-y-6 duration-700 animate-in fade-in">
+      <section
+        className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20 md:p-8"
+        style={{
+          background: "linear-gradient(135deg, #020617 0%, #0f172a 52%, #0f766e 100%)",
+        }}
+      >
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute -left-14 top-6 h-40 w-40 rounded-full bg-primary/30 blur-3xl" />
+          <div className="absolute right-0 top-0 h-52 w-52 rounded-full bg-amber-400/20 blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 h-36 w-36 rounded-full bg-cyan-400/15 blur-3xl" />
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setMapMode("heat")} className={cn("rounded-lg border border-slate-200 px-5 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all active:scale-95", mapMode === "heat" ? "bg-slate-900 text-white" : "bg-white text-slate-800 hover:bg-slate-50")}>Bản đồ nhiệt</button>
-          <button onClick={() => setMapMode("digital")} className={cn("rounded-lg px-5 py-2 text-[10px] font-black uppercase tracking-wider shadow-lg transition-all active:scale-95", mapMode === "digital" ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-white text-slate-800 border border-slate-200 hover:bg-slate-50")}>Dữ liệu số</button>
-        </div>
-      </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600">Chế độ hiển thị hiện tại: {mapMode === "heat" ? "Bản đồ nhiệt" : "Dữ liệu số"}</div>
+        <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-white/80 backdrop-blur">
+              <MapPinned size={12} />
+              Live city overview
+            </div>
+            <div className="space-y-3">
+              <h1 className="max-w-3xl text-3xl font-black uppercase tracking-tight text-white md:text-5xl">
+                Tổng quan xúc tiến đầu tư thành phố
+              </h1>
+              <p className="max-w-2xl text-sm font-medium leading-6 text-white/70 md:text-base">
+                Dữ liệu tổng hợp trực tiếp từ partner, pipeline, delegation, event và task để lãnh đạo nhìn nhanh tình hình thành phố.
+              </p>
+            </div>
 
-      {/* Map Interactive Placeholder */}
-      <div className="group relative h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-xl shadow-slate-200/50">
-        <img
-          src="https://images.unsplash.com/photo-1596701062351-8c0880026391?q=80&w=2070&auto=format&fit=crop"
-          alt="Danang Map"
-          className="duration-[2000ms] h-full w-full object-cover opacity-90 transition-all group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-        
-        {/* Map markers */}
-        <div className="absolute left-[55%] top-[35%] -translate-x-1/2">
-          <div className="relative">
-            <div className="absolute h-5 w-5 animate-ping rounded-full bg-primary/40" />
-            <div className="relative z-10 h-5 w-5 rounded-full border-2 border-white bg-primary shadow-lg shadow-primary/40" />
-            <div className="absolute left-1/2 top-7 -translate-x-1/2 whitespace-nowrap rounded-lg border border-slate-200 bg-white/95 px-3 py-2 shadow-2xl backdrop-blur-sm">
-              <p className="text-[10px] font-black uppercase tracking-tight text-slate-950">Khu Công nghệ Cao</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[9px] font-bold text-primary">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                15 DỰ ÁN MỚI
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleRefresh}
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-100"
+              >
+                <RefreshCw size={14} />
+                Tải dữ liệu
+              </button>
+              <button
+                onClick={() => navigate("/reports/city")}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-white/10"
+              >
+                <ArrowUpRight size={14} />
+                Xem báo cáo
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <HeroStat title="Đối tác" value={String(city?.partners ?? 0)} note="từ backend" icon={<Users size={16} />} />
+              <HeroStat title="Pipeline" value={String(city?.pipelineProjects ?? 0)} note="dự án" icon={<Briefcase size={16} />} />
+              <HeroStat title="Đoàn công tác" value={String(city?.activeDelegations ?? 0)} note="đang mở" icon={<ClipboardList size={16} />} />
+              <HeroStat title="Sự kiện tới" value={String(city?.upcomingEvents ?? 0)} note="đã xếp lịch" icon={<CalendarDays size={16} />} />
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/10 p-5 shadow-2xl shadow-black/10 backdrop-blur-xl">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/45">KPI trọng tâm</p>
+                  <h2 className="mt-1 text-xl font-black uppercase tracking-tight text-white">Dòng vốn & tiến độ</h2>
+                </div>
+                <div className="rounded-full border border-white/10 bg-white/10 p-3 text-amber-300 shadow-inner">
+                  <TrendingUp size={18} />
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <MetricBlock label="Tổng giá trị pipeline" value={formatCurrency(city?.totalPipelineValue)} accent="from-emerald-400/25 to-emerald-500/10" />
+                <MetricBlock label="Giá trị đang mở" value={formatCurrency(city?.activePipelineValue)} accent="from-cyan-400/25 to-cyan-500/10" />
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.28em] text-white/45">
+                  <span>Pipeline stages</span>
+                  <span>{totalStages} dự án</span>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {stageBreakdown.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-white/10 bg-white/5 p-4 text-xs font-medium text-white/60">
+                      Chưa có dữ liệu pipeline.
+                    </div>
+                  ) : (
+                    stageBreakdown.map((item) => (
+                      <div key={item.stageId} className="space-y-2">
+                        <div className="flex items-center justify-between gap-4 text-sm">
+                          <span className="font-bold text-white/90">{formatDisplayLabel(item.stageName, "Chưa có giai đoạn")}</span>
+                          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">{item.projectCount} / {formatCurrency(item.totalValue)}</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-amber-300 via-primary to-cyan-300"
+                            style={{ width: `${Math.max(8, (item.projectCount / totalStages) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-          <div className="space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50">Hệ thống giám sát vĩ mô</p>
-            <h3 className="font-title text-3xl font-black uppercase tracking-tighter text-white">ĐÀ NẴNG SMART CITY</h3>
-          </div>
-          <div className="flex gap-3">
-            <div className="min-w-[110px] rounded-lg border border-white/10 bg-white/5 p-3 text-center text-white backdrop-blur-md shadow-inner">
-              <p className="text-xl font-black tracking-tight leading-none">1.2M+</p>
-              <p className="mt-1 text-[8px] font-black uppercase tracking-widest text-white/40">Dân số</p>
-            </div>
-            <div className="min-w-[110px] rounded-lg border border-white/10 bg-white/5 p-3 text-center text-white backdrop-blur-md shadow-inner">
-              <p className="text-xl font-black tracking-tight leading-none">7.2%</p>
-              <p className="mt-1 text-[8px] font-black uppercase tracking-widest text-white/40">GRDP 2026</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/20">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-100/50 shadow-sm">
-              <Globe size={18} />
-            </div>
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Vốn FDI Đăng ký</h4>
-          </div>
-          <div>
-            <p className="text-3xl font-black tracking-tight text-slate-950 uppercase leading-none">
-              $420M
-            </p>
-            <span className="mt-1 inline-block text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+12% vs 2025</span>
-          </div>
-          <div className="space-y-3 pt-2">
-            {[
-              { label: "Nhật Bản", width: "w-3/4", color: "bg-blue-600" },
-              { label: "Hàn Quốc", width: "w-1/2", color: "bg-primary" },
-            ].map((item, i) => (
-              <div key={i} className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-slate-500">
-                  <span>{item.label}</span>
+      <section className="grid gap-6 xl:grid-cols-2">
+        <PanelCard title="Phân bổ pipeline" subtitle="Stage breakdown theo dữ liệu thật" icon={<Layers3 size={18} />}>
+          <div className="space-y-4">
+            {stageBreakdown.length === 0 ? (
+              <EmptyState label="Chưa có dự án pipeline nào." />
+            ) : (
+              stageBreakdown.map((item) => (
+                <div key={item.stageId} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(item.stageName, "Chưa có giai đoạn")}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{formatDisplayLabel(item.stageCode, "Không có mã")}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-slate-950">{item.projectCount}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">dự án</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-slate-950 via-primary to-amber-400"
+                      style={{ width: `${Math.max(6, (item.projectCount / totalStages) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                    <span>Giá trị</span>
+                    <span>{formatCurrency(item.totalValue)}</span>
+                  </div>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-50 border border-slate-100">
-                  <div className={cn("h-full rounded-full transition-all", item.color, item.width)} />
+              ))
+            )}
+          </div>
+        </PanelCard>
+
+        <PanelCard title="Sự kiện sắp tới" subtitle="Lịch làm việc và khảo sát" icon={<CalendarDays size={18} />}>
+          <div className="space-y-3">
+            {upcomingEvents.length === 0 ? (
+              <EmptyState label="Chưa có sự kiện nào trong lịch tới." />
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event.id} className="group rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/20 hover:shadow-lg hover:shadow-slate-100/50">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">{formatDateTime(event.startAt)}</p>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(event.title, "Sự kiện chưa đặt tên")}</h3>
+                      <p className="text-[10px] font-medium text-slate-400">
+                        {formatDisplayLabel(event.delegationName, "Không gắn đoàn")}
+                        {event.locationName ? ` · ${formatDisplayLabel(event.locationName, "Không gắn địa điểm")}` : ""}
+                      </p>
+                    </div>
+                    <ArrowUpRight size={16} className="text-slate-300 transition group-hover:text-primary" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-        </div>
+        </PanelCard>
+      </section>
 
-        <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/20">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm">
-              <Building2 size={18} />
-            </div>
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Hạ tầng sẵn sàng</h4>
+      <section className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr]">
+        <PanelCard title="Dự án mới cập nhật" subtitle="5 bản ghi gần nhất từ pipeline" icon={<Briefcase size={18} />}>
+          <div className="space-y-3">
+            {recentProjects.length === 0 ? (
+              <EmptyState label="Chưa có dự án nào." />
+            ) : (
+              recentProjects.map((project) => (
+                <div key={project.id} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/20 hover:shadow-lg hover:shadow-slate-100/50">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{project.projectCode}</span>
+                        <span className="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-primary">{formatDisplayLabel(project.stageName, "Chưa có giai đoạn")}</span>
+                      </div>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(project.projectName, "Dự án chưa đặt tên")}</h3>
+                      <p className="text-[10px] font-medium text-slate-400">
+                        {formatDisplayLabel(project.partnerName, "Chưa gắn partner")}
+                        {project.delegationName ? ` · ${formatDisplayLabel(project.delegationName, "Chưa gắn đoàn")}` : ""}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 lg:min-w-[220px]">
+                      <MiniMetric label="Giá trị" value={formatCurrency(project.estimatedValue)} />
+                      <MiniMetric label="Xác suất" value={project.successProbability !== null ? `${project.successProbability}%` : "N/A"} />
+                      <MiniMetric label="Đóng dự kiến" value={formatDateOnly(project.expectedCloseDate)} />
+                      <MiniMetric label="Cập nhật" value={formatDateOnly(project.updatedAt)} />
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-          <div>
-            <p className="text-3xl font-black tracking-tight text-slate-950 uppercase leading-none">
-              820 HA
-            </p>
-            <p className="mt-2 text-[11px] font-bold text-slate-400 uppercase tracking-tight leading-relaxed">
-              Quỹ đất công nghiệp sạch lớn nhất miền Trung.
-            </p>
-          </div>
-          <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-            <p className="text-[10px] font-medium leading-relaxed text-slate-600">
-              Sẵn sàng bàn giao quỹ đất 20ha cho nhà đầu tư bán dẫn trong Q3/2026.
-            </p>
-          </div>
-        </div>
+        </PanelCard>
 
-        <div className="flex flex-col justify-between rounded-xl bg-primary p-6 text-white shadow-xl shadow-primary/20 border border-primary/10">
-          <div className="space-y-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-amber-300 border border-white/5 shadow-inner">
-              <Zap size={20} />
-            </div>
-            <div className="space-y-0.5">
-              <h3 className="text-lg font-black uppercase tracking-tight">BÁO CÁO PCI 2026</h3>
-              <p className="text-[9px] font-black uppercase tracking-widest text-white/40">Năng lực cạnh tranh cấp tỉnh</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-6 text-center shadow-inner backdrop-blur-sm">
-              <p className="text-4xl font-black uppercase tracking-tighter">HẠNG 2</p>
-              <p className="mt-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 truncate">Toàn quốc / 63 tỉnh thành</p>
-            </div>
+        <PanelCard title="Đầu việc cần xử lý" subtitle="Task feed từ backend" icon={<ClipboardList size={18} />}>
+          <div className="space-y-3">
+            {taskItems.length === 0 ? (
+              <EmptyState label="Chưa có task nào." />
+            ) : (
+              taskItems.map((task) => (
+                <div key={task.id} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(task.title, "Đầu việc chưa đặt tên")}</h3>
+                      <span className={cn("rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em]", getPriorityClasses(task.priority))}>
+                        {getPriorityLabel(task.priority)}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      <span>{getTaskStatusLabel(task.status)}</span>
+                      <span>·</span>
+                      <span>{formatDateOnly(task.dueAt)}</span>
+                      {task.isOverdue && <span className="text-rose-600">Quá hạn</span>}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-          <button onClick={() => setShowPciAnalysis((prev) => !prev)} className="mt-6 w-full rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">XEM PHÂN TÍCH</button>
-        </div>
-      </div>
+        </PanelCard>
+      </section>
 
-      {showPciAnalysis && (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm font-semibold text-slate-700">
-          Phân tích PCI: điểm mạnh nổi bật ở tính minh bạch thủ tục và tốc độ xử lý hồ sơ đầu tư, cần cải thiện chỉ số chi phí không chính thức.
-        </div>
-      )}
+      <section className="grid gap-6 xl:grid-cols-2">
+        <PanelCard title="Đối tác nổi bật" subtitle="Xếp hạng theo score và số dự án" icon={<BadgeDollarSign size={18} />}>
+          <div className="space-y-3">
+            {topPartners.length === 0 ? (
+              <EmptyState label="Chưa có dữ liệu partner." />
+            ) : (
+              topPartners.map((partner, index) => (
+                <div key={partner.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-black uppercase tracking-tight text-slate-950">{partner.partnerName}</p>
+                    <p className="text-[10px] font-medium text-slate-400">{partner.projectCount} dự án đang nối</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-slate-950">{partner.score !== null ? partner.score.toFixed(2) : "N/A"}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">score</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </PanelCard>
+
+        <PanelCard title="Điểm nhấn thành phố" subtitle="Tóm lược vận hành hiện tại" icon={<Building2 size={18} />}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <MetricBlock label="Tổng dự án" value={String(city?.pipelineProjects ?? 0)} accent="from-slate-900 to-slate-700" />
+            <MetricBlock label="Đối tác" value={String(city?.partners ?? 0)} accent="from-primary to-primary/70" />
+            <MetricBlock label="Đoàn đang mở" value={String(city?.activeDelegations ?? 0)} accent="from-amber-400 to-amber-300" />
+            <MetricBlock label="Sự kiện tới" value={String(city?.upcomingEvents ?? 0)} accent="from-cyan-500 to-cyan-300" />
+          </div>
+        </PanelCard>
+      </section>
     </div>
   );
+}
+
+function HeroStat({ title, value, note, icon }: { title: string; value: string; note: string; icon: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm">
+      <div className="flex items-center gap-2 text-white/55">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-amber-300">{icon}</span>
+        <p className="text-[10px] font-black uppercase tracking-[0.24em]">{title}</p>
+      </div>
+      <p className="mt-3 text-2xl font-black tracking-tight text-white">{value}</p>
+      <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/45">{note}</p>
+    </div>
+  );
+}
+
+function MetricBlock({ label, value, accent }: { label: string; value: string; accent: string }) {
+  return (
+    <div className={cn("rounded-2xl border border-white/10 bg-gradient-to-br p-4", accent)}>
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/60">{label}</p>
+      <p className="mt-2 text-lg font-black tracking-tight text-white">{value}</p>
+    </div>
+  );
+}
+
+function PanelCard({
+  title,
+  subtitle,
+  icon,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-5 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <div className="flex items-center gap-2 text-slate-950">
+            <span className="rounded-lg bg-slate-950 p-2 text-white">{icon}</span>
+            <h2 className="text-base font-black uppercase tracking-tight">{title}</h2>
+          </div>
+          <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">{subtitle}</p>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function MiniMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-left">
+      <p className="text-[9px] font-black uppercase tracking-[0.24em] text-slate-400">{label}</p>
+      <p className="mt-1 truncate text-[11px] font-black uppercase tracking-tight text-slate-950">{value}</p>
+    </div>
+  );
+}
+
+function EmptyState({ label }: { label: string }) {
+  return <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-5 text-sm font-medium text-slate-500">{label}</div>;
+}
+
+function CityOverviewSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-[360px] rounded-[2rem] bg-slate-200/80" />
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className="h-[420px] rounded-[1.75rem] bg-slate-100" />
+        <div className="h-[420px] rounded-[1.75rem] bg-slate-100" />
+      </div>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className="h-[360px] rounded-[1.75rem] bg-slate-100" />
+        <div className="h-[360px] rounded-[1.75rem] bg-slate-100" />
+      </div>
+    </div>
+  );
+}
+
+function formatCurrency(value: number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+
+  return currencyFormatter.format(value);
+}
+
+function formatDateOnly(value: string | null | undefined): string {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  return dateFormatter.format(date);
+}
+
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  return `${dateFormatter.format(date)} · ${timeFormatter.format(date)}`;
+}
+
+function formatDisplayLabel(value: string | null | undefined, fallback: string): string {
+  if (!value) {
+    return fallback;
+  }
+
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  const lowered = normalized.toLowerCase();
+  if (
+    lowered.includes("seed") ||
+    lowered.startsWith("ipa_") ||
+    lowered.startsWith("name_vi_") ||
+    lowered.startsWith("name_") ||
+    lowered.startsWith("title_") ||
+    lowered.startsWith("project_name_") ||
+    lowered.startsWith("partner_name_")
+  ) {
+    return fallback;
+  }
+
+  return normalized;
+}
+
+function getTaskStatusLabel(status: number): string {
+  if (status === 1) {
+    return "Đang xử lý";
+  }
+
+  if (status === 2) {
+    return "Hoàn thành";
+  }
+
+  return "Chưa xử lý";
+}
+
+function getPriorityLabel(priority: number): string {
+  if (priority === 3) {
+    return "Urgent";
+  }
+
+  if (priority === 2) {
+    return "High";
+  }
+
+  return "Normal";
+}
+
+function getPriorityClasses(priority: number): string {
+  if (priority === 3) {
+    return "bg-rose-50 text-rose-600";
+  }
+
+  if (priority === 2) {
+    return "bg-amber-50 text-amber-600";
+  }
+
+  return "bg-slate-100 text-slate-500";
 }

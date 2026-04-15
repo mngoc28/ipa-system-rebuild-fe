@@ -1,10 +1,41 @@
 import * as React from "react";
 import { TrendingUp, Users, Calendar, Clock, CheckCircle2, ChevronRight, ArrowUpRight, Zap, Briefcase, MapPin, ShieldCheck, Building2, PieChart, ClipboardList, Search, Bell, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { dashboardTasks, weekSessions } from "@/dataHelper/ui-system.data";
+import { weekSessions } from "@/dataHelper/ui-system.data";
+import { onlineUsers } from "@/dataHelper/dashboard.dataHelper";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
+
+interface TimelineItem {
+  id: string | number;
+  time?: string;
+  role?: string;
+  title?: string;
+  name?: string;
+  location?: string;
+  ip?: string;
+}
+
+interface StatCardProps {
+  title: string;
+  value: string;
+  note: string;
+  icon: React.ReactNode;
+  color: "blue" | "emerald" | "rose" | "amber" | "purple";
+}
+
+interface HighlightCardProps {
+  title: string;
+  detail: string;
+  action: string;
+  color: "dark" | "primary";
+  icon: React.ReactNode;
+  progress?: number;
+  onClick?: () => void;
+}
+
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -13,6 +44,14 @@ export default function DashboardPage() {
   const isDirector = role === "Director";
   const isManager = role === "Manager";
   const quickActionPath = isAdmin ? "/admin/audit-log" : isDirector ? "/reports/city" : isManager ? "/reports/unit" : "/tasks";
+  const scope = isAdmin ? "admin" : isDirector ? "director" : isManager ? "manager" : "staff";
+
+  const summaryQuery = useDashboardSummaryQuery(scope);
+  const tasksQuery = useDashboardTasksQuery(scope);
+
+  const summary = summaryQuery.data?.data;
+  const taskFeed = tasksQuery.data?.data?.items || [];
+  const timelineItems: TimelineItem[] = isAdmin ? onlineUsers : weekSessions.slice(0, 3);
 
   return (
     <div className="space-y-8 duration-700 animate-in fade-in">
@@ -46,31 +85,31 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {isAdmin ? (
           <>
-            <StatCard title="Tổng người dùng" value="124" note="+2 tuần này" icon={<Users size={20} />} color="blue" />
-            <StatCard title="System Uptime" value="99.9%" note="Ổn định" icon={<ShieldCheck size={20} />} color="emerald" />
-            <StatCard title="Traffic định kỳ" value="1.2k" note="+15%" icon={<TrendingUp size={20} />} color="purple" />
-            <StatCard title="Log Storage" value="12GB" note="/50GB total" icon={<Clock size={20} />} color="amber" />
+            <StatCard title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Từ API summary" icon={<Users size={20} />} color="blue" />
+            <StatCard title="System Uptime" value={String(summary?.stats.tasks ?? 0)} note="Task records" icon={<ShieldCheck size={20} />} color="emerald" />
+            <StatCard title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Event records" icon={<TrendingUp size={20} />} color="purple" />
+            <StatCard title="Log Storage" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue tasks" icon={<Clock size={20} />} color="amber" />
           </>
         ) : isDirector ? (
           <>
-            <StatCard title="Tổng vốn đầu tư" value="$1.2B" note="+24% YoY" icon={<TrendingUp size={20} />} color="emerald" />
-            <StatCard title="Dự án Pipeline" value="48" note="12 dự án lớn" icon={<Briefcase size={20} />} color="blue" />
-            <StatCard title="Chỉ số PCI" value="70.5" note="Top 3 cả nước" icon={<PieChart size={20} />} color="purple" />
-            <StatCard title="Đoàn cấp cao" value="15" note="Tháng này" icon={<Users size={20} />} color="amber" />
+            <StatCard title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<TrendingUp size={20} />} color="emerald" />
+            <StatCard title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<Briefcase size={20} />} color="blue" />
+            <StatCard title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Events" icon={<PieChart size={20} />} color="purple" />
+            <StatCard title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Users size={20} />} color="amber" />
           </>
         ) : isManager ? (
           <>
-            <StatCard title="Đoàn chờ duyệt" value="05" note="Cần xử lý ngay" icon={<ClipboardList size={20} />} color="rose" />
-            <StatCard title="Việc phòng ban" value="32" note="85% hoàn thành" icon={<CheckCircle2 size={20} />} color="blue" />
-            <StatCard title="Lịch họp tuần" value="12" note="+3 tuần trước" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Báo cáo đơn vị" value="04" note="Đã gửi đi" icon={<PieChart size={20} />} color="emerald" />
+            <StatCard title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<ClipboardList size={20} />} color="rose" />
+            <StatCard title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="blue" />
+            <StatCard title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
+            <StatCard title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<PieChart size={20} />} color="emerald" />
           </>
         ) : (
           <>
-            <StatCard title="Đoàn phụ trách" value="04" note="2 đoàn đang tới" icon={<Users size={20} />} color="blue" />
-            <StatCard title="Việc cần làm" value="08" note="3 việc gấp" icon={<CheckCircle2 size={20} />} color="rose" />
-            <StatCard title="Lịch cá nhân" value="05" note="Trong hôm nay" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Tài liệu mới" value="12" note="Vừa cập nhật" icon={<Zap size={20} />} color="emerald" />
+            <StatCard title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<Users size={20} />} color="blue" />
+            <StatCard title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="rose" />
+            <StatCard title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
+            <StatCard title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Zap size={20} />} color="emerald" />
           </>
         )}
       </div>
@@ -88,18 +127,23 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="space-y-4">
-              {(isAdmin ? adminLogs : dashboardTasks).map((item) => (
+              {taskFeed.length === 0 && (
+                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-xs font-semibold text-slate-500">
+                  Chua co dau viec tu API.
+                </div>
+              )}
+              {taskFeed.map((item) => (
                 <div
                   key={item.id}
                   className={cn(
                     "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-slate-50/50 hover:shadow-lg hover:shadow-slate-100/50",
-                    (item as any).priority === "urgent" ? "border-rose-100 bg-rose-50/30" : "border-slate-100 bg-white",
+                    item.priority === "urgent" ? "border-rose-100 bg-rose-50/30" : "border-slate-100 bg-white",
                   )}
                 >
                   <div
                     className={cn(
                       "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
-                      (item as any).priority === "urgent" ? "border-rose-300 text-rose-500 bg-white" : "border-slate-300 text-slate-400 bg-white",
+                      item.priority === "urgent" ? "border-rose-300 text-rose-500 bg-white" : "border-slate-300 text-slate-400 bg-white",
                     )}
                   >
                     <Clock size={12} />
@@ -107,18 +151,18 @@ export default function DashboardPage() {
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-black text-slate-900 transition-colors group-hover:text-primary uppercase tracking-tight leading-tight">{item.title}</h4>
-                      {(item as any).priority && (
-                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", (item as any).priority === "urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-200")}>
-                          {(item as any).priority}
+                      {item.priority && (
+                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-200")}>
+                          {item.priority}
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{(item as any).delegation || (item as any).user}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.delegation || item.user || "GENERAL"}</p>
                     <div className="mt-3 flex items-center gap-4">
                       <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                        <Calendar size={12} className="text-slate-300" /> {(item as any).deadline || (item as any).time}
+                        <Calendar size={12} className="text-slate-300" /> {item.deadline || item.time || "N/A"}
                       </span>
-                      {(item as any).overdue && <span className="text-[9px] font-black tracking-[0.2em] text-rose-600">!! QUÁ HẠN XỬ LÝ</span>}
+                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-rose-600">!! QUÁ HẠN XỬ LÝ</span>}
                     </div>
                   </div>
                 </div>
@@ -153,7 +197,7 @@ export default function DashboardPage() {
               <Calendar size={16} className="text-primary" />
             </div>
             <div className="relative space-y-6 before:absolute before:bottom-2 before:left-3.5 before:top-2 before:w-px before:bg-slate-100">
-              {(isAdmin ? onlineUsers : weekSessions.slice(0, 3)).map((item: any) => (
+              {timelineItems.map((item) => (
                 <div key={item.id} className="group relative pl-10">
                   <div className="absolute left-[8.5px] top-1.5 z-10 h-2 w-2 rounded-sm bg-slate-200 transition-all group-hover:bg-primary shadow-[0_0_0_4px_white] ring-1 ring-slate-100" />
                   <div className="space-y-1">
@@ -195,8 +239,8 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, note, icon, color }: any) {
-  const colors: any = {
+function StatCard({ title, value, note, icon, color }: StatCardProps) {
+  const colors: Record<StatCardProps["color"], string> = {
     blue: "text-blue-600 bg-white border-blue-100",
     emerald: "text-emerald-600 bg-white border-emerald-100",
     rose: "text-rose-600 bg-white border-rose-100",
@@ -220,7 +264,7 @@ function StatCard({ title, value, note, icon, color }: any) {
   );
 }
 
-function HighlightCard({ title, detail, action, color, icon, progress, onClick }: any) {
+function HighlightCard({ title, detail, action, color, icon, progress, onClick }: HighlightCardProps) {
   const handleCardClick = () => {
     onClick?.();
     toast.info(`Đang mở ${title}`);
@@ -261,13 +305,3 @@ function HighlightCard({ title, detail, action, color, icon, progress, onClick }
   );
 }
 
-const adminLogs = [
-  { id: 1, title: "Đăng nhập từ IP mới", user: "Admin", time: "10:45", priority: "urgent" },
-  { id: 2, title: "Cấu hình Keycloak cập nhật", user: "System", time: "09:20", priority: "normal" },
-  { id: 3, title: "Backup DB định kỳ", user: "Service", time: "00:00", priority: "normal" },
-];
-const onlineUsers = [
-  { id: 1, name: "Trần Thu Hà", role: "Staff", ip: "10.0.1.45" },
-  { id: 2, name: "Nguyễn Minh Châu", role: "Manager", ip: "10.0.1.12" },
-  { id: 3, name: "Hồ Kỳ Minh", role: "Director", ip: "10.0.2.1" },
-];

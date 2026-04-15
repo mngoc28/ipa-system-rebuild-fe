@@ -1,11 +1,55 @@
 import * as React from "react";
-import { PieChart, TrendingUp, Calendar, Download, FileText, ChevronRight, Filter, Target } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Download, FileText, Filter, PieChart, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { reportsApi } from "@/api/reportsApi";
+
 export default function UnitReportsPage() {
   const [showChartPanel, setShowChartPanel] = React.useState(false);
   const [showReportFilter, setShowReportFilter] = React.useState(false);
-  const [lastExportAt, setLastExportAt] = React.useState<string | null>(null);
+  const [selectedCode, setSelectedCode] = React.useState("");
+  const [activeRunId, setActiveRunId] = React.useState<string | null>(null);
+  const [runHistory, setRunHistory] = React.useState<Array<{ run_id: string; report_code: string; status: string }>>([]);
+
+  const definitionsQuery = useQuery({
+    queryKey: ["report-definitions", "unit"],
+    queryFn: reportsApi.listDefinitions,
+  });
+
+  const createRunMutation = useMutation({
+    mutationFn: (reportCode: string) => reportsApi.createRun({ report_code: reportCode, params: { scope: "unit" } }),
+    onSuccess: (data) => {
+      const runId = data.data.run_id;
+      setActiveRunId(runId);
+      setRunHistory((prev) => [{ run_id: runId, report_code: selectedCode, status: data.data.status }, ...prev]);
+      toast.success("Đã khởi tạo tiến trình tạo báo cáo.");
+    },
+    onError: () => toast.error("Không thể khởi tạo báo cáo."),
+  });
+
+  const runStatusQuery = useQuery({
+    queryKey: ["report-run", activeRunId],
+    queryFn: () => reportsApi.showRun(activeRunId || ""),
+    enabled: Boolean(activeRunId),
+    refetchInterval: (query) => {
+      const status = String(query.state.data?.data?.status || "").toLowerCase();
+      return status === "queued" || status === "running" ? 1500 : false;
+    },
+  });
+
+  const definitions = definitionsQuery.data?.data?.items || [];
+
+  React.useEffect(() => {
+    if (!selectedCode && definitions.length > 0) {
+      setSelectedCode(definitions[0].report_code);
+    }
+  }, [definitions, selectedCode]);
+
+  React.useEffect(() => {
+    const latest = runStatusQuery.data?.data;
+    if (!latest?.run_id) return;
+    setRunHistory((prev) => prev.map((r) => (r.run_id === latest.run_id ? { ...r, status: latest.status } : r)));
+  }, [runStatusQuery.data]);
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
@@ -16,17 +60,32 @@ export default function UnitReportsPage() {
         </div>
         <button
           onClick={() => {
-            const now = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
-            setLastExportAt(now);
-            toast.success("Đã tạo gói xuất báo cáo đơn vị.");
+            if (!selectedCode) {
+              toast.error("Chưa có mẫu báo cáo khả dụng.");
+              return;
+            }
+            createRunMutation.mutate(selectedCode);
           }}
           className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
         >
-          <Download size={16} /> XUẤT TẤT CẢ
+          <Download size={16} /> TẠO BÁO CÁO
         </button>
       </div>
 
-      {lastExportAt && <p className="text-[10px] font-black uppercase tracking-widest text-primary">Lần xuất gần nhất: {lastExportAt}</p>}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mẫu báo cáo</p>
+          <p className="mt-1 text-xl font-black text-slate-900">{definitions.length}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiến trình gần nhất</p>
+          <p className="mt-1 text-xl font-black text-slate-900">{runStatusQuery.data?.data?.status || "-"}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã chạy</p>
+          <p className="mt-1 truncate text-sm font-black text-slate-900">{runStatusQuery.data?.data?.run_id || "-"}</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Monthly KPI card */}
@@ -79,15 +138,25 @@ export default function UnitReportsPage() {
           </button>
         </div>
 
-        {showReportFilter && <p className="text-[10px] font-black uppercase tracking-widest text-primary">Đang lọc báo cáo theo chu kỳ Tuần và Tháng.</p>}
+        {showReportFilter && (
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <select
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+              value={selectedCode}
+              onChange={(e) => setSelectedCode(e.target.value)}
+            >
+              {definitions.map((def) => (
+                <option key={def.report_code} value={def.report_code}>
+                  {def.report_code}
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] font-black uppercase tracking-widest text-primary">Đang lọc theo mẫu báo cáo đã chọn.</p>
+          </div>
+        )}
 
         <div className="space-y-3">
-          {[
-            { title: "Báo cáo Tuần 14 - Tháng 04/2026", type: "Tuần", date: "07/04/2026", author: "Trần Thu Hà" },
-            { title: "Báo cáo Tuần 13 - Tháng 03/2026", type: "Tuần", date: "31/03/2026", author: "Nguyễn Minh Châu" },
-            { title: "Báo cáo Tổng kết Tháng 03/2026", type: "Tháng", date: "01/04/2026", author: "IPA System" },
-            { title: "Báo cáo Quý I/2026 - Tầm nhìn chiến lược 2030", type: "Quý", date: "25/03/2026", author: "Nguyễn Minh Châu" },
-          ].map((report, i) => (
+          {(runHistory.length ? runHistory : []).map((report, i) => (
             <div
               key={i}
               className="group flex flex-col justify-between gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-4 transition-all hover:border-primary/20 hover:bg-white hover:shadow-md md:flex-row md:items-center"
@@ -97,19 +166,28 @@ export default function UnitReportsPage() {
                   <FileText size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 transition-colors group-hover:text-primary">{report.title}</h4>
+                  <h4 className="text-sm font-bold text-slate-900 transition-colors group-hover:text-primary">Run {report.run_id}</h4>
                   <div className="mt-0.5 flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">{report.type}</span>
-                    <span className="text-[10px] font-medium text-slate-400">&bull; {report.date}</span>
-                    <span className="text-[10px] font-medium text-slate-400">&bull; {report.author}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">{report.report_code}</span>
+                    <span className="text-[10px] font-medium text-slate-400">&bull; {report.status}</span>
                   </div>
                 </div>
               </div>
-              <button onClick={() => toast.success(`Đang tải báo cáo: ${report.title}`)} className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all group-hover:bg-primary group-hover:text-white group-hover:border-primary active:scale-95">
+              <button
+                onClick={() => {
+                  if (report.status.toLowerCase() !== "done") {
+                    toast.error("Báo cáo chưa hoàn tất.");
+                    return;
+                  }
+                  toast.success(`Sẵn sàng tải báo cáo run ${report.run_id}`);
+                }}
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all group-hover:bg-primary group-hover:text-white group-hover:border-primary active:scale-95"
+              >
                 Tải xuống <Download size={14} />
               </button>
             </div>
           ))}
+          {runHistory.length === 0 && <p className="text-sm font-semibold text-slate-500">Chưa có lịch sử chạy báo cáo. Hãy tạo báo cáo mới.</p>}
         </div>
       </div>
     </div>

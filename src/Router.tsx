@@ -19,6 +19,7 @@ import StaffMinutesDetailPage from "./pages/staff/minutes/MinutesDetailPage";
 import StaffTaskListPage from "./pages/staff/tasks/TaskListPage";
 import StaffPartnerListPage from "./pages/staff/partners/PartnerListPage";
 import StaffDocumentListPage from "./pages/staff/documents/DocumentListPage";
+import StaffPipelinePage from "./pages/staff/PipelinePage";
 import StaffNotificationsPage from "./pages/staff/notifications/NotificationsPage";
 
 // == MANAGER IMPORTS ==
@@ -35,6 +36,7 @@ import ManagerDocumentListPage from "./pages/manager/documents/DocumentListPage"
 import ApprovalsPage from "./pages/manager/ApprovalsPage";
 import UnitReportsPage from "./pages/manager/UnitReportsPage";
 import TeamsPage from "./pages/manager/TeamsPage";
+import ManagerPipelinePage from "./pages/manager/PipelinePage";
 
 // == DIRECTOR IMPORTS ==
 import DirectorDashboardPage from "./pages/director/dashboard/DashboardPage";
@@ -48,8 +50,9 @@ import DirectorTaskListPage from "./pages/director/tasks/TaskListPage";
 import DirectorPartnerListPage from "./pages/director/partners/PartnerListPage";
 import DirectorDocumentListPage from "./pages/director/documents/DocumentListPage";
 import CityOverviewPage from "./pages/director/CityOverviewPage";
-import PipelinePage from "./pages/director/PipelinePage";
+import DirectorPipelinePage from "./pages/director/PipelinePage";
 import CityReportsPage from "./pages/director/CityReportsPage";
+import PartnerDetailPage from "./pages/partners/PartnerDetailPage";
 
 // == ADMIN APP IMPORTS ==
 import AdminAppDashboardPage from "./pages/admin/dashboard/DashboardPage";
@@ -69,23 +72,25 @@ import SystemSettingsPage from "./pages/admin/SystemSettingsPage";
 import UserManagementPage from "./pages/admin/UserManagementPage";
 import MasterDataPage from "./pages/admin/MasterDataPage";
 import AuditLogPage from "./pages/admin/AuditLogPage";
+import { AUTH_LOGIN_PATH, getDashboardPathForRole } from "./lib/routeHelpers";
 
 export default function Router() {
   const { isAuthenticated, user } = useAuthStore();
   const role = user?.role;
+  const dashboardPath = getDashboardPathForRole(role);
 
   return (
     <Routes>
-      <Route path="/auth/login" element={<LoginPageV2 />} />
+      <Route path={AUTH_LOGIN_PATH} element={<LoginPageV2 />} />
       <Route path="/auth/change-password" element={<ChangePasswordFirstTime />} />
 
       {/* Public Landing Route */}
       <Route element={<LandingLayout />}>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to={dashboardPath} replace /> : <LandingPage />} />
       </Route>
 
       {/* Main Base Route (Authenticated) */}
-      <Route element={isAuthenticated ? <AppShellV2 /> : <Navigate to="/auth/login" replace />}>
+      <Route element={isAuthenticated ? <AppShellV2 /> : <Navigate to={AUTH_LOGIN_PATH} replace />}>
         {role === "Staff" && (
           <>
             <Route path="dashboard" element={<StaffDashboardPage />} />
@@ -97,6 +102,8 @@ export default function Router() {
             <Route path="minutes/:id" element={<StaffMinutesDetailPage />} />
             <Route path="tasks" element={<StaffTaskListPage />} />
             <Route path="partners" element={<StaffPartnerListPage />} />
+            <Route path="partners/:id" element={<PartnerDetailPage />} />
+            <Route path="pipeline" element={<StaffPipelinePage />} />
             <Route path="documents" element={<StaffDocumentListPage />} />
             <Route path="notifications" element={<StaffNotificationsPage />} />
             <Route path="profile" element={<ProfilePage />} />
@@ -114,6 +121,8 @@ export default function Router() {
             <Route path="minutes/:id" element={<ManagerMinutesDetailPage />} />
             <Route path="tasks" element={<ManagerTaskListPage />} />
             <Route path="partners" element={<ManagerPartnerListPage />} />
+            <Route path="partners/:id" element={<PartnerDetailPage />} />
+            <Route path="pipeline" element={<ManagerPipelinePage />} />
             <Route path="documents" element={<ManagerDocumentListPage />} />
             <Route path="approvals" element={<ApprovalsPage />} />
             <Route path="reports/unit" element={<UnitReportsPage />} />
@@ -134,9 +143,10 @@ export default function Router() {
             <Route path="minutes/:id" element={<DirectorMinutesDetailPage />} />
             <Route path="tasks" element={<DirectorTaskListPage />} />
             <Route path="partners" element={<DirectorPartnerListPage />} />
+            <Route path="partners/:id" element={<PartnerDetailPage />} />
             <Route path="documents" element={<DirectorDocumentListPage />} />
             <Route path="city-overview" element={<CityOverviewPage />} />
-            <Route path="pipeline" element={<PipelinePage />} />
+            <Route path="pipeline" element={<DirectorPipelinePage />} />
             <Route path="reports/city" element={<CityReportsPage />} />
             <Route path="notifications" element={<StaffNotificationsPage />} />
             <Route path="profile" element={<ProfilePage />} />
@@ -154,17 +164,18 @@ export default function Router() {
             <Route path="minutes/:id" element={<AdminMinutesDetailPage />} />
             <Route path="tasks" element={<AdminTaskListPage />} />
             <Route path="partners" element={<AdminPartnerListPage />} />
+            <Route path="partners/:id" element={<PartnerDetailPage />} />
             <Route path="documents" element={<AdminDocumentListPage />} />
             <Route path="notifications" element={<StaffNotificationsPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </>
         )}
 
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to={dashboardPath} replace />} />
       </Route>
 
       {/* Admin Route Shell */}
-      <Route path="/admin" element={isAuthenticated && role === "Admin" ? <AdminLayout /> : <Navigate to="/auth/login" replace />}>
+      <Route path="/admin" element={isAuthenticated && role === "Admin" ? <AdminLayout /> : <Navigate to={AUTH_LOGIN_PATH} replace />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<UserManagementPage />} />
@@ -173,7 +184,7 @@ export default function Router() {
         <Route path="audit-log" element={<AuditLogPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to={isAuthenticated ? dashboardPath : "/"} replace />} />
     </Routes>
   );
 }

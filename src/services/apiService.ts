@@ -1,60 +1,21 @@
-import axios, { AxiosRequestConfig } from "axios";
-import { getAuthToken } from "@/store/useAuthStore";
-import { getAccessToken, removeAccessToken } from "@/utils/storage";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
-// Tạo instance Axios với các cấu hình mặc định
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Thêm interceptor cho request
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Prefer in-memory auth token, fallback to persisted access token.
-    const token = getAuthToken() || getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
-// Thêm interceptor cho response
-axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // Xử lý lỗi: 401 Unauthorized, 403 Forbidden, v.v.
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      // Redirect đến trang đăng nhập hoặc xử lý lỗi xác thực
-      removeAccessToken();
-      window.location.href = "/auth/login";
-    }
-    return Promise.reject(error);
-  },
-);
+import type { AxiosRequestConfig } from "axios";
+import axiosClient from "@/api/axiosClient";
 
 const apiService = {
   get: <T>(url: string, config?: AxiosRequestConfig) => {
-    return axiosInstance.get<T>(url, config);
+    return axiosClient.get<T>(url, config);
   },
   post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => {
-    return axiosInstance.post<T>(url, data, config);
+    return axiosClient.post<T>(url, data, config);
+  },
+  patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => {
+    return axiosClient.patch<T>(url, data, config);
   },
   put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => {
-    return axiosInstance.put<T>(url, data, config);
+    return axiosClient.put<T>(url, data, config);
   },
   delete: <T>(url: string, config?: AxiosRequestConfig) => {
-    return axiosInstance.delete<T>(url, config);
+    return axiosClient.delete<T>(url, config);
   },
 };
 

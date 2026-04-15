@@ -1,28 +1,103 @@
-import { useState } from "react";
-import { FileText, Plus, Search, Download, Share2, Eye, MoreVertical, CheckCircle2, Clock, History, PenTool, Filter } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FileText, Plus, Search, Download, Share2, Eye, MoreVertical, CheckCircle2, Clock, History, PenTool, Filter, X } from "lucide-react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { delegationsApi } from "@/api/delegationsApi";
+import { SEARCH_DEBOUNCE_DELAY_MS } from "@/constant";
+import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 
 export default function MinutesListPage() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [showSignedOnly, setShowSignedOnly] = useState(false);
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
 
-  const [minutes, setMinutes] = useState([
-    { id: 1, title: "Biên bản làm việc - Samsung Electronics", date: "10/04/2026", type: "Ghi nhớ (MoU)", status: "Signed", author: "Trần Thu Hà", size: "1.2MB" },
-    { id: 2, title: "Biên bản khảo sát - KCN Thung lũng Silicon", date: "08/04/2026", type: "Khảo sát thực địa", status: "Pending", author: "Nguyễn Văn A", size: "2.5MB" },
-    { id: 3, title: "Biên bản họp nội bộ - Chuẩn bị đón đoàn HQ", date: "05/04/2026", type: "Nội bộ", status: "Draft", author: "Trần Thu Hà", size: "850KB" },
-  ]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+      setPage(1);
+    }, SEARCH_DEBOUNCE_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
+  const listQuery = useQuery({
+    queryKey: ["minutes", page, pageSize, debouncedSearchQuery, showSignedOnly],
+    queryFn: () =>
+      minutesApi.list({
+        page,
+        pageSize,
+        keyword: debouncedSearchQuery || undefined,
+        status: showSignedOnly ? "FINAL" : undefined,
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const delegationsQuery = useQuery({
+    queryKey: ["delegations", "minutes-context"],
+    queryFn: () => delegationsApi.list({ page: 1 }),
+  });
+
+  const firstDelegationId = delegationsQuery.data?.data?.items?.[0]?.id;
+
+  const createMinutesMutation = useMutation({
+    mutationFn: (payload: { title: string; delegationId: string; content?: string }) => minutesApi.create(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["minutes"] });
+      toast.success("Đã tạo bản nháp biên bản mới.");
+    },
+  });
+
+  const approveMinutesMutation = useMutation({
+    mutationFn: (id: string) => minutesApi.approve(id, { decision: "APPROVE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["minutes"] });
+      toast.success("Đã cập nhật trạng thái biên bản.");
+    },
+    onError: () => {
+      toast.error("Không thể chuyển trạng thái biên bản.");
+    },
+  });
+
+  if (listQuery.isLoading || delegationsQuery.isLoading) {
+    return <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">Đang tải biên bản...</div>;
+  }
+
+  if (listQuery.isError || delegationsQuery.isError) {
+    return <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-sm font-semibold text-rose-600">Không thể tải danh sách biên bản.</div>;
+  }
+
+  const minutes = (listQuery.data?.data?.items ?? []).map((item) => ({
+    id: item.id,
+    delegationId: item.delegationId,
+    title: item.title,
+    date: "Vừa cập nhật",
+    type: item.eventId ? "Biên bản sự kiện" : "Biên bản đoàn",
+    status: mapMinutesStatus(item.status),
+    author: "Hệ thống",
+    size: "--",
+  }));
+
+  const pagination = listQuery.data?.data?.meta;
+  const totalPages = pagination?.totalPages ?? 1;
+  const totalItems = pagination?.total ?? minutes.length;
+  const pageLabelStart = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const pageLabelEnd = totalItems === 0 ? 0 : pageLabelStart + minutes.length - 1;
+  const paginationPages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
   const handleShare = (title: string) => {
     toast.success(`Đã gửi liên kết truy cập biên bản "${title}" cho đối tác!`);
   };
 
-  const handleView = (id: number) => {
-    navigate(`/minutes/${id}`);
+  const handleView = (id: string) => {
+    navigate(`${id}`);
   };
 
   const handleDownload = (title: string) => {
@@ -35,67 +110,96 @@ export default function MinutesListPage() {
   };
 
   const handleCreateMinutes = () => {
-    const newItem = {
-      id: Date.now(),
-      title: `Biên bản mới #${minutes.length + 1}`,
-      date: "Vừa xong",
-      type: "Nội bộ",
-      status: "Draft",
-      author: "Bạn",
-      size: "640KB",
-    };
-    setMinutes([newItem, ...minutes]);
-    toast.success("Đã tạo bản nháp biên bản mới.");
+    if (!firstDelegationId) {
+      toast.error("Không tìm thấy đoàn để tạo biên bản.");
+      return;
+    }
+    createMinutesMutation.mutate(
+      {
+        title: `Biên bản mới #${minutes.length + 1}`,
+        delegationId: String(firstDelegationId),
+      },
+      {
+        onSuccess: (response) => {
+          const newId = response.data?.id;
+          if (newId) {
+            navigate(`${newId}`);
+            return;
+          }
+          toast.success("Đã tạo bản nháp biên bản mới.");
+        },
+        onError: () => {
+          toast.error("Tạo biên bản thất bại.");
+        },
+      },
+    );
   };
 
   const handleTemplate = (name: string) => {
-    const templated = {
-      id: Date.now(),
-      title: `${name} - Bản mới`,
-      date: "Vừa xong",
-      type: "Mẫu chuẩn",
-      status: "Draft",
-      author: "Bạn",
-      size: "700KB",
-    };
-    setMinutes([templated, ...minutes]);
-    toast.success(`Đã tạo biên bản từ mẫu: ${name}`);
+    if (!firstDelegationId) {
+      toast.error("Không tìm thấy đoàn để tạo từ mẫu.");
+      return;
+    }
+    createMinutesMutation.mutate(
+      {
+        title: `${name} - Bản mới`,
+        delegationId: String(firstDelegationId),
+      },
+      {
+        onSuccess: (response) => {
+          const newId = response.data?.id;
+          if (newId) {
+            navigate(`${newId}`);
+            return;
+          }
+          toast.success(`Đã tạo biên bản từ mẫu: ${name}`);
+        },
+      },
+    );
   };
 
   const handleFilter = () => {
     setShowSignedOnly((prev) => !prev);
+    setPage(1);
     toast.info(!showSignedOnly ? "Đang lọc chỉ biên bản đã ký." : "Đã bỏ lọc trạng thái ký.");
   };
 
-  const handleDuplicateRow = (id: number) => {
+  const handleDuplicateRow = (id: string) => {
     const row = minutes.find((item) => item.id === id);
     if (!row) return;
-    setMinutes([{ ...row, id: Date.now(), title: `${row.title} (Bản sao)`, status: "Draft", date: "Vừa xong", author: "Bạn" }, ...minutes]);
-    toast.success("Đã nhân bản biên bản.");
+    createMinutesMutation.mutate(
+      {
+        title: `${row.title} (Bản sao)`,
+        delegationId: String(row.delegationId),
+      },
+      {
+        onSuccess: (response) => {
+          const newId = response.data?.id;
+          if (newId) {
+            navigate(`${newId}`);
+            return;
+          }
+          toast.success("Đã nhân bản biên bản.");
+        },
+      },
+    );
   };
 
-  const handleToggleStatus = (id: number) => {
-    setMinutes(
-      minutes.map((item) => {
-        if (item.id !== id) return item;
-        if (item.status === "Draft") return { ...item, status: "Pending" };
-        if (item.status === "Pending") return { ...item, status: "Signed" };
-        return { ...item, status: "Draft" };
-      }),
-    );
-    toast.success("Đã cập nhật trạng thái biên bản.");
+  const handleToggleStatus = (id: string) => {
+    const row = minutes.find((item) => item.id === id);
+    if (!row) return;
+    if (row.status === "Signed") {
+      toast.info("Biên bản đã finalized, không thể đổi trạng thái tại danh sách.");
+      return;
+    }
+    approveMinutesMutation.mutate(id);
   };
 
   const handlePagination = (page: number) => {
-    toast.info(`Đang chuyển sang trang ${page}`);
+    setPage(page);
   };
 
-  const visibleMinutes = minutes.filter((item) => {
-    const byStatus = showSignedOnly ? item.status === "Signed" : true;
-    const keyword = searchQuery.trim().toLowerCase();
-    const byKeyword = keyword ? item.title.toLowerCase().includes(keyword) || item.author.toLowerCase().includes(keyword) : true;
-    return byStatus && byKeyword;
-  });
+  const visibleMinutes = minutes;
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
@@ -153,10 +257,23 @@ export default function MinutesListPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
                 placeholder="Tìm tên biên bản, đối tác..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-10 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {searchQuery.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setPage(1);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition-all hover:bg-slate-200 hover:text-slate-700"
+                  aria-label="Xóa tìm kiếm"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
             <button onClick={handleFilter} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-slate-400 transition-all hover:text-primary hover:bg-white">
               <Filter size={16} />
@@ -165,7 +282,11 @@ export default function MinutesListPage() {
         </div>
 
         <div className="space-y-3">
-          {visibleMinutes.map((item) => (
+          {listQuery.isFetching && !listQuery.data ? (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Đang cập nhật danh sách biên bản...</div>
+          ) : visibleMinutes.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Không có biên bản phù hợp.</div>
+          ) : visibleMinutes.map((item) => (
             <div
               key={item.id}
               className="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-md lg:flex-row lg:items-center"
@@ -222,15 +343,27 @@ export default function MinutesListPage() {
           ))}
         </div>
 
-        {/* Pagination mockup */}
-        <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Hiển thị 3 / 45 biên bản</p>
-          <div className="flex items-center gap-1">
-            <button className="h-7 w-7 rounded bg-slate-950 text-[10px] font-bold text-white shadow-md">1</button>
-            <button onClick={() => handlePagination(2)} className="h-7 w-7 rounded border border-slate-200 bg-white text-[10px] font-bold text-slate-400 hover:bg-slate-50 transition-colors">2</button>
-            <button onClick={() => handlePagination(3)} className="h-7 w-7 rounded border border-slate-200 bg-white text-[10px] font-bold text-slate-400 hover:bg-slate-50 transition-colors">3</button>
+        {totalPages > 1 && (
+          <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+              Hiển thị {pageLabelStart}-{pageLabelEnd} / {totalItems} biên bản
+            </p>
+            <div className="flex flex-wrap items-center gap-1">
+              {paginationPages.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePagination(pageNumber)}
+                  className={cn(
+                    "h-7 w-7 rounded border text-[10px] font-bold transition-colors",
+                    pageNumber === page ? "border-slate-950 bg-slate-950 text-white shadow-md" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50",
+                  )}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

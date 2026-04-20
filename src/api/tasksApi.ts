@@ -7,22 +7,40 @@ import type {
   TaskPatchPayload,
 } from "@/dataHelper/tasks.dataHelper";
 
+/**
+ * Represents a commentary or feedback item linked to a task.
+ */
 export interface TaskCommentApiItem {
+  /** Unique ID of the comment */
   id: number | string;
+  /** The actual text content of the comment */
   comment_text: string;
+  /** ISO timestamp of record creation */
   created_at: string;
+  /** Information about the user who authored the comment */
   commenter?: {
+    /** user ID */
     id?: number | string;
+    /** user full name */
     full_name?: string;
+    /** user avatar absolute URL */
     avatar_url?: string | null;
   };
 }
 
+/**
+ * Metadata for a file uploaded as an attachment to a task.
+ */
 export interface TaskAttachmentApiItem {
+  /** Unique attachment ID */
   id: number | string;
+  /** The original name of the uploaded file */
   file_name: string;
+  /** Size of the file in bytes */
   file_size: number;
+  /** Standard MIME type (e.g., application/pdf, image/png) */
   mime_type?: string;
+  /** Upload timestamp */
   created_at?: string;
 }
 
@@ -32,7 +50,15 @@ const getPrefix = () => {
   return `/api/v1/${mappedRole}/tasks`;
 };
 
+/**
+ * API service for managing workflow tasks, comments, and file attachments.
+ */
 export const tasksApi = {
+  /**
+   * Fetches a paginated list of tasks matching search and status criteria.
+   * @param query - Filter parameters for progress, importance, and pagination.
+   * @returns Paginated list of tasks records.
+   */
   list: async (query?: {
     status?: number;
     priority?: number;
@@ -46,32 +72,63 @@ export const tasksApi = {
     return response.data;
   },
 
+  /**
+   * Retrieves full details for a single task.
+   * @param id - The unique task identifier.
+   * @returns Comprehensive task metadata.
+   */
   get: async (id: string) => {
     const response = await axiosClient.get<ApiEnvelope<TaskApiItem>>(`${getPrefix()}/${id}`);
     return response.data;
   },
 
+  /**
+   * Registers a new actionable task in the system.
+   * @param payload - Initial task configuration and assignment.
+   * @returns Newly created task record.
+   */
   create: async (payload: TaskCreatePayload) => {
     const response = await axiosClient.post<ApiEnvelope<TaskApiItem>>(`${getPrefix()}`, payload);
     return response.data;
   },
 
+  /**
+   * Modifies an existing task's lifecycle or metadata.
+   * @param id - Target task ID.
+   * @param payload - Subset of fields to update.
+   * @returns The updated task record.
+   */
   update: async (id: string, payload: TaskPatchPayload) => {
     const response = await axiosClient.patch<ApiEnvelope<TaskApiItem>>(`${getPrefix()}/${id}`, payload);
     return response.data;
   },
 
+  /**
+   * Permanently removes a task from the system.
+   * @param id - ID of the task to delete.
+   * @returns Success confirmation.
+   */
   delete: async (id: string) => {
     const response = await axiosClient.delete<ApiEnvelope<null>>(`${getPrefix()}/${id}`);
     return response.data;
   },
 
-  // Comments
+  /**
+   * Fetches all collaboration comments for a specific task.
+   * @param taskId - The parent task ID.
+   * @returns List of formatted comment objects.
+   */
   listComments: async (taskId: string) => {
     const response = await axiosClient.get<ApiEnvelope<TaskCommentApiItem[]>>(`${getPrefix()}/${taskId}/comments`);
     return response.data;
   },
 
+  /**
+   * Adds a new feedback or progress comment to a task.
+   * @param taskId - Target task ID.
+   * @param content - The text content to post.
+   * @returns The newly created comment record.
+   */
   addComment: async (taskId: string, content: string) => {
     const response = await axiosClient.post<ApiEnvelope<TaskCommentApiItem>>(`${getPrefix()}/${taskId}/comments`, {
       content,
@@ -79,12 +136,22 @@ export const tasksApi = {
     return response.data;
   },
 
-  // Attachments
+  /**
+   * Lists all binary file attachments linked to a task.
+   * @param taskId - Target task ID.
+   * @returns List of attachment metadata records.
+   */
   listAttachments: async (taskId: string) => {
     const response = await axiosClient.get<ApiEnvelope<TaskAttachmentApiItem[]>>(`${getPrefix()}/${taskId}/attachments`);
     return response.data;
   },
 
+  /**
+   * Uploads a new document or image as a task attachment.
+   * @param taskId - Target task ID.
+   * @param file - The binary file to upload.
+   * @returns Attachment metadata for the newly uploaded file.
+   */
   uploadAttachment: async (taskId: string, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -98,6 +165,12 @@ export const tasksApi = {
     return response.data;
   },
 
+  /**
+   * Deletes a specific file attachment from a task.
+   * @param taskId - The parent task ID.
+   * @param attachmentId - The ID of the file to remove.
+   * @returns Success confirmation.
+   */
   deleteAttachment: async (taskId: string, attachmentId: string) => {
     const response = await axiosClient.delete<ApiEnvelope<null>>(
       `${getPrefix()}/${taskId}/attachments/${attachmentId}`

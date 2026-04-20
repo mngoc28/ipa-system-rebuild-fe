@@ -1,23 +1,44 @@
 import { Building, Cpu, DollarSign, MapPin, Plane, TrendingUp, Users, type LucideIcon } from "lucide-react";
 
+/**
+ * Represents a highlight item displayed in the landing page's benefits section.
+ */
 export interface LandingHighlightItem {
+  /** Icon component from lucide-react */
   icon: LucideIcon;
+  /** Main title of the highlight */
   title: string;
+  /** Detailed description or subtext */
   desc: string;
 }
 
+/**
+ * Represents a step in the investment process shown on the landing page.
+ */
 export interface LandingStepItem {
+  /** Label/Title of the step */
   title: string;
+  /** Explanation of what happens in this step */
   desc: string;
 }
 
+/**
+ * Represents an investment sector category on the landing page.
+ */
 export interface LandingSectorItem {
+  /** Visual icon representing the sector */
   icon: LucideIcon;
+  /** Human-readable name of the sector */
   name: string;
+  /** Statistical count of projects or other metrics */
   count: string;
+  /** Tailwind CSS classes for custom styling */
   color: string;
 }
 
+/**
+ * Collection of unique selling points/highlights for the landing page.
+ */
 export const landingHighlights: LandingHighlightItem[] = [
   {
     icon: MapPin,
@@ -36,6 +57,9 @@ export const landingHighlights: LandingHighlightItem[] = [
   },
 ];
 
+/**
+ * Sequential steps of the investment procedure.
+ */
 export const landingSteps: LandingStepItem[] = [
   { title: "Nghiên cứu vị trí", desc: "Giới thiệu địa điểm, quy hoạch kiến trúc." },
   { title: "Đề xuất dự án", desc: "Thẩm định năng lực và quy mô đầu tư." },
@@ -43,6 +67,9 @@ export const landingSteps: LandingStepItem[] = [
   { title: "Triển khai", desc: "Hỗ trợ thủ tục xây dựng và khởi công." },
 ];
 
+/**
+ * Key investment sectors targeted by the organization.
+ */
 export const landingSectors: LandingSectorItem[] = [
   { icon: Cpu, name: "Công nghệ Thông tin", count: "142 Dự án", color: "bg-indigo-50 text-indigo-600" },
   { icon: Plane, name: "Du lịch Dịch vụ", count: "89 Dự án", color: "bg-sky-50 text-sky-600" },

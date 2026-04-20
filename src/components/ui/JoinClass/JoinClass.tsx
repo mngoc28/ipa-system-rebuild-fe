@@ -1,6 +1,10 @@
 import * as React from "react";
 import { useState } from "react";
 
+/**
+ * A simple placeholder component for joining a class.
+ * Features a toggleable state for "Join" and "Joined".
+ */
 export default function JoinClass() {
   const [active, setActive] = useState(false);
   return (

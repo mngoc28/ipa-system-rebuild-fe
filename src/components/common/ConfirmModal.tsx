@@ -10,25 +10,40 @@ import {
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
+/**
+ * Props for the ConfirmModal component.
+ */
 interface ConfirmModalProps {
+  /** Visibility state of the modal. */
   isOpen: boolean;
+  /** Callback to close the modal without action. */
   onClose: () => void;
+  /** Callback triggered when the user confirms the action. */
   onConfirm: () => void;
+  /** Primary heading for the modal. */
   title: string;
+  /** Supporting text or JSX content explaining the consequences. */
   description: React.ReactNode;
+  /** Label for the primary action button. Defaults to "Confirm". */
   confirmText?: string;
+  /** Label for the secondary dismissal button. Defaults to "Cancel". */
   cancelText?: string;
+  /** Color scheme and icon style. */
   variant?: "danger" | "warning" | "info" | "primary";
 }
 
+/**
+ * A standardized confirmation dialog for dangerous or critical actions.
+ * Wraps shadcn/ui Dialog with consistent styling for different severity levels.
+ */
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
   title,
   description,
-  confirmText = "Xác nhận",
-  cancelText = "Hủy bỏ",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
   variant = "danger",
 }) => {
   const getVariantStyles = () => {

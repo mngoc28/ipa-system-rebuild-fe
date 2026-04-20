@@ -17,13 +17,26 @@ import { useQuery } from "@tanstack/react-query";
 import { SelectField } from "@/components/ui/SelectField";
 import { RotateCcw, X } from "lucide-react";
 
+/**
+ * Props for the SharedDelegationList component.
+ */
 interface SharedDelegationListProps {
+  /** The user role, determining access levels and available actions. */
   role: "admin" | "director" | "manager" | "staff";
 }
 
+/** Checklist item count and completion indicator. */
 type DelegationChecklistItem = { status: number };
-type SelectOptionItem = { id: string | number; name_vi?: string; fullName?: string };
+/** Generic selection option for master data filters. */
+type SelectOptionItem = { id: string | number; name_vi?: string; name?: string; fullName?: string };
 
+/**
+ * A comprehensive view for managing delegations, supporting both 
+ * Kanban and List views with advanced filtering and search.
+ * Shared across multiple user roles with varying degrees of control.
+ * 
+ * @param props - Component props following SharedDelegationListProps interface.
+ */
 export default function SharedDelegationList({ role }: SharedDelegationListProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"inbound" | "outbound">("inbound");
@@ -65,7 +78,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
   });
 
   const delegations = useMemo(() => delegationsQuery.data?.data?.items || [], [delegationsQuery.data]);
-  const errorMessage = delegationsQuery.error instanceof Error ? delegationsQuery.error.message : "Không thể tải danh sách đoàn công tác.";
+  const errorMessage = delegationsQuery.error instanceof Error ? delegationsQuery.error.message : "Unable to load delegation list.";
   void role;
 
   // Map to UI-friendly format
@@ -79,7 +92,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
         id: item.id,
         code: item.code,
         name: item.name,
-        country: item.country?.name_vi || "N/A",
+        country: item.country?.name_vi || item.country?.name_en || "N/A",
         partnerOrg: item.objective || "N/A",
         hostUnit: "IPA",
         type: item.direction === 1 ? "inbound" : "outbound",
@@ -98,8 +111,12 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
     });
   }, [delegations]);
 
+  /**
+   * Generates and downloads a CSV export of the current delegation list.
+   * Includes key fields such as code, name, country, and status.
+   */
   const handleExport = () => {
-    const headers = ["Mã Đoàn", "Tên Đoàn", "Quốc Gia", "Đối tác", "Ngày bắt đầu", "Ngày kết thúc", "Trạng thái", "Người phụ trách"];
+    const headers = ["Delegation Code", "Delegation Name", "Country", "Partner", "Start Date", "End Date", "Status", "Owner"];
     const rows = uiDelegations.map((item) => [
       item.code,
       item.name,
@@ -119,11 +136,11 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Danh_sach_doan_${activeTab === "inbound" ? "den" : "di"}_${formatDate(new Date(), "YYYYMMDD")}.csv`;
+    link.download = `Delegation_List_${activeTab === "inbound" ? "Inbound" : "Outbound"}_${formatDate(new Date(), "YYYYMMDD")}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
 
-    toast.success("Đã xuất dữ liệu đoàn công tác (CSV).");
+    toast.success("Exported delegation data (CSV).");
   };
 
   const handleDelete = (id: number | string) => {
@@ -135,9 +152,9 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
       try {
         await deleteMutation.mutateAsync(Number(deleteConfirm.id));
         setDeleteConfirm({ isOpen: false, id: null });
-        toast.success("Đã xóa hồ sơ đoàn công tác.");
+        toast.success("Delegation record deleted successfully.");
       } catch {
-        toast.error("Không thể xóa hồ sơ đoàn. Vui lòng thử lại.");
+        toast.error("Failed to delete delegation record. Please try again.");
       }
     }
   };
@@ -178,29 +195,29 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             <ol className="flex items-center space-x-2 text-xs font-medium text-slate-500">
               <li>
                 <button onClick={() => navigate("/dashboard")} className="transition-colors hover:text-primary">
-                  Hệ thống
+                  System
                 </button>
               </li>
               <li className="flex items-center space-x-2">
                 <ChevronDown size={12} className="-rotate-90" />
-                <span className="text-slate-900">Quản lý Đoàn</span>
+                <span className="text-slate-900">Delegation Management</span>
               </li>
             </ol>
           </nav>
-          <h1 className="font-title text-2xl font-black text-slate-900">Quản lý Đoàn Công tác</h1>
+          <h1 className="font-title text-2xl font-black text-slate-900">Manage Delegations</h1>
         </div>
 
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50">
             <Download size={14} />
-            Xuất dữ liệu
+            Export Data
           </button>
           <button
             onClick={() => navigate(`/delegations/create`)}
             className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95"
           >
             <Plus size={16} />
-            Tạo đoàn mới
+            Create New
           </button>
         </div>
       </div>
@@ -208,11 +225,11 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
       <div className="flex flex-col justify-between gap-4 border-b border-slate-200 sm:flex-row sm:items-center">
         <div className="flex gap-8">
           <button onClick={() => setActiveTab("inbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "inbound" ? "text-primary" : "text-slate-500 hover:text-slate-700")}>
-            Đoàn đến (Inbound)
+            Inbound Delegations
             {activeTab === "inbound" && <div className="absolute inset-x-0 bottom-0 h-1 rounded-t-full bg-primary" />}
           </button>
           <button onClick={() => setActiveTab("outbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "outbound" ? "text-primary" : "text-slate-500 hover:text-slate-700")}>
-            Đoàn đi (Outbound)
+            Outbound Delegations
             {activeTab === "outbound" && <div className="absolute inset-x-0 bottom-0 h-1 rounded-t-full bg-primary" />}
           </button>
         </div>
@@ -230,7 +247,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all", viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}
           >
             <List size={12} />
-            Danh sách
+            Table List
           </button>
         </div>
       </div>
@@ -241,7 +258,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary" size={16} />
             <input
               type="text"
-              placeholder="Tìm kiếm đoàn công tác theo tên, mã..."
+              placeholder="Search delegations by name, code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium shadow-sm outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
@@ -265,7 +282,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             )}
           >
             <Filter size={14} />
-            Bộ lọc
+            Filters
             {hasActiveFilters && (
               <span className="ml-1 flex size-4 items-center justify-center rounded-full bg-primary text-[8px] text-white">
                 {Number(statusFilter !== "all") + Number(priorityFilter !== "all") + Number(countryFilter !== "all") + Number(staffFilter !== "all") + Number(searchTerm !== "")}
@@ -279,7 +296,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
               className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-rose-600 transition-all hover:bg-rose-50"
             >
               <RotateCcw size={14} />
-              Làm mới
+              Reset All
             </button>
           )}
         </div>
@@ -288,69 +305,69 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
         {isFilterOpen && (
           <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 animate-in slide-in-from-top-2 md:grid-cols-4">
             <div className="space-y-1.5">
-              <label htmlFor="filter-status" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</label>
+              <label htmlFor="filter-status" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Status</label>
               <SelectField
                 id="filter-status"
                 value={statusFilter}
                 onValueChange={setStatusFilter}
                 options={[
-                  { label: "Tất cả trạng thái", value: "all" },
-                  { label: "Bản nháp", value: "0" },
-                  { label: "Chờ phê duyệt", value: "1" },
-                  { label: "Cần chỉnh sửa", value: "2" },
-                  { label: "Đã phê duyệt", value: "3" },
-                  { label: "Đang thực hiện", value: "4" },
-                  { label: "Hoàn thành", value: "5" },
-                  { label: "Đã hủy", value: "6" },
+                  { label: "All Statuses", value: "all" },
+                  { label: "Draft", value: "0" },
+                  { label: "Pending Approval", value: "1" },
+                  { label: "Needs Revision", value: "2" },
+                  { label: "Approved", value: "3" },
+                  { label: "In Progress", value: "4" },
+                  { label: "Completed", value: "5" },
+                  { label: "Cancelled", value: "6" },
                 ]}
-                placeholder="Trạng thái"
+                placeholder="Status"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-priority" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mức độ ưu tiên</label>
+              <label htmlFor="filter-priority" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Priority Level</label>
               <SelectField
                 id="filter-priority"
                 value={priorityFilter}
                 onValueChange={setPriorityFilter}
                 options={[
-                  { label: "Tất cả mức độ", value: "all" },
-                  { label: "Thấp", value: "1" },
-                  { label: "Trung bình", value: "2" },
-                  { label: "Cao", value: "3" },
+                  { label: "All Priorities", value: "all" },
+                  { label: "Low", value: "1" },
+                  { label: "Medium", value: "2" },
+                  { label: "High", value: "3" },
                 ]}
-                placeholder="Ưu tiên"
+                placeholder="Priority"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-country" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</label>
+              <label htmlFor="filter-country" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country</label>
               <SelectField
                 id="filter-country"
                 value={countryFilter}
                 onValueChange={setCountryFilter}
                 options={[
-                  { label: "Tất cả quốc gia", value: "all" },
-                  ...countries.map((c: SelectOptionItem & { name_vi: string }) => ({ label: c.name_vi, value: String(c.id) })),
+                  { label: "All Countries", value: "all" },
+                  ...countries.map((c: SelectOptionItem) => ({ label: c.name_vi || c.name || "Unknown", value: String(c.id) })),
                 ]}
-                placeholder="Quốc gia"
+                placeholder="Country"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-staff" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Người phụ trách</label>
+              <label htmlFor="filter-staff" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Owner / PIC</label>
               <SelectField
                 id="filter-staff"
                 value={staffFilter}
                 onValueChange={setStaffFilter}
                 options={[
-                  { label: "Tất cả nhân sự", value: "all" },
+                  { label: "All Staff", value: "all" },
                   ...staffMembers.map((u: SelectOptionItem & { fullName: string }) => ({ label: u.fullName, value: String(u.id) })),
                 ]}
-                placeholder="Nhân sự"
+                placeholder="Staff"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"
               />
             </div>
@@ -365,19 +382,19 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
           </div>
         ) : delegationsQuery.isError ? (
           <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-rose-100 bg-rose-50 p-8 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Không tải được dữ liệu</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Failed to load data</p>
             <p className="max-w-md text-sm font-medium text-rose-700">{errorMessage}</p>
             <button
               onClick={() => delegationsQuery.refetch()}
               className="rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-700"
             >
-              Thử lại
+              Retry
             </button>
           </div>
         ) : delegations.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Chưa có đoàn công tác nào</p>
-            <p className="max-w-md text-sm text-slate-500">Tạo mới một hồ sơ đoàn công tác hoặc thay đổi bộ lọc để xem dữ liệu.</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">No delegations found</p>
+            <p className="max-w-md text-sm text-slate-500">Create a new delegation record or adjust filters to see results.</p>
           </div>
         ) : (
           viewMode === "kanban" ? (
@@ -400,9 +417,9 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
         onConfirm={executeDelete}
-        title="Xóa hồ sơ đoàn?"
-        description="Bạn có chắc chắn muốn xóa hồ sơ đoàn này? Mọi dữ liệu liên quan đến thành viên và lịch trình cũng sẽ bị xóa vĩnh viễn và không thể khôi phục."
-        confirmText="Xác nhận xóa"
+        title="Delete delegation record?"
+        description="Are you sure you want to delete this delegation record? All associated member and schedule data will be permanently removed and cannot be recovered."
+        confirmText="Confirm Delete"
         variant="danger"
       />
     </div>

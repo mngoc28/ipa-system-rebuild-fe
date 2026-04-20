@@ -5,6 +5,14 @@ import { useAuthStore } from "@/store/useAuthStore";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import { Link } from "react-router-dom";
 
+/**
+ * Shared application header component.
+ * Features global search, quick-action buttons (e.g., Create Delegation),
+ * language toggle, notifications, and user profile dropdown.
+ * 
+ * @param props - Component props.
+ * @param props.onMenuClick - Optional callback to trigger the mobile sidebar drawer.
+ */
 export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuthStore();
   const [language, setLanguage] = useState<"VI" | "EN">("VI");
@@ -12,7 +20,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/80 px-4 backdrop-blur-md">
       <div className="flex items-center gap-4">
-        <button data-testid="mobile-menu-toggle" onClick={onMenuClick} title="Mở menu điều hướng" aria-label="Mở menu điều hướng" className="rounded-md p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
+        <button data-testid="mobile-menu-toggle" onClick={onMenuClick} title="Open navigation menu" aria-label="Open navigation menu" className="rounded-md p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
           <Menu size={20} />
         </button>
 
@@ -21,7 +29,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
           < Search className="absolute left-3.5 text-slate-400" size={16} />
           <input
             type="text"
-            placeholder="Tìm kiếm đoàn, đối tác, tài liệu..."
+            placeholder="Search delegations, partners, documents..."
             className="h-10 w-full rounded-xl border border-slate-100 bg-slate-50 pl-10 pr-4 text-sm transition-all focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5"
           />
         </div>
@@ -32,7 +40,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         {user?.role === "Staff" && (
           <Link to="/delegations/create" className="hidden items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95 sm:flex">
             <Plus size={14} />
-            Tạo đoàn
+            New Delegation
           </Link>
         )}
 
@@ -62,18 +70,18 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="mt-2 w-64 rounded-xl border-slate-200 p-2 shadow-2xl">
-            <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Tài khoản</DropdownMenuLabel>
+            <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-50" />
             <DropdownMenuItem asChild className="rounded-lg">
               <Link to="/profile" className="flex cursor-pointer items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
                 <User size={16} className="text-slate-400" />
-                Hồ sơ cá nhân
+                Profile
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-slate-50" />
             <DropdownMenuItem onClick={logout} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold text-rose-600 transition-colors hover:bg-rose-50 focus:bg-rose-50 focus:text-rose-600">
               <LogOut size={16} />
-              Đăng xuất
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

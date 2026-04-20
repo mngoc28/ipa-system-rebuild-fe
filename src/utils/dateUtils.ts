@@ -1,7 +1,16 @@
 import { t } from "i18next";
 
+/**
+ * Supported date string formats for output generation.
+ */
 export type DateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD" | "DD MMM YYYY" | "DD-MM-YYYY" | "YYYYMMDD";
 
+/**
+ * Formats a Date object or string into a specified string format.
+ * @param date - The source date to format.
+ * @param format - The target format pattern.
+ * @returns Formatted date string, or empty string if invalid.
+ */
 export const formatDate = (date: string | Date, format: DateFormat = "DD/MM/YYYY"): string => {
   const d = new Date(date);
 
@@ -32,13 +41,25 @@ export const formatDate = (date: string | Date, format: DateFormat = "DD/MM/YYYY
   }
 };
 
+/**
+ * Hook or utility providing access to formatting functions.
+ */
 export const useDateFormatter = () => {
   return {
+    /**
+     * Proxies to the global formatDate utility.
+     * @param date - Source date.
+     * @param format - Output format.
+     */
     formatDate: (date: string | Date, format: DateFormat = "DD/MM/YYYY") => formatDate(date, format),
   };
 };
 
-// Vietnam timezone aware formatters (Asia/Ho_Chi_Minh)
+/**
+ * Formats a date specifically for the Vietnam (Asia/Ho_Chi_Minh) timezone.
+ * @param date - Source date.
+ * @returns Formatted date string (DD-MM-YYYY).
+ */
 export const formatDateVietnam = (date: string | Date): string => {
   const d = new Date(date);
   if (isNaN(d.getTime())) return "";
@@ -52,6 +73,11 @@ export const formatDateVietnam = (date: string | Date): string => {
   return `${get("day")}-${get("month")}-${get("year")}`;
 };
 
+/**
+ * Formats a date and time for the Vietnam (Asia/Ho_Chi_Minh) timezone.
+ * @param date - Source date.
+ * @returns Formatted timestamp string (DD-MM-YYYY, HH:mm:ss).
+ */
 export const formatDateTimeVietnam = (date: string | Date): string => {
   const d = new Date(date);
   if (isNaN(d.getTime())) return "";
@@ -69,7 +95,12 @@ export const formatDateTimeVietnam = (date: string | Date): string => {
   return `${get("day")}-${get("month")}-${get("year")}, ${get("hour")}:${get("minute")}:${get("second")}`;
 };
 
-// Strict ISO (YYYY-MM-DD) -> VN (DD-MM-YYYY) without timezone shifting
+/**
+ * Parses an ISO date string (YYYY-MM-DD) and converts it to VN format (DD-MM-YYYY)
+ * without performing timezone shifting (assumes raw date component transfer).
+ * @param iso - The ISO date string.
+ * @returns VN formatted date or empty string.
+ */
 export const formatDateVietnamFromISO = (iso: string | null | undefined): string => {
   if (!iso) return "";
   const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(iso);
@@ -78,7 +109,11 @@ export const formatDateVietnamFromISO = (iso: string | null | undefined): string
   return `${d}-${mo}-${y}`;
 };
 
-// VN (DD-MM-YYYY) -> ISO (YYYY-MM-DD). Returns null if invalid.
+/**
+ * Parses a VN date string (DD-MM-YYYY) into a standard ISO format (YYYY-MM-DD).
+ * @param vn - The VN date string.
+ * @returns ISO date string or null if input is malformed.
+ */
 export const parseVietnamDateToISO = (vn: string | null | undefined): string | null => {
   if (!vn) return null;
   const m = /^\s*([0-9]{2})-([0-9]{2})-([0-9]{4})\s*$/.exec(vn);
@@ -90,6 +125,11 @@ export const parseVietnamDateToISO = (vn: string | null | undefined): string | n
   return `${y}-${mo}-${d}`;
 };
 
+/**
+ * Maps a numeric day of the week (2-7, 1 for Sunday) to a translated string.
+ * @param dayOfWeek - Numeric index of the day.
+ * @returns Translated day name.
+ */
 export const mapDayOfWeek = (dayOfWeek: number) => {
   switch (dayOfWeek) {
     case 2:
@@ -109,6 +149,11 @@ export const mapDayOfWeek = (dayOfWeek: number) => {
   }
 };
 
+/**
+ * Safely formats a date-time string or object, returning "-" for invalid inputs.
+ * @param date - The date to format.
+ * @returns Formatted timestamp or placeholder.
+ */
 export const safeFormatDateTime = (date: string | Date | undefined): string => {
   if (!date) return "-";
   const d = new Date(date);

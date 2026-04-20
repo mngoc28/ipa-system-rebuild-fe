@@ -12,15 +12,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+/**
+ * Props for the KanbanColumn component.
+ */
 interface KanbanColumnProps {
+  /** Unique identifier for the column, corresponding to a status. */
   id: string;
+  /** Display title for the column. */
   label: string;
+  /** Theme color used for background and accents in this column. */
   color: string;
+  /** List of delegation items currently assigned to this column. */
   items: DelegationItem[];
+  /** Callback passed down to KanbanCard for deletion requests. */
   onDelete?: (id: string | number) => void;
+  /** Callback to switch back to list view. */
   onViewList?: () => void;
 }
 
+/**
+ * A container representing a specific status in the Kanban board.
+ * Supports dropping items and managing horizontal layout for cards. 
+ * Includes actions for exporting the column's data to CSV.
+ * 
+ * @param props - Component props following KanbanColumnProps interface.
+ */
 export default function KanbanColumn({ id, label, color, items, onDelete, onViewList }: KanbanColumnProps) {
   const navigate = useNavigate();
 
@@ -29,7 +45,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
   });
 
   const handleExportColumn = () => {
-    const headers = ["Mã Đoàn", "Tên Đoàn", "Quốc Gia", "Trạng thái"];
+    const headers = ["Delegation Code", "Delegation Name", "Country", "Status"];
     const rows = items.map((item) => [item.code, item.name, item.country, item.status]);
     const csv = [headers, ...rows]
       .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
@@ -43,7 +59,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
     link.click();
     window.URL.revokeObjectURL(url);
 
-    toast.success(`Đã xuất danh sách cột ${label}.`);
+    toast.success(`Exported ${label} list.`);
   };
 
   return (
@@ -58,16 +74,16 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button title={`Tùy chọn cột ${label}`} aria-label={`Tùy chọn cột ${label}`} className="text-slate-400 transition-colors hover:text-slate-600">
+            <button title={`${label} column options`} aria-label={`${label} column options`} className="text-slate-400 transition-colors hover:text-slate-600">
               <MoreHorizontal size={18} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleExportColumn}>
-              <Download size={14} className="mr-2" /> Xuất CSV cột
+              <Download size={14} className="mr-2" /> Export to CSV
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/delegations/create")}>
-              <Plus size={14} className="mr-2" /> Tạo đoàn mới
+              <Plus size={14} className="mr-2" /> Create New Delegation
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => {
@@ -78,7 +94,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
                 }
               }}
             >
-              <List size={14} className="mr-2" /> Xem danh sách đoàn
+              <List size={14} className="mr-2" /> View All Delegations
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -91,7 +107,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
             <KanbanCard key={item.id} item={item} onDelete={onDelete} color={color} />
           ))}
 
-          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-300">Kéo thả vào đây</div>}
+          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-300">Drop here</div>}
         </SortableContext>
       </div>
     </div>

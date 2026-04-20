@@ -3,15 +3,30 @@ import { MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Props for the SyllabusCard component.
+ */
 interface SyllabusCardProps {
+  /** Unique identifier for the syllabus/course. */
   id: string;
+  /** Display title for the card. */
   title: string;
+  /** Whether the card is currently pinned to the top of the list. */
   isPinned: boolean;
+  /** Completion percentage (0-100). */
   progress: number;
+  /** Additional styling classes. */
   className?: string;
+  /** Callback triggered when the pin status is toggled. */
   onTogglePin: (id: string, isPinned: boolean) => void;
 }
 
+/**
+ * A horizontal card component displaying course summary information, 
+ * including a progress bar, pin status, and a link to detailed views.
+ * 
+ * @param props - Component props following SyllabusCardProps interface.
+ */
 const SyllabusCard = ({
   id,
   title,
@@ -67,7 +82,7 @@ const SyllabusCard = ({
               isPinned ? "text-blue-500" : "text-slate-900 hover:text-blue-500"
             )}
             onClick={handleTogglePin}
-            aria-label={isPinned ? "Gỡ ghim" : "Ghim lên đầu trang"}
+            aria-label={isPinned ? "Unpin" : "Pin to top"}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -78,7 +93,7 @@ const SyllabusCard = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <span>{isPinned ? "Gỡ ghim" : "Ghim lên đầu trang"}</span>
+            <span>{isPinned ? "Unpin" : "Pin to top"}</span>
           </button>
           <div className="flex flex-col gap-1.5">
             <div className="h-2 w-32 rounded-full bg-slate-200">
@@ -94,7 +109,7 @@ const SyllabusCard = ({
         className="rounded-md bg-blue-500 px-6 py-3 text-base font-bold text-white transition-colors hover:bg-blue-600"
         onClick={handleDetailsClick}
       >
-        Chi tiết
+        Details
       </button>
     </div>
   );

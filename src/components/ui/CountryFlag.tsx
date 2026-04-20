@@ -1,11 +1,23 @@
 import React from "react";
 import { Globe } from "lucide-react";
 
+/**
+ * Props for the CountryFlag component.
+ */
 interface CountryFlagProps {
+  /** Full name of the country in Vietnamese or English (e.g., "Hàn Quốc" or "Korea"). */
   countryName: string;
+  /** Optional CSS classes for additional styling. */
   className?: string;
 }
 
+/**
+ * Maps a country name to its corresponding ISO 3166-1 alpha-2 code.
+ * Supported names are currently in Vietnamese.
+ * 
+ * @param countryName - The name of the country to look up.
+ * @returns The 2-letter country code or null if not found.
+ */
 export const getCountryCode = (countryName: string): string | null => {
   if (!countryName) return null;
   const flags: Record<string, string> = {
@@ -33,6 +45,13 @@ export const getCountryCode = (countryName: string): string | null => {
   return foundKey ? flags[foundKey] : null;
 };
 
+/**
+ * Displays a small country flag icon based on the provided country name.
+ * Uses flagcdn.com as the image source. Falls back to a globe icon if the 
+ * country is not recognized.
+ * 
+ * @param props - Component props following CountryFlagProps interface.
+ */
 export const CountryFlag: React.FC<CountryFlagProps> = ({ countryName, className = "" }) => {
   const code = getCountryCode(countryName);
 

@@ -7,24 +7,38 @@ import KanbanCard from "./KanbanCard.tsx";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 
+/**
+ * Props for the KanbanBoard component.
+ */
 interface KanbanBoardProps {
+  /** Array of delegation records to display in the board. */
   delegations: DelegationItem[];
+  /** Callback triggered when an item is dropped into a new valid status column. */
   onUpdateStatus?: (id: string | number, status: string) => void;
+  /** Callback triggered when an item is requested for deletion from a card. */
   onDelete?: (id: string | number) => void;
+  /** Optional callback to switch back to list view. */
   onViewList?: () => void;
 }
 
+/**
+ * Configuration for the Kanban columns, mapping status identifiers to 
+ * localized labels and theme colors.
+ */
 const COLUMNS: { id: StatusTone; label: string; color: string }[] = [
-  { id: "draft", label: "Bản nháp", color: "#6B7280" },
-  { id: "pendingApproval", label: "Chờ phê duyệt", color: "#F59E0B" },
-  { id: "needsRevision", label: "Cần chỉnh sửa", color: "#F97316" },
-  { id: "approved", label: "Đã phê duyệt", color: "#1A56DB" },
-  { id: "inProgress", label: "Đang thực hiện", color: "#0E9F6E" },
-  { id: "completed", label: "Hoàn thành", color: "#065F46" },
-  { id: "cancelled", label: "Đã hủy", color: "#DC2626" },
+  { id: "draft", label: "Draft", color: "#6B7280" },
+  { id: "pendingApproval", label: "Pending Approval", color: "#F59E0B" },
+  { id: "needsRevision", label: "Needs Revision", color: "#F97316" },
+  { id: "approved", label: "Approved", color: "#1A56DB" },
+  { id: "inProgress", label: "In Progress", color: "#0E9F6E" },
+  { id: "completed", label: "Completed", color: "#065F46" },
+  { id: "cancelled", label: "Cancelled", color: "#DC2626" },
 ];
 
-// Business rules for state transitions
+/**
+ * Business rules defining allowed status transitions for delegations.
+ * Prevents invalid workflow movements (e.g., from Completed back to Pending).
+ */
 const VALID_TRANSITIONS: Record<string, string[]> = {
   draft: ["pendingApproval", "cancelled"],
   pendingApproval: ["approved", "needsRevision", "cancelled"],
@@ -35,6 +49,12 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   cancelled: ["draft"],
 };
 
+/**
+ * A sophisticated drag-and-drop Kanban board for managing delegation lifecycles.
+ * Implements strict workflow validation and provides visual feedback during transitions.
+ * 
+ * @param props - Component props following KanbanBoardProps interface.
+ */
 export default function KanbanBoard({ delegations: initialDelegations, onUpdateStatus, onDelete, onViewList }: KanbanBoardProps) {
   const [items, setItems] = useState(initialDelegations);
   const [activeItem, setActiveItem] = useState<DelegationItem | null>(null);
@@ -132,7 +152,7 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
           });
         }, 250); // Delay matches the dropAnimation duration
       } else {
-        toast.error(`Không thể chuyển trực tiếp từ ${COLUMNS.find((c) => c.id === originalItem.status)?.label} sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
+        toast.error(`Cannot move directly from ${COLUMNS.find((c) => c.id === originalItem.status)?.label} to ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
         // Reset items to initial because drag over might have changed it
         setItems(initialDelegations);
       }
@@ -151,7 +171,7 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
         onUpdateStatus(confirmModal.item.id, confirmModal.targetStatus);
       } else {
         setItems((prev) => prev.map((item) => (item.id === confirmModal.item!.id ? { ...item, status: confirmModal.targetStatus! } : item)));
-        toast.success(`Đã cập nhật trạng thái đoàn sang ${COLUMNS.find((c) => c.id === confirmModal.targetStatus)?.label}`);
+        toast.success(`Updated delegation status to ${COLUMNS.find((c) => c.id === confirmModal.targetStatus)?.label}`);
       }
     }
     setConfirmModal({ isOpen: false, item: null, targetStatus: null });
@@ -204,9 +224,9 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
         isOpen={confirmModal.isOpen}
         onClose={handleCancelStatus}
         onConfirm={handleConfirmStatus}
-        title="Xác nhận chuyển trạng thái"
-        description={<p>Bạn có chắc chắn muốn chuyển <strong className="text-slate-900">{confirmModal.item?.name}</strong> sang trạng thái <strong className="text-primary">{COLUMNS.find(c => c.id === confirmModal.targetStatus)?.label}</strong>?</p>}
-        confirmText="Xác nhận"
+        title="Confirm Status Transition"
+        description={<p>Are you sure you want to move <strong className="text-slate-900">{confirmModal.item?.name}</strong> to <strong className="text-primary">{COLUMNS.find(c => c.id === confirmModal.targetStatus)?.label}</strong> status?</p>}
+        confirmText="Confirm"
         variant="primary"
       />
     </div>

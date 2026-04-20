@@ -3,6 +3,12 @@ import { Mail, Phone, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContactCardProps } from "../type";
 
+/**
+ * A reusable UI card for displaying contact information, including name, role, 
+ * email, and phone, with support for an avatar image or default user icon.
+ * 
+ * @param props - Component props following ContactCardProps interface.
+ */
 const ContactCard: React.FC<ContactCardProps> = ({
   name,
   role,

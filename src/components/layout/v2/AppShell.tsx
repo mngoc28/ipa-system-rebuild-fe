@@ -8,6 +8,11 @@ import { useAuthStore, getHasFetchedLatestUser, setHasFetchedLatestUserFlag } fr
 import { authApi } from "@/api/authApi";
 import { cn } from "@/lib/utils";
 
+/**
+ * The core application shell that wraps all non-administrative pages.
+ * Handles background user profile synchronization, mobile menu state,
+ * and standard app-wide UI elements like Sidebar and Header.
+ */
 export default function AppShell() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

@@ -1,37 +1,66 @@
 import { STORAGE_VAR } from "../constant";
 
+/**
+ * Retrieves the short-term JWT access token from local storage.
+ * @returns The token string or null if not found.
+ */
 export const getAccessToken = () => {
   return localStorage.getItem(STORAGE_VAR.ACCESS_TOKEN);
 };
 
+/**
+ * Persists a new JWT access token to local storage.
+ * @param token - The newly issued token.
+ */
 export const setAccessToken = (token: string) => {
   localStorage.setItem(STORAGE_VAR.ACCESS_TOKEN, token);
 };
 
+/**
+ * Removes the access token from local storage (logout/expiration).
+ */
 export const removeAccessToken = () => {
   localStorage.removeItem(STORAGE_VAR.ACCESS_TOKEN);
 };
 
+/**
+ * Retrieves the long-term JWT refresh token.
+ */
 export const getRefreshToken = () => {
   return localStorage.getItem(STORAGE_VAR.REFRESH_TOKEN);
 };
 
+/**
+ * Persists the JWT refresh token.
+ */
 export const setRefreshToken = (token: string) => {
   localStorage.setItem(STORAGE_VAR.REFRESH_TOKEN, token);
 };
 
+/**
+ * Removes the refresh token.
+ */
 export const removeRefreshToken = () => {
   localStorage.removeItem(STORAGE_VAR.REFRESH_TOKEN);
 };
 
+/**
+ * Retrieves the persisted email of the remembered user.
+ */
 export const getUserEmail = () => {
   return localStorage.getItem(STORAGE_VAR.USER_EMAIL);
 };
 
+/**
+ * Persists user email for autofill/remember me.
+ */
 export const setUserEmail = (email: string) => {
   localStorage.setItem(STORAGE_VAR.USER_EMAIL, email);
 };
 
+/**
+ * Removes the remembered user email.
+ */
 export const removeUserEmail = () => {
   localStorage.removeItem(STORAGE_VAR.USER_EMAIL);
 };
@@ -41,6 +70,11 @@ const DASHBOARD_DATE_RANGE_KEYS = {
   REVENUE_BY_MONTH: "dashboard_revenue_by_month_date_range",
 } as const;
 
+/**
+ * Retrieves cached date range filters for specific dashboard charts.
+ * @param chartType - The identifier of the target chart.
+ * @returns Object containing startDate and endDate (optional).
+ */
 export const getDashboardDateRange = (chartType: keyof typeof DASHBOARD_DATE_RANGE_KEYS) => {
   const key = DASHBOARD_DATE_RANGE_KEYS[chartType];
   const stored = localStorage.getItem(key);
@@ -58,6 +92,12 @@ export const getDashboardDateRange = (chartType: keyof typeof DASHBOARD_DATE_RAN
   return { startDate: undefined, endDate: undefined };
 };
 
+/**
+ * Persists date range filter preferences for a dashboard chart.
+ * @param chartType - Target chart identifier.
+ * @param startDate - selected start date string.
+ * @param endDate - selected end date string.
+ */
 export const setDashboardDateRange = (chartType: keyof typeof DASHBOARD_DATE_RANGE_KEYS, startDate?: string, endDate?: string) => {
   const key = DASHBOARD_DATE_RANGE_KEYS[chartType];
   localStorage.setItem(
@@ -69,11 +109,18 @@ export const setDashboardDateRange = (chartType: keyof typeof DASHBOARD_DATE_RAN
   );
 };
 
+/**
+ * Clears the cached date range for a specific dashboard chart.
+ * @param chartType - Target chart identifier.
+ */
 export const removeDashboardDateRange = (chartType: keyof typeof DASHBOARD_DATE_RANGE_KEYS) => {
   const key = DASHBOARD_DATE_RANGE_KEYS[chartType];
   localStorage.removeItem(key);
 };
 
+/**
+ * Removes all dashboard-related date range caches.
+ */
 export const clearAllDashboardDateRanges = () => {
   Object.values(DASHBOARD_DATE_RANGE_KEYS).forEach((key) => {
     localStorage.removeItem(key);

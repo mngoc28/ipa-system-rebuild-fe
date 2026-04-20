@@ -1,6 +1,8 @@
 import React from "react";
 
-// Status color mapping for booking status
+/**
+ * Standard background and text color utility classes for booking lifecycle statuses.
+ */
 export const statusColor: Record<string, string> = {
   pending: "bg-yellow-50 text-yellow-700",
   confirmed: "bg-blue-50 text-blue-700",
@@ -9,9 +11,9 @@ export const statusColor: Record<string, string> = {
 };
 
 /**
- * Map news status number to string and color.
- * @param status number
- * @returns {status: string, color: string}
+ * Maps a numeric news status to its translation key and corresponding UI color.
+ * @param status - Numeric status code (0: draft, 1: published, 2: archived).
+ * @returns Object containing translation key and Tailwind color classes.
  */
 export function statusNews(status: number): {status: string, color: string} {
   switch (status) {
@@ -23,9 +25,9 @@ export function statusNews(status: number): {status: string, color: string} {
 }
 
 /**
- * Map booking status number from API to string.
- * @param status number
- * @returns "pending" | "confirmed" | "cancelled" | "completed"
+ * Converts a numeric booking status from the API into a semantic string identifier.
+ * @param status - Numeric API status code.
+ * @returns Semantic status string ("pending", "confirmed", etc.).
  */
 export function mapBookingStatus(status: number): "pending" | "confirmed" | "cancelled" | "completed" {
   switch (status) {
@@ -53,9 +55,10 @@ export function mapStatusToNumber(status: string): number {
 }
 
 /**
- * Format a price value as Vietnamese currency (VND).
- * @param v number | string | null | undefined
- * @returns string
+ * Formats a numeric value into a Vietnamese Dong (VND) currency string.
+ * Handles both number and numeric string inputs.
+ * @param v - The raw value to format.
+ * @returns Formatted currency string (e.g. "1.000.000 ₫") or "-" if invalid.
  */
 export function formatPrice(v?: number | string | null): string {
   if (v == null) return "-";
@@ -65,9 +68,9 @@ export function formatPrice(v?: number | string | null): string {
 }
 
 /**
- * Map user status number to translation key.
- * @param status 0 | 1 | 2 | "0" | "1" | "2"
- * @returns "pending" | "active" | "blocked"
+ * Converts a numeric user account status to a translation-friendly string key.
+ * @param status - User status code (0: pending, 1: active, 2: blocked).
+ * @returns Status identifier string.
  */
 export function statusNumberToText(status?: number | string): string {
   const statusNum = typeof status === 'string' ? parseInt(status, 10) : status;
@@ -84,9 +87,10 @@ export function statusNumberToText(status?: number | string): string {
 }
 
 /**
- * Map user status text to number.
- * @param status
- * @returns number
+ * Reverse maps display labels (in Vietnamese) to their corresponding numeric status codes.
+ * Note: This is usually for parsing localized Excel imports or manual inputs.
+ * @param status - The Vietnamese status label.
+ * @returns The numeric status code.
  */
 export function statusTextToNumber(status: string): number {
   switch (status) {
@@ -102,9 +106,9 @@ export function statusTextToNumber(status: string): number {
 }
 
 /**
- * Get CSS class for user status.
- * @param status
- * @returns
+ * Retrieves the appropriate CSS class string for a user's status tag.
+ * @param status - User status numeric code or string.
+ * @returns Tailwind CSS utility classes for background and text.
  */
 export function getStatusClass(status?: number | string) {
   const statusNum = typeof status === 'string' ? parseInt(status, 10) : status;
@@ -120,7 +124,11 @@ export function getStatusClass(status?: number | string) {
   }
 }
 
-// Helper function to format Date to datetime-local format (YYYY-MM-DDTHH:mm)
+/**
+ * Formats a Date object specifically for HTML5 datetime-local input fields.
+ * @param date - The Date object to format.
+ * @returns String in YYYY-MM-DDTHH:mm format.
+ */
 export const formatDateTimeLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -131,9 +139,9 @@ export const formatDateTimeLocal = (date: Date): string => {
 };
 
 /**
- * Format currency input value with thousand separators.
- * @param val string value from input field
- * @returns formatted string with thousand separators
+ * Formats a numeric input string with US-style thousand separators (commas).
+ * @param val - The raw numeric string from an input.
+ * @returns Formatted string (e.g. "1,000,000").
  */
 export function formatCurrencyInput(val: string): string {
   if (!val || val === '') return '';
@@ -142,9 +150,9 @@ export function formatCurrencyInput(val: string): string {
 }
 
 /**
- * Validate and clean currency input value.
- * @param value string value from input change event
- * @returns cleaned string or empty string if invalid
+ * Validates and sanitizes a currency input string by removing non-numeric characters.
+ * @param value - The raw input value containing potential separators.
+ * @returns Cleaned numeric string or null if the input contains invalid characters.
  */
 export function validateCurrencyInput(value: string): string | null {
   const cleaned = value.replace(/,/g, '');
@@ -155,10 +163,10 @@ export function validateCurrencyInput(value: string): string | null {
 };
 
 /**
- * Highlight search text within a given string.
- * @param text
- * @param search
- * @returns
+ * Wraps search term occurrences within a string with a highlighted span.
+ * @param text - The full text to search within.
+ * @param search - The term to highlight.
+ * @returns React node with highlighted spans and text fragments.
  */
 export function highlightText(text: string, search: string): React.ReactNode {
   if (!search) return text;
@@ -170,15 +178,21 @@ export function highlightText(text: string, search: string): React.ReactNode {
   );
 }
 
-// status news array
+/**
+ * Standard utility array for mapping news status codes to their display labels.
+ */
 export const statusNewsArray = [
   { value: 0, label: "news.status_draft" },
   { value: 1, label: "news.status_published" },
   { value: 2, label: "news.status_archived" },
 ];
 
-// image partner edit
-
+/**
+ * Helper to safely append an image or a 'delete' command to FormData.
+ * @param formData - The target form data object.
+ * @param key - The field name in the binary payload.
+ * @param value - The File object, a 'delete' flag, or null/undefined to skip.
+ */
 export function appendImageField(formData: FormData, key: string, value?: File | 'delete' | null) {
   if (value instanceof File) {
     formData.append(key, value);

@@ -16,27 +16,47 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
+/**
+ * Structure for a single sidebar navigation item.
+ */
 interface MenuItem {
+  /** Display title for the menu item. */
   title: string;
+  /** Internal application path. */
   path: string;
+  /** Lucide icon component to display. */
   icon: ElementType;
 }
 
+/**
+ * Navigation configuration for the administrative sidebar.
+ */
 const adminMenuItems: MenuItem[] = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Định danh & Phân quyền", path: "/admin/users", icon: Users },
+  { title: "Identity & Permissions", path: "/admin/users", icon: Users },
   { title: "Master Data", path: "/admin/master-data", icon: Server },
-  { title: "Thông báo & Vận hành", path: "/admin/announcements", icon: Settings },
+  { title: "Announcements & Ops", path: "/admin/announcements", icon: Settings },
   { title: "Audit Log", path: "/admin/audit-log", icon: ShieldCheck },
 ];
 
+/**
+ * Props for the AdminSidebar component.
+ */
 interface AdminSidebarProps {
+  /** Whether the sidebar is in its narrow (icon-only) state. */
   isCollapsed: boolean;
+  /** Callback to toggle the collapsed state. */
   setIsCollapsed: (val: boolean) => void;
+  /** Visibility state for small screen mobile drawer. */
   isMobileOpen?: boolean;
+  /** Callback to close the mobile drawer. */
   onMobileClose?: () => void;
 }
 
+/**
+ * The primary navigation wrapper for the Administration section.
+ * Supports a collapsed desktop mode and a drawer-based mobile mode.
+ */
 export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: AdminSidebarProps) {
   const { user, logout } = useAuthStore();
 
@@ -60,7 +80,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
       {/* Navigation */}
       <nav className="scrollbar-hide flex-1 overflow-y-auto px-3 py-6">
         <div className="mb-4 px-2">
-           {!isCollapsed && <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bảng điều khiển</p>}
+           {!isCollapsed && <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Administration Console</p>}
         </div>
         <ul className="space-y-1.5">
           {adminMenuItems.map((item) => (
@@ -90,7 +110,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
         </ul>
 
         <div className="mb-4 mt-8 border-t border-white/10 px-2 pt-4">
-           <NavLink
+            <NavLink
               to="/dashboard"
               onClick={onMobileClose}
               className={cn(
@@ -98,10 +118,10 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
               )}
             >
               <ArrowLeft size={18} className={cn("shrink-0 transition-transform group-hover:-translate-x-1")} />
-              {!isCollapsed && <span className="ml-3 truncate text-xs font-black uppercase tracking-wider">THOÁT ADMIN</span>}
+              {!isCollapsed && <span className="ml-3 truncate text-xs font-black uppercase tracking-wider">EXIT ADMIN</span>}
               {isCollapsed && (
                   <div className="invisible absolute left-14 z-50 whitespace-nowrap rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 transition-all group-hover:visible group-hover:opacity-100">
-                    Thoát Admin
+                    Exit Admin
                   </div>
               )}
            </NavLink>
@@ -117,19 +137,19 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
           {!isCollapsed && (
             <div className="ml-3 overflow-hidden">
               <p className="truncate text-xs font-black text-emerald-50">{user?.fullName || "System Admin"}</p>
-              <p className="text-[10px] uppercase tracking-widest text-emerald-500/80">Quản trị viên root</p>
+              <p className="text-[10px] uppercase tracking-widest text-emerald-500/80">Root Administrator</p>
             </div>
           )}
         </div>
 
         <div className="flex flex-col gap-px">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} aria-label={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
             {isCollapsed ? (
               <ChevronRight size={20} />
             ) : (
               <>
                 <ChevronLeft size={20} />
-                <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Thu nhỏ</span>
+                <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Collapse</span>
               </>
             )}
           </button>
@@ -139,12 +159,12 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
               onMobileClose?.();
               logout();
             }}
-            title="Đăng xuất"
-            aria-label="Đăng xuất"
+            title="Logout"
+            aria-label="Logout"
             className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white"
           >
             <LogOut size={20} />
-            {!isCollapsed && <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Đăng xuất</span>}
+            {!isCollapsed && <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Logout</span>}
           </button>
         </div>
       </div>

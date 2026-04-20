@@ -6,14 +6,29 @@ import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { LIGHTBOX_DOUBLE_CLICK_DELAY, LIGHTBOX_DOUBLE_CLICK_MAX_STOPS, LIGHTBOX_DOUBLE_TAP_DELAY, LIGHTBOX_MAX_ZOOM_PIXEL_RATIO, LIGHTBOX_PINCH_ZOOM_DISTANCE_FACTOR, LIGHTBOX_ZOOM_IN_MULTIPLIER } from "@/constant";
+/**
+ * Props for the ImageLightbox component.
+ */
 export interface ImageLightboxProps {
+  /** Visibility state of the lightbox. */
   open: boolean;
+  /** Callback to close the lightbox. */
   onClose: () => void;
+  /** Index of the image to show first. */
   index: number;
+  /** List of images to display. */
   slides: Array<{ src: string }>;
+  /** Maximum pixel ratio for zooming. */
   maxZoomPixelRatio?: number;
+  /** Multiplier for each zoom step. */
   zoomInMultiplier?: number;
 }
+/**
+ * A full-screen image gallery and zoom viewer component.
+ * Wraps `yet-another-react-lightbox` with pre-configured plugins and styles.
+ * 
+ * @param props - Component props following ImageLightboxProps interface.
+ */
 const ImageLightbox: FC<ImageLightboxProps> = ({ open, onClose, index, slides, maxZoomPixelRatio = LIGHTBOX_MAX_ZOOM_PIXEL_RATIO, zoomInMultiplier = LIGHTBOX_ZOOM_IN_MULTIPLIER }) => {
   return (
     <Lightbox

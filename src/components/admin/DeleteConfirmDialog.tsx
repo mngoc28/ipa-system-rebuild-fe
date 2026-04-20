@@ -10,21 +10,34 @@ import {
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
+/**
+ * Props for the DeleteConfirmDialog component.
+ */
 interface DeleteConfirmDialogProps {
+  /** Whether the dialog is visible. */
   isOpen: boolean;
+  /** Callback triggered when the dialog is dismissed or canceled. */
   onClose: () => void;
+  /** Callback triggered when the deletion is confirmed. */
   onConfirm: () => void;
+  /** Optional title for the dialog. Defaults to English equivalent of "Confirm delete?". */
   title?: string;
+  /** Optional detailed description for the dialog. */
   description?: string;
+  /** Whether a deletion operation is currently in progress. */
   loading?: boolean;
 }
 
+/**
+ * A modal dialog used to confirm destructive deletion actions.
+ * Features a rose-colored warning theme and localized English labels.
+ */
 export function DeleteConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
-  title = "Xác nhận xóa?",
-  description = "Hành động này không thể hoàn tác. Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống.",
+  title = "Confirm Delete?",
+  description = "This action cannot be undone. This will permanently delete the data from the system.",
   loading = false,
 }: DeleteConfirmDialogProps) {
   return (
@@ -46,7 +59,7 @@ export function DeleteConfirmDialog({
             disabled={loading}
             className="h-10 flex-1 text-[10px] font-black uppercase tracking-widest"
           >
-            Hủy bỏ
+            Cancel
           </Button>
           <Button
             variant="destructive"
@@ -57,10 +70,10 @@ export function DeleteConfirmDialog({
             {loading ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                ĐANG XÓA
+                DELETING...
               </>
             ) : (
-              "XÁC NHẬN XÓA"
+              "CONFIRM DELETE"
             )}
           </Button>
         </DialogFooter>

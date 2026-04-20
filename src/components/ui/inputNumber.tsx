@@ -2,6 +2,12 @@ import * as React from "react";
 import { ChangeEvent, useState } from "react";
 import { PropsInput } from "../type.ts";
 
+/**
+ * A numeric input component that automatically formats values with thousands separators (en-US).
+ * Displays raw numbers while focused and formatted strings while blurred.
+ * 
+ * @param props - Component props following PropsInput interface.
+ */
 export default function InputNumber({ value, onChange, placeholder, ...props }: PropsInput) {
   const [isFocused, setIsFocused] = useState(false);
 

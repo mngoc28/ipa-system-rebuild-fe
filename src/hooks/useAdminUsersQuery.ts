@@ -6,6 +6,10 @@ import {
   type UpdateAdminUserPayload,
 } from "@/api/adminUsersApi";
 
+/**
+ * Hook to retrieve a paginated list of administrative users with filtering and sorting.
+ * @param query - Search, role, status, and pagination parameters.
+ */
 export const useAdminUsersListQuery = (query: AdminUsersQuery) => {
   return useQuery({
     queryKey: ["admin-users", query],
@@ -14,6 +18,10 @@ export const useAdminUsersListQuery = (query: AdminUsersQuery) => {
   });
 };
 
+/**
+ * Hook to onboard a new administrative user.
+ * Invalidates the main user list on successful creation.
+ */
 export const useCreateAdminUserMutation = () => {
   const queryClient = useQueryClient();
 
@@ -25,6 +33,10 @@ export const useCreateAdminUserMutation = () => {
   });
 };
 
+/**
+ * Hook to partially update an administrative user's profile or account details.
+ * @returns A mutation object accepting { userId, payload }.
+ */
 export const usePatchAdminUserMutation = () => {
   const queryClient = useQueryClient();
 
@@ -36,6 +48,11 @@ export const usePatchAdminUserMutation = () => {
   });
 };
 
+/**
+ * Hook to fetch detailed information for a specific administrative user by ID.
+ * @param userId - Target user identifier.
+ * @param enabled - Boolean flag to control whether the query should run automatically.
+ */
 export const useAdminUserQuery = (userId?: string, enabled = true) => {
   return useQuery({
     queryKey: ["admin-user", userId],
@@ -44,6 +61,11 @@ export const useAdminUserQuery = (userId?: string, enabled = true) => {
   });
 };
 
+/**
+ * Hook to lock or unlock an administrative user account.
+ * Useful for suspending access without total deletion.
+ * @returns A mutation object accepting { userId, locked }.
+ */
 export const useLockAdminUserMutation = () => {
   const queryClient = useQueryClient();
 
@@ -55,6 +77,10 @@ export const useLockAdminUserMutation = () => {
   });
 };
 
+/**
+ * Hook to permanently delete an administrative user account.
+ * @returns A mutation object accepting the userId string.
+ */
 export const useDeleteAdminUserMutation = () => {
   const queryClient = useQueryClient();
 

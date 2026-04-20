@@ -20,8 +20,8 @@ import { Loader2, AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { Announcement } from "@/api/adminApi";
 
 const announcementSchema = z.object({
-  title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự"),
-  content: z.string().min(10, "Nội dung phải có ít nhất 10 ký tự"),
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  content: z.string().min(10, "Content must be at least 10 characters"),
   type: z.enum(["info", "warning", "success"]),
   is_active: z.boolean().default(true),
   starts_at: z.string().nullable().optional(),
@@ -32,19 +32,31 @@ const announcementSchema = z.object({
   }
   return true;
 }, {
-  message: "Ngày kết thúc phải sau ngày bắt đầu",
+  message: "End date must be after start date",
   path: ["ends_at"],
 });
 
 type AnnouncementFormValues = z.infer<typeof announcementSchema>;
 
+/**
+ * Props for the AnnouncementForm component.
+ */
 interface AnnouncementFormProps {
+  /** Optional existing data for editing mode. */
   initialData?: Announcement | null;
+  /** Callback triggered on successful form submission. */
   onSubmit: (values: AnnouncementFormValues) => Promise<void>;
+  /** Callback triggered when the action is cancelled. */
   onCancel: () => void;
+  /** Whether the form is currently submitting. */
   loading?: boolean;
 }
 
+/**
+ * A comprehensive form for creating and editing announcements.
+ * Includes fields for title, content, type (informational, success, warning), 
+ * visibility dates, and active status.
+ */
 export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: AnnouncementFormProps) {
   const {
     register,
@@ -66,11 +78,11 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-2">
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Tiêu đề thông báo *</Label>
+        <Label htmlFor="title" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Announcement Title *</Label>
         <Input 
           id="title" 
           {...register("title")} 
-          placeholder="Ví dụ: Bảo trì hệ thống định kỳ..." 
+          placeholder="E.g., Scheduled System Maintenance..." 
           className="border-slate-200 bg-slate-50/50 transition-all focus:bg-white"
         />
         {errors.title && <p className="text-[10px] font-bold uppercase tracking-tighter text-rose-500">{errors.title.message}</p>}
@@ -78,24 +90,24 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-[11px] font-black uppercase tracking-wider text-slate-500">Loại thông báo</Label>
+          <Label className="text-[11px] font-black uppercase tracking-wider text-slate-500">Announcement Type</Label>
           <Controller
             control={control}
             name="type"
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger className="border-slate-200 bg-slate-50/50">
-                  <SelectValue placeholder="Chọn loại" />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="info">
-                    <div className="flex items-center gap-2"><Info size={14} className="text-blue-500" /> Thông tin</div>
+                    <div className="flex items-center gap-2"><Info size={14} className="text-blue-500" /> Information</div>
                   </SelectItem>
                   <SelectItem value="warning">
-                    <div className="flex items-center gap-2"><AlertCircle size={14} className="text-orange-500" /> Quan trọng</div>
+                    <div className="flex items-center gap-2"><AlertCircle size={14} className="text-orange-500" /> Warning</div>
                   </SelectItem>
                   <SelectItem value="success">
-                    <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> Cập nhật mới</div>
+                    <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500" /> Success</div>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -110,11 +122,11 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
             render={({ field }) => (
               <div className="flex items-center space-x-2">
                 <Checkbox 
-                  id="is_active" 
+                   id="is_active" 
                   checked={field.value} 
                   onCheckedChange={field.onChange}
                 />
-                <Label htmlFor="is_active" className="cursor-pointer text-[11px] font-black uppercase tracking-wider text-slate-900">Kích hoạt ngay</Label>
+                <Label htmlFor="is_active" className="cursor-pointer text-[11px] font-black uppercase tracking-wider text-slate-900">Activate immediately</Label>
               </div>
             )}
           />
@@ -123,22 +135,22 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="starts_at" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Ngày bắt đầu (Để trống nếu luôn hiển thị)</Label>
+          <Label htmlFor="starts_at" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Start Date (Leave blank for immediate)</Label>
           <Input id="starts_at" type="date" {...register("starts_at")} className="border-slate-200 bg-slate-50/50" />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="ends_at" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Ngày kết thúc (Để trống nếu không hết hạn)</Label>
+          <Label htmlFor="ends_at" className="text-[11px] font-black uppercase tracking-wider text-slate-500">End Date (Leave blank for no expiry)</Label>
           <Input id="ends_at" type="date" {...register("ends_at")} className="border-slate-200 bg-slate-50/50" />
           {errors.ends_at && <p className="text-[10px] font-bold uppercase tracking-tighter text-rose-500">{errors.ends_at.message}</p>}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="content" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Nội dung chi tiết *</Label>
+        <Label htmlFor="content" className="text-[11px] font-black uppercase tracking-wider text-slate-500">Detailed Content *</Label>
         <PlainTextarea 
           id="content" 
           {...register("content")} 
-          placeholder="Nhập nội dung đầy đủ của thông báo..." 
+          placeholder="Enter full announcement details..." 
           className="min-h-[120px] border-slate-200 bg-slate-50/50 transition-all focus:bg-white"
         />
         {errors.content && <p className="text-[10px] font-bold uppercase tracking-tighter text-rose-500">{errors.content.message}</p>}
@@ -146,16 +158,16 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
 
       <div className="mt-4 flex justify-end gap-3 border-t border-slate-100 pt-6">
         <Button variant="outline" type="button" onClick={onCancel} className="h-10 border-slate-200 px-6 text-[10px] font-black uppercase tracking-widest">
-          Hủy bỏ
+          Cancel
         </Button>
         <Button disabled={loading} type="submit" className="h-10 px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">
           {loading ? (
             <>
               <Loader2 className="mr-2 size-4 animate-spin" />
-              ĐANG XỬ LÝ
+              PROCESSING
             </>
           ) : (
-            initialData ? "CẬP NHẬT THÔNG BÁO" : "XÁC NHẬN TẠO MỚI"
+            initialData ? "UPDATE ANNOUNCEMENT" : "CONFIRM CREATE"
           )}
         </Button>
       </div>

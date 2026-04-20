@@ -1,11 +1,23 @@
+/**
+ * Internal UI status for partners, representing their lead or relationship stage.
+ */
 export type PartnerUiStatus = "Lead" | "Partner" | "Active";
 
+/**
+ * Interface representing a contact person associated with a partner organization.
+ */
 export interface PartnerContactItem {
+  /** Unique ID of the contact */
   id: string;
+  /** Full name of the contact person */
   fullName: string;
+  /** Job title or professional designation */
   title?: string | null;
+  /** Professional email address */
   email?: string | null;
+  /** Contact phone number */
   phone?: string | null;
+  /** Flag indicating if this is the primary point of contact */
   isPrimary?: boolean;
 }
 
@@ -32,8 +44,13 @@ export interface PartnerDetailInteractionItem {
   summary?: string | null;
 }
 
+/**
+ * Represents a partner organization with detailed fields for interaction tracking.
+ */
 export interface PartnerDetailApiItem extends PartnerApiItem {
+  /** Supplemental background notes */
   notes?: string | null;
+  /** Collection of recent meeting or communication summaries */
   recentInteractions?: PartnerDetailInteractionItem[];
 }
 
@@ -88,18 +105,33 @@ export interface PartnerUiItem {
   partnerCode: string;
 }
 
+/**
+ * Maps numeric API status codes to internal UI status keys.
+ * @param status - Numeric status code from API.
+ * @returns Normalized status string for UI display.
+ */
 export const mapPartnerStatus = (status: number): PartnerUiStatus => {
   if (status === 2) return "Active";
   if (status === 1) return "Partner";
   return "Lead";
 };
 
+/**
+ * Returns the numeric API value for a given UI status key.
+ * @param status - Internal UI status string.
+ * @returns Equivalent numeric code for API compatibility.
+ */
 export const getPartnerStatusValue = (status: PartnerUiStatus): number => {
   if (status === "Active") return 2;
   if (status === "Partner") return 1;
   return 0;
 };
 
+/**
+ * Maps a single partner API item to the structure used by frontend components.
+ * @param item - Raw partner data from the API.
+ * @returns Formatted partner object for UI components.
+ */
 export const mapPartnerToUi = (item: PartnerApiItem): PartnerUiItem => {
   return {
     id: item.id,

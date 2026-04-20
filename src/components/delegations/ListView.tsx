@@ -7,21 +7,33 @@ import { parse } from "date-fns";
 import { toast } from "sonner";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 
+/**
+ * Props for the ListView component.
+ */
 interface ListViewProps {
+  /** Array of delegation items to display in the list. */
   delegations: DelegationItem[];
+  /** Callback triggered when a delete action is confirmed for an item. */
   onDelete?: (id: string | number) => Promise<void> | void;
 }
 
+/**
+ * Theme and localized labels for delegation statuses.
+ */
 const statusColors: Record<string, { bg: string; text: string; label: string }> = {
-  draft: { bg: "bg-slate-100", text: "text-slate-600", label: "Bản nháp" },
-  pendingApproval: { bg: "bg-amber-100", text: "text-amber-700", label: "Chờ duyệt" },
-  needsRevision: { bg: "bg-orange-100", text: "text-orange-700", label: "Cần sửa" },
-  approved: { bg: "bg-blue-100", text: "text-blue-700", label: "Đã duyệt" },
-  inProgress: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Đang triển khai" },
-  completed: { bg: "bg-teal-100", text: "text-teal-800", label: "Hoàn thành" },
-  cancelled: { bg: "bg-rose-100", text: "text-rose-700", label: "Đã hủy" },
+  draft: { bg: "bg-slate-100", text: "text-slate-600", label: "Draft" },
+  pendingApproval: { bg: "bg-amber-100", text: "text-amber-700", label: "Pending Approval" },
+  needsRevision: { bg: "bg-orange-100", text: "text-orange-700", label: "Needs Revision" },
+  approved: { bg: "bg-blue-100", text: "text-blue-700", label: "Approved" },
+  inProgress: { bg: "bg-emerald-100", text: "text-emerald-700", label: "In Progress" },
+  completed: { bg: "bg-teal-100", text: "text-teal-800", label: "Completed" },
+  cancelled: { bg: "bg-rose-100", text: "text-rose-700", label: "Cancelled" },
 };
 
+/**
+ * A tabular view for displaying delegations with sorting, pagination, 
+ * and row-level actions (view, edit, delete).
+ */
 export default function ListView({ delegations, onDelete }: ListViewProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,20 +78,20 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
     navigate(`/delegations/${item.id}/edit`);
-    toast.info(`Đang mở chỉnh sửa: ${item.name}`);
+    toast.info(`Opening editor: ${item.name}`);
   };
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
     if (!onDelete) {
-      toast.error("Không thể thực hiện hành động xóa vào lúc này.");
+      toast.error("Delete action is currently unavailable.");
       return;
     }
 
     try {
       await onDelete(item.id);
     } catch {
-      toast.error("Không thể xóa hồ sơ đoàn.");
+      toast.error("Failed to delete delegation record.");
     }
   };
 
@@ -94,7 +106,7 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 onClick={() => handleSort("code")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Mã Đoàn <ArrowUpDown size={10} className={cn(sortConfig.key === "code" && "text-primary")} />
+                  Code <ArrowUpDown size={10} className={cn(sortConfig.key === "code" && "text-primary")} />
                 </div>
               </th>
               <th 
@@ -102,21 +114,21 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 onClick={() => handleSort("name")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Sự kiện / Đoàn công tác <ArrowUpDown size={10} className={cn(sortConfig.key === "name" && "text-primary")} />
+                  Event / Delegation <ArrowUpDown size={10} className={cn(sortConfig.key === "name" && "text-primary")} />
                 </div>
               </th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Country</th>
               <th 
                 className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400"
                 onClick={() => handleSort("startDate")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Thời gian <ArrowUpDown size={10} className={cn(sortConfig.key === "startDate" && "text-primary")} />
+                  Timeline <ArrowUpDown size={10} className={cn(sortConfig.key === "startDate" && "text-primary")} />
                 </div>
               </th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Nhân sự</th>
-              <th className="px-6 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Thao tác</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Staff</th>
+              <th className="px-6 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -157,13 +169,13 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right">
                   <div className="flex scale-95 items-center justify-end gap-1 opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                    <button onClick={(e) => handleView(e, item.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-900" title="Xem chi tiết">
+                    <button onClick={(e) => handleView(e, item.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-900" title="View details">
                       <Eye size={14} />
                     </button>
-                    <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-900" title="Chỉnh sửa">
+                    <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-900" title="Edit delegation">
                       <Edit2 size={14} />
                     </button>
-                    <button onClick={(e) => handleDelete(e, item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600" title="Xóa">
+                    <button onClick={(e) => handleDelete(e, item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600" title="Delete record">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -177,15 +189,15 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
       {/* Pagination Footer */}
       <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-4">
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-          HIỂN THỊ{" "}
+          SHOWING{" "}
           <span className="text-slate-900">
             {sortedDelegations.length === 0 ? "0 - 0" : `${(normalizedPage - 1) * itemsPerPage + 1} - ${Math.min(normalizedPage * itemsPerPage, sortedDelegations.length)}`}
           </span>{" "}
-          TRÊN <span className="text-slate-900">{sortedDelegations.length}</span> KẾT QUẢ
+          OF <span className="text-slate-900">{sortedDelegations.length}</span> RESULTS
         </p>
 
         <div className="flex items-center gap-1">
-          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} title="Trang trước" aria-label="Trang trước" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} title="Previous page" aria-label="Previous page" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} className="rotate-180" />
           </button>
 
@@ -201,7 +213,7 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
             ))}
           </div>
 
-          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} title="Trang sau" aria-label="Trang sau" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} title="Next page" aria-label="Next page" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} />
           </button>
         </div>

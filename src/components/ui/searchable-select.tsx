@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchableSelectProps } from "@/components/type.ts";
 
+/**
+ * A versatile searchable dropdown component.
+ * Features a filterable list of options, loading state, and custom trigger/content styling.
+ * Supports both manual selection and search-to-filter.
+ * 
+ * @param props - Component props following SearchableSelectProps interface.
+ */
 export default function SearchableSelect({
   value,
   onValueChange,

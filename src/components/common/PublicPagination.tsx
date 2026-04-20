@@ -5,6 +5,14 @@ import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PublicPaginationProps } from "../type";
 
+/**
+ * A comprehensive pagination controller that includes page navigation buttons, 
+ * a page size selector, and item count display.
+ * 
+ * Supports ellipsis for many pages and is fully responsive.
+ * 
+ * @param props - Component props following PublicPaginationProps interface.
+ */
 const PublicPagination = ({
   currentPage,
   totalPages,

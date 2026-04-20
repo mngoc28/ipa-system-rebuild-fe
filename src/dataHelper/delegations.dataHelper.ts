@@ -1,29 +1,58 @@
+/**
+ * Detailed representation of a delegation item from the API.
+ */
 export interface DelegationApiItem {
+  /** Unique ID */
   id: number;
+  /** Internal tracking code */
   code: string;
+  /** Name of the delegation */
   name: string;
+  /** Direction code (e.g., 1 for Inbound, 2 for Outbound) */
   direction: number;
+  /** Status code (e.g., 0: Draft, 1: Pending, etc.) */
   status: number;
+  /** Priority level code (e.g., 1: Low, 2: Medium, 3: High) */
   priority: number;
+  /** ID of the associated country */
   country_id: number;
+  /** ID of the host unit/department */
   host_unit_id: number;
+  /** IDs of associated partner organizations */
   partner_ids?: number[];
+  /** ID of the user managing this delegation */
   owner_user_id: number;
+  /** Visit start date */
   start_date: string;
+  /** Visit end date */
   end_date: string;
+  /** Number of participants in the delegation */
   participant_count: number;
+  /** Visit objectives */
   objective: string;
+  /** Detailed description and background */
   description: string;
+  /** Investment potential score or value */
   investment_potential?: number;
+  /** IDs of associated business sectors */
   sector_ids?: number[];
+  /** Remark provided during approval process */
   approval_remark?: string | null;
+  /** Creation timestamp */
   created_at: string;
+  /** Last update timestamp */
   updated_at: string;
+  /** List of delegation members */
   members?: unknown[];
+  /** List of related events */
   events?: unknown[];
+  /** List of outcomes/results */
   outcomes?: unknown[];
+  /** Associated business sectors detail */
   sectors?: Array<{ id: number; name: string; name_vi?: string }>;
+  /** Checklist items status */
   checklist?: unknown[];
+  /** Primary and secondary contact persons */
   contacts?: Array<{
     id: number;
     name: string;
@@ -32,41 +61,57 @@ export interface DelegationApiItem {
     phone?: string;
     is_primary?: boolean;
   }>;
+  /** Country details */
   country?: {
     id: number;
     name_vi: string;
     name_en: string;
     code: string;
   };
+  /** Partner organization details */
   partners?: Array<{
     id: number;
     name: string;
     partner_name?: string;
   }>;
+  /** Hosting unit details */
   host_unit?: {
     id: number;
     unit_name: string;
     unit_code: string;
   };
+  /** Owner user details */
   owner?: {
     id: number;
     full_name: string;
     avatar_url?: string;
   };
+  /** List of associated tasks */
   tasks?: Array<{
     id: number;
     due_at: string;
   }>;
 }
 
+/**
+ * Query parameters for fetching delegations.
+ */
 export interface DelegationsQuery {
+  /** Search keyword for filtering by name or code */
   search?: string;
+  /** Filter by visit direction */
   direction?: number;
+  /** Filter by current status */
   status?: number;
+  /** Filter by priority level */
   priority?: number;
+  /** Filter by country ID */
   country_id?: number | string;
+  /** Filter by owner user ID */
   owner_user_id?: number | string;
+  /** Page number for pagination */
   page?: number;
+  /** Number of items per page */
   per_page?: number;
 }
 
@@ -120,6 +165,11 @@ export interface CreateDelegationPayload {
   approval_remark?: string | null;
 }
 
+/**
+ * Maps numeric API status codes to internal UI status keys.
+ * @param status - Numeric status code from API.
+ * @returns Human-readable status key for UI state management.
+ */
 export const mapDelegationStatus = (status: number): "draft" | "pendingApproval" | "needsRevision" | "approved" | "inProgress" | "completed" | "cancelled" => {
   switch (status) {
     case 0: return "draft";
@@ -133,6 +183,11 @@ export const mapDelegationStatus = (status: number): "draft" | "pendingApproval"
   }
 };
 
+/**
+ * Gets a localized label for a delegation status.
+ * @param status - Internal UI status key.
+ * @returns Vietnamese label for the status.
+ */
 export const getDelegationStatusLabel = (status: string): string => {
   switch (status) {
     case "draft": return "Bản nháp";
@@ -146,6 +201,11 @@ export const getDelegationStatusLabel = (status: string): string => {
   }
 };
 
+/**
+ * Maps numeric API priority codes to internal UI priority keys.
+ * @param priority - Numeric priority code from API.
+ * @returns Human-readable priority key.
+ */
 export const mapDelegationPriority = (priority: number): string => {
   switch (priority) {
     case 3: return "high";
@@ -155,6 +215,11 @@ export const mapDelegationPriority = (priority: number): string => {
   }
 };
 
+/**
+ * Returns a flag emoji for a given country name.
+ * @param countryName - The name of the country (in Vietnamese).
+ * @returns An emoji string or a globe icon if not found.
+ */
 export const getFlagEmoji = (countryName: string): string => {
   const flags: Record<string, string> = {
     "Hàn Quốc": "🇰🇷",

@@ -27,83 +27,104 @@ import { useAuthStore, UserRole } from "@/store/useAuthStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { cn } from "@/lib/utils";
 
+/**
+ * Structure for a single sidebar navigation item.
+ */
 interface MenuItem {
+  /** Display title for the menu item. */
   title: string;
+  /** Internal application path. */
   path: string;
+  /** Lucide icon component to display. */
   icon: ElementType;
+  /** List of roles authorized to view this item. */
   roles: UserRole[];
+  /** Optional numeric notification badge. */
   badge?: number;
 }
 
+/**
+ * Structure for grouping related menu items under a header.
+ */
 interface MenuGroup {
+  /** Display name of the category. */
   group: string;
+  /** Optional roles authorized to view this entire group. */
   roles?: UserRole[];
+  /** List of items within this category. */
   items: MenuItem[];
 }
 
 const menuGroups: MenuGroup[] = [
   {
-    group: "CHUNG",
+    group: "GENERAL",
     items: [
-      { title: "Tổng quan", path: "/dashboard", icon: LayoutDashboard, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Đoàn đến/đi", path: "/delegations", icon: Briefcase, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Delegations", path: "/delegations", icon: Briefcase, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
-    group: "QUẢN LÝ ĐƠN VỊ",
+    group: "UNIT MANAGEMENT",
     roles: ["Manager"],
     items: [
-      { title: "Chờ phê duyệt", path: "/approvals", icon: ClipboardList, roles: ["Manager"] },
-      { title: "Báo cáo đơn vị", path: "/reports/unit", icon: BarChart3, roles: ["Manager"] },
-      { title: "Đội nhóm & Nhân sự", path: "/teams", icon: Users, roles: ["Manager"] },
+      { title: "Pending Approvals", path: "/approvals", icon: ClipboardList, roles: ["Manager"] },
+      { title: "Unit Reports", path: "/reports/unit", icon: BarChart3, roles: ["Manager"] },
+      { title: "Teams & HR", path: "/teams", icon: Users, roles: ["Manager"] },
     ]
   },
   {
-    group: "LÃNH ĐẠO THÀNH PHỐ",
+    group: "CITY LEADERSHIP",
     roles: ["Director"],
     items: [
-      { title: "Tổng quan thành phố", path: "/city-overview", icon: Building2, roles: ["Director"] },
-      { title: "Báo cáo thành phố", path: "/reports/city", icon: BarChart3, roles: ["Director"] },
+      { title: "City Overview", path: "/city-overview", icon: Building2, roles: ["Director"] },
+      { title: "City Reports", path: "/reports/city", icon: BarChart3, roles: ["Director"] },
     ]
   },
   {
-    group: "HỆ THỐNG",
+    group: "SYSTEM",
     roles: ["Admin"],
     items: [
-      { title: "Portal Quản trị", path: "/admin/dashboard", icon: ShieldCheck, roles: ["Admin"] },
-      { title: "Danh mục hệ thống", path: "/admin/master-data", icon: Database, roles: ["Admin"] },
-      { title: "Nhật ký hệ thống", path: "/admin/audit-logs", icon: Activity, roles: ["Admin"] },
-      { title: "Thông báo & Vận hành", path: "/admin/announcements", icon: Settings, roles: ["Admin"] },
+      { title: "Admin Portal", path: "/admin/dashboard", icon: ShieldCheck, roles: ["Admin"] },
+      { title: "Master Data", path: "/admin/master-data", icon: Database, roles: ["Admin"] },
+      { title: "Audit Logs", path: "/admin/audit-logs", icon: Activity, roles: ["Admin"] },
+      { title: "Announcements & Ops", path: "/admin/announcements", icon: Settings, roles: ["Admin"] },
     ]
   },
   {
-    group: "NGHIỆP VỤ",
+    group: "OPERATIONS",
     items: [
-      { title: "Pipeline Dự án", path: "/pipeline", icon: PieChart, roles: ["Staff", "Manager", "Director"] },
-      { title: "Lịch công tác", path: "/schedule", icon: Calendar, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Việc cần làm", path: "/tasks", icon: CheckSquare, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Project Pipeline", path: "/pipeline", icon: PieChart, roles: ["Staff", "Manager", "Director"] },
+      { title: "Work Schedule", path: "/schedule", icon: Calendar, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Task Manager", path: "/tasks", icon: CheckSquare, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
-    group: "VĂN PHÒNG",
+    group: "OFFICE",
     items: [
-      { title: "Biên bản", path: "/minutes", icon: FileText, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Thông báo", path: "/notifications", icon: Bell, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Minutes", path: "/minutes", icon: FileText, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Notifications", path: "/notifications", icon: Bell, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
-    group: "TÀI NGUYÊN",
+    group: "RESOURCES",
     items: [
-      { title: "CRM Đối tác", path: "/partners", icon: Users, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Tài liệu", path: "/documents", icon: FileStack, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Partner CRM", path: "/partners", icon: Users, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Documents", path: "/documents", icon: FileStack, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   }
 ];
 
+/**
+ * Props for the Sidebar component.
+ */
 interface SidebarProps {
+  /** Whether the sidebar is in its narrow (icon-only) state. */
   isCollapsed: boolean;
+  /** Callback to toggle the collapsed state. */
   setIsCollapsed: (val: boolean) => void;
+  /** Visibility state for small screen mobile drawer. */
   isMobileOpen?: boolean;
+  /** Callback to close the mobile drawer. */
   onMobileClose?: () => void;
 }
 
@@ -150,7 +171,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20">
           <span className="text-[10px] font-black tracking-widest text-white">IPA</span>
         </div>
-        {!isCollapsed && <span className="ml-3 whitespace-nowrap font-title text-sm font-black tracking-[0.15em] text-slate-100">IPA ĐÀ NẴNG</span>}
+        {!isCollapsed && <span className="ml-3 whitespace-nowrap font-title text-sm font-black tracking-[0.15em] text-slate-100">IPA DANANG</span>}
       </div>
 
       {/* Navigation */}
@@ -214,13 +235,13 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
         </NavLink>
 
         <div className="flex flex-col gap-px">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} aria-label={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
             {isCollapsed ? (
               <ChevronRight size={20} />
             ) : (
               <>
                 <ChevronLeft size={20} />
-                <span className="ml-3 text-xs">Thu nhỏ</span>
+                <span className="ml-3 text-xs">Collapse</span>
               </>
             )}
           </button>
@@ -230,12 +251,12 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
               onMobileClose?.();
               logout();
             }}
-            title="Đăng xuất"
-            aria-label="Đăng xuất"
+            title="Logout"
+            aria-label="Logout"
             className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white"
           >
             <LogOut size={20} />
-            {!isCollapsed && <span className="ml-3 text-xs">Đăng xuất</span>}
+            {!isCollapsed && <span className="ml-3 text-xs">Logout</span>}
           </button>
         </div>
       </div>

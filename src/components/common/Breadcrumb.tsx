@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
 import { BreadcrumbProps } from "../type.ts";
 
+/**
+ * Breadcrumb navigation component displaying a horizontal list of links.
+ * Automatically adds a home icon for the first item and separators between items.
+ * 
+ * @param props - Component props following BreadcrumbProps interface.
+ */
 const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
   if (!items.length) return null;
 

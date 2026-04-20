@@ -1,27 +1,54 @@
+/**
+ * Represents the raw delegation data structure from the API.
+ */
 export interface DelegationApiItem {
+  /** Unique identifier */
   id: string;
+  /** Internal tracking code */
   code: string;
+  /** Name of the delegation */
   name: string;
+  /** Direction of the delegation: INBOUND (coming in) or OUTBOUND (going out) */
   direction: "INBOUND" | "OUTBOUND" | string;
+  /** Urgency level */
   priority: "HIGH" | "MEDIUM" | "LOW" | string;
+  /** ID of the associated country */
   countryId: string;
+  /** ID of the unit hosting the delegation */
   hostUnitId: string;
+  /** ID of the user managing this delegation */
   ownerId: string;
+  /** Current lifecycle status */
   status: string;
+  /** Effective start date */
   startDate: string;
+  /** Effective end date */
   endDate: string;
+  /** Primary objective of the visit */
   objective?: string;
+  /** Additional details or context */
   description?: string;
+  /** Last update timestamp */
   updatedAt?: string;
 }
 
+/**
+ * Represents a member participating in a delegation.
+ */
 export interface DelegationMemberItem {
+  /** Member unique ID */
   id: string;
+  /** Full name of the member */
   fullName: string;
+  /** Professional title/position */
   title?: string;
+  /** Name of the organization they belong to */
   organizationName?: string;
+  /** Email address for contact */
   contactEmail?: string;
+  /** Phone number for contact */
   contactPhone?: string;
+  /** Type/Role of the member in the delegation */
   memberType: string;
 }
 
@@ -33,19 +60,35 @@ export interface DelegationDetailResponse {
   outcome: unknown;
 }
 
+/**
+ * Payload for creating a new delegation.
+ */
 export interface CreateDelegationPayload {
+  /** Optional custom code */
   code?: string;
+  /** Name of the delegation */
   name: string;
+  /** Visit direction */
   direction: "INBOUND" | "OUTBOUND";
+  /** Urgency priority */
   priority: "HIGH" | "MEDIUM" | "LOW";
+  /** Target country ID */
   countryId: string;
+  /** Unit responsible for hosting */
   hostUnitId: string;
+  /** User assigned as the primary owner */
   ownerUserId: string;
+  /** Expected start date */
   startDate: string;
+  /** Expected end date */
   endDate: string;
+  /** Goals of the delegation */
   objective: string;
+  /** Detailed background info */
   description: string;
+  /** List of member IDs to associate */
   members?: string[];
+  /** Proposed itinerary/schedule items */
   schedule_items?: Array<{
     date: string;
     title: string;
@@ -118,6 +161,11 @@ export const delegationMinutesItems: DelegationMinutesItem[] = [
   { id: 2, title: "Biên bản làm việc ngày 15/05", status: "Chờ ký" },
 ];
 
+/**
+ * Maps API status strings to internal UI status keys.
+ * @param apiStatus - The status string from the API.
+ * @returns Normalized internal status key.
+ */
 export const mapDelegationStatus = (apiStatus: string) => {
   const normalized = (apiStatus || "").toUpperCase();
   if (normalized === "PENDING_APPROVAL") return "pendingApproval";
@@ -129,6 +177,12 @@ export const mapDelegationStatus = (apiStatus: string) => {
   return "draft";
 };
 
+/**
+ * Maps a delegation item from API format to the format used in UI components.
+ * @param apiDelegation - The raw delegation record from the API.
+ * @param fallback - Fallback values for missing fields.
+ * @returns A UI-ready delegation object.
+ */
 export const mapDelegationDetailToUi = (apiDelegation: DelegationApiItem, fallback: DelegationUiItem): DelegationUiItem => {
   return {
     ...fallback,

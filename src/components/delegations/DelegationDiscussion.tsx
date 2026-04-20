@@ -1,6 +1,5 @@
 import { forwardRef, useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 import { Send, MoreHorizontal, Pencil, Trash2, X, Check } from "lucide-react";
 import { 
   useDelegationCommentsQuery, 
@@ -21,8 +20,11 @@ import { useQuery } from "@tanstack/react-query";
 import { teamsApi } from "@/api/teamsApi";
 import type { DelegationCommentApiItem } from "@/api/delegationsApi";
 
+/** Represents a team member that can be mentioned in a discussion. */
 type TeamMemberMention = {
+  /** The unique ID of the member. */
   id: string;
+  /** The display name of the member. */
   name: string;
 };
 
@@ -34,10 +36,18 @@ const PlainTextarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttribut
 );
 PlainTextarea.displayName = "PlainTextarea";
 
+/** Props for the DelegationDiscussion component. */
 interface DelegationDiscussionProps {
+  /** The ID of the delegation to which the discussion belongs. */
   delegationId: string | number;
 }
 
+/**
+ * A real-time discussion component for delegation teams.
+ * Supports @mentions, rich text rendering for tags, and CRUD for comments.
+ * 
+ * @param props - Component props following DelegationDiscussionProps interface.
+ */
 export default function DelegationDiscussion({ delegationId }: DelegationDiscussionProps) {
   const [commentContent, setCommentContent] = useState("");
   const [showMentions, setShowMentions] = useState(false);
@@ -161,7 +171,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   };
 
   const handleDeleteComment = (commentId: number) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa bình luận này không?")) return;
+    if (!confirm("Are you sure you want to delete this comment?")) return;
     
     deleteCommentMutation.mutate({ 
       id: delegationId.toString(), 
@@ -200,7 +210,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-400">Đang tải...</div>;
+    return <div className="p-8 text-center text-slate-400">Loading...</div>;
   }
 
   return (
@@ -227,7 +237,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                         {comment.commenter?.full_name || "UnknownUser"}
                       </span>
                       <span className="text-[9px] font-medium text-slate-400">
-                        {format(new Date(comment.created_at), "HH:mm, dd/MM", { locale: vi })}
+                        {format(new Date(comment.created_at), "HH:mm, dd/MM")}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -290,14 +300,14 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                             <DropdownMenuContent align="end" className="w-24">
                               <DropdownMenuItem onClick={() => handleStartEdit(comment)} className="cursor-pointer">
                                 <Pencil className="mr-2 size-3.5" />
-                                <span>Sửa</span>
+                                <span>Edit</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => handleDeleteComment(Number(comment.id))} 
                                 className="cursor-pointer text-destructive focus:text-destructive"
                               >
                                 <Trash2 className="mr-2 size-3.5" />
-                                <span>Xóa</span>
+                                <span>Delete</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -313,8 +323,8 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         ) : (
           <div className="flex h-full flex-col items-center justify-center py-10 text-slate-400 opacity-50">
             <Send size={32} className="mb-2" />
-            <p className="text-sm font-bold">Chưa có thảo luận nào.</p>
-            <p className="text-xs">Hãy là người đầu tiên để lại tin nhắn!</p>
+            <p className="text-sm font-bold">No discussions yet.</p>
+            <p className="text-xs">Be the first to leave a message!</p>
           </div>
         )}
       </div>
@@ -324,7 +334,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         {showMentions && filteredMembers.length > 0 && (
           <div className="absolute bottom-full left-4 z-50 mb-2 w-64 rounded-xl border border-slate-100 bg-white p-1 shadow-2xl duration-200 animate-in fade-in slide-in-from-bottom-2">
             <p className="border-b border-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Nhắc tên thành viên
+              Mention Member
             </p>
             <div className="max-h-48 overflow-auto">
               {filteredMembers.map((member) => (
@@ -349,7 +359,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         <form onSubmit={handleAddComment} className="relative flex flex-col gap-2">
           <PlainTextarea
             ref={inputRef}
-            placeholder="Gửi tin nhắn trong đoàn... (Gõ @ để tag tên)"
+            placeholder="Type a message... (Use @ to mention someone)"
             className="max-h-[150px] min-h-[60px] w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 pr-12 text-sm font-medium outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             value={commentContent}
             onChange={handleCommentChange}

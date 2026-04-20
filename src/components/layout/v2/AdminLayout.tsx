@@ -6,6 +6,11 @@ import Header from "./Header";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
+/**
+ * Root layout component for the Administrative dashboard.
+ * Manages sidebar visibility, mobile menu states, and provides the
+ * main content area via react-router-dom Outlet.
+ */
 export default function AdminLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

@@ -3,6 +3,9 @@ import { delegationsApi } from "@/api/delegationsApi";
 import { DelegationsQuery, CreateDelegationPayload } from "@/dataHelper/delegations.dataHelper";
 import { toast } from "sonner";
 
+/**
+ * Structural helper for handling standard API error responses in mutations.
+ */
 type ApiErrorLike = {
   response?: {
     data?: {
@@ -13,6 +16,10 @@ type ApiErrorLike = {
   };
 };
 
+/**
+ * Composite hook providing a query for delegations and mutations for CRUD operations.
+ * @param query - Optional filtering and sorting parameters for the delegation list.
+ */
 export const useDelegationsQuery = (query?: DelegationsQuery) => {
   const queryClient = useQueryClient();
 
@@ -27,7 +34,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Lỗi khi tạo hồ sơ đoàn.");
+      toast.error(error.response?.data?.error?.message || "Error creating delegation record.");
     },
   });
 
@@ -39,7 +46,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegation", variables.id.toString()] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Lỗi khi cập nhật hồ sơ đoàn.");
+      toast.error(error.response?.data?.error?.message || "Error updating delegation record.");
     },
   });
 
@@ -49,7 +56,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Lỗi khi xóa hồ sơ đoàn.");
+      toast.error(error.response?.data?.error?.message || "Error deleting delegation record.");
     },
   });
 
@@ -61,6 +68,10 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
   };
 };
 
+/**
+ * Hook to retrieve detailed data for a specific delegation.
+ * @param id - The delegation identifier.
+ */
 export const useDelegationDetailQuery = (id: string | number | undefined) => {
   return useQuery({
     queryKey: ["delegation", id?.toString()],
@@ -69,6 +80,11 @@ export const useDelegationDetailQuery = (id: string | number | undefined) => {
   });
 };
 
+/**
+ * Hook to retrieve the discussion thread (comments) for a delegation.
+ * Automatically polls for updates every 5 seconds.
+ * @param id - Parent delegation ID.
+ */
 export const useDelegationCommentsQuery = (id: string | undefined) => {
   return useQuery({
     queryKey: ["delegation-comments", id?.toString()],
@@ -78,6 +94,9 @@ export const useDelegationCommentsQuery = (id: string | undefined) => {
   });
 };
 
+/**
+ * Hook to add a new collaboration comment to a delegation.
+ */
 export const useAddDelegationCommentMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -86,10 +105,13 @@ export const useAddDelegationCommentMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Tải bình luận thất bại.");
+      toast.error(error.response?.data?.error?.message || "Failed to load comments.");
     },
   });
 };
+/**
+ * Hook to modify the content of an existing delegation comment.
+ */
 export const useUpdateDelegationCommentMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -97,14 +119,17 @@ export const useUpdateDelegationCommentMutation = () => {
       delegationsApi.updateComment(id, commentId, content),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
-      toast.success("Đã cập nhật bình luận.");
+      toast.success("Comment updated successfully.");
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Cập nhật bình luận thất bại.");
+      toast.error(error.response?.data?.error?.message || "Failed to update comment.");
     },
   });
 };
 
+/**
+ * Hook to permanently remove a comment from a delegation discussion.
+ */
 export const useDeleteDelegationCommentMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -112,10 +137,10 @@ export const useDeleteDelegationCommentMutation = () => {
       delegationsApi.deleteComment(id, commentId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
-      toast.success("Đã xóa bình luận.");
+      toast.success("Comment deleted successfully.");
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Xóa bình luận thất bại.");
+      toast.error(error.response?.data?.error?.message || "Failed to delete comment.");
     },
   });
 };

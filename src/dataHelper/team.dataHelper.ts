@@ -1,18 +1,35 @@
+/** Valid display statuses for a team member. */
 export type TeamMemberStatus = "In Office" | "On Field" | "On Leave";
 
+/**
+ * Interface representing a member of a team.
+ */
 export interface TeamMemberItem {
+  /** Unique ID of the member */
   id: string | number;
+  /** Full name of the team member */
   name: string;
+  /** Professional role or job title */
   role: string;
+  /** Work email address */
   email: string;
+  /** Current work status (e.g., In Office, On Field) */
   status: TeamMemberStatus;
+  /** Number of active tasks assigned */
   tasks: number;
+  /** Performance metric score (percentage) */
   performance: number;
 }
 
+/**
+ * Represents a recent activity performed by a team member.
+ */
 export interface TeamActivityItem {
+  /** Name of the user who performed the activity */
   user: string;
+  /** Description of the action taken */
   action: string;
+  /** Time elapsed or timestamp of the activity */
   time: string;
 }
 

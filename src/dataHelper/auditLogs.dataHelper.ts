@@ -1,14 +1,29 @@
+/**
+ * Types of audit log entries, representing the severity or category of the log.
+ */
 export type AuditLogType = "info" | "success" | "warning" | "system";
 
+/**
+ * Interface representing a single audit log entry.
+ */
 export interface AuditLogItem {
+  /** Unique ID of the log entry */
   id: number;
+  /** Name of the user who performed the action */
   user: string;
+  /** The action that was performed */
   action: string;
+  /** Detailed description of the action */
   detail: string;
+  /** Timestamp when the action occurred */
   time: string;
+  /** The type/category of the log */
   type: AuditLogType;
 }
 
+/**
+ * Sample audit logs for demonstration or development purposes.
+ */
 export const auditLogs: AuditLogItem[] = [
   { id: 1, user: "Nguyễn Văn Quản Trị", action: "Đăng nhập hệ thống", detail: "Thực hiện đăng nhập thành công từ IP 192.168.1.5", time: "10:15 - 10/04/2026", type: "info" },
   { id: 2, user: "Trần Thu Hà", action: "Cập nhật đoàn", detail: "Chuyển trạng thái Đoàn Inbound Hàn Quốc sang \"Đang khảo sát\"", time: "09:42 - 10/04/2026", type: "success" },

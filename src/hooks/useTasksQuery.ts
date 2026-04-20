@@ -8,14 +8,27 @@ import {
 } from "@/dataHelper/tasks.dataHelper";
 import * as React from "react";
 
+/**
+ * Parameters for filtering and paginating current tasks.
+ */
 export interface TasksQueryOptions {
+  /** Filter by numeric status ID. */
   status?: number;
+  /** Filter by priority level. */
   priority?: number;
+  /** Text search for task title or description. */
   search?: string;
+  /** Page number (1-indexed). */
   page?: number;
+  /** Number of items per page. */
   pageSize?: number;
 }
 
+/**
+ * Hook to retrieve a filtered and paginated list of actionable tasks.
+ * Maps backend task schemas to UI-specific data structures.
+ * @param options - Filtering and pagination criteria.
+ */
 export const useTasksListQuery = (options: TasksQueryOptions = {}) => {
   const tasksQuery = useQuery({
     queryKey: ["tasks", options],
@@ -28,6 +41,9 @@ export const useTasksListQuery = (options: TasksQueryOptions = {}) => {
   return { tasksQuery, tasks, meta };
 };
 
+/**
+ * Hook to create a new task.
+ */
 export const useCreateTaskMutation = () => {
   const queryClient = useQueryClient();
 
@@ -35,12 +51,15 @@ export const useCreateTaskMutation = () => {
     mutationFn: (payload: TaskCreatePayload) => tasksApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã tạo công việc mới.");
+      toast.success("New task created successfully.");
     },
-    onError: () => toast.error("Không thể tạo công việc."),
+    onError: () => toast.error("Failed to create task."),
   });
 };
 
+/**
+ * Hook to update an existing task's properties.
+ */
 export const useUpdateTaskMutation = () => {
   const queryClient = useQueryClient();
 
@@ -48,12 +67,15 @@ export const useUpdateTaskMutation = () => {
     mutationFn: ({ id, payload }: { id: string; payload: TaskPatchPayload }) => tasksApi.update(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã cập nhật công việc.");
+      toast.success("Task updated successfully.");
     },
-    onError: () => toast.error("Cập nhật thất bại."),
+    onError: () => toast.error("Failed to update task."),
   });
 };
 
+/**
+ * Hook to permanently remove a task.
+ */
 export const useDeleteTaskMutation = () => {
   const queryClient = useQueryClient();
 
@@ -61,13 +83,18 @@ export const useDeleteTaskMutation = () => {
     mutationFn: (id: string) => tasksApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã xóa công việc.");
+      toast.success("Task deleted successfully.");
     },
-    onError: () => toast.error("Xóa thất bại."),
+    onError: () => toast.error("Failed to delete task."),
   });
 };
 
 // --- Comments ---
+/**
+ * Hook to retrieve the comment thread for a specific task.
+ * @param taskId - Target task ID.
+ * @param isOpen - Flag to enable/disable active polling.
+ */
 export const useTaskCommentsQuery = (taskId: string, isOpen: boolean = false) => {
   return useQuery({
     queryKey: ["task-comments", taskId],
@@ -78,6 +105,9 @@ export const useTaskCommentsQuery = (taskId: string, isOpen: boolean = false) =>
   });
 };
 
+/**
+ * Hook to add a new comment to a task.
+ */
 export const useAddCommentMutation = () => {
   const queryClient = useQueryClient();
 
@@ -85,15 +115,17 @@ export const useAddCommentMutation = () => {
     mutationFn: ({ taskId, content }: { taskId: string; content: string }) =>
       tasksApi.addComment(taskId, content),
     onSuccess: (_, { taskId }) => {
-      // taskId is string here; cache key also uses string — they match
       queryClient.invalidateQueries({ queryKey: ["task-comments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã gửi bình luận.");
+      toast.success("Comment posted successfully.");
     },
   });
 };
 
 // --- Attachments ---
+/**
+ * Hook to retrieve files associated with a task.
+ */
 export const useTaskAttachmentsQuery = (taskId: string) => {
   return useQuery({
     queryKey: ["task-attachments", taskId],
@@ -102,6 +134,9 @@ export const useTaskAttachmentsQuery = (taskId: string) => {
   });
 };
 
+/**
+ * Hook to upload a new file attachment to a task.
+ */
 export const useUploadAttachmentMutation = () => {
   const queryClient = useQueryClient();
 
@@ -111,11 +146,14 @@ export const useUploadAttachmentMutation = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["task-attachments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã tải lên tệp đính kèm.");
+      toast.success("Attachment uploaded successfully.");
     },
   });
 };
 
+/**
+ * Hook to remove an attachment from a task.
+ */
 export const useDeleteAttachmentMutation = () => {
   const queryClient = useQueryClient();
 
@@ -125,7 +163,7 @@ export const useDeleteAttachmentMutation = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["task-attachments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Đã xóa tệp đính kèm.");
+      toast.success("Attachment removed successfully.");
     },
   });
 };

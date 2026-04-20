@@ -4,23 +4,50 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+/**
+ * Definition for a single column in the DataTable.
+ * @template T - The type of data object represented by each row.
+ */
 export interface Column<T> {
+  /** The rendered header content for this column. */
   header: ReactNode;
+  /** The key in the data object to access, or a string for custom rendering. */
   accessorKey: keyof T | string;
+  /** Optional custom rendering function for cells in this column. */
   cell?: (item: T) => ReactNode;
+  /** Optional CSS classes for both header and data cells. */
   className?: string;
+  /** Whether to hide this column on mobile screens. */
   hideOnMobile?: boolean;
 }
 
+/**
+ * Props for the DataTable component.
+ * @template T - The type of data object represented by each row.
+ */
 interface DataTableProps<T> {
+  /** The array of data objects to display. */
   data: T[];
+  /** Configuration for the table columns. */
   columns: Column<T>[];
+  /** Whether the table is currently fetching data. */
   isLoading?: boolean;
+  /** Whether a data fetching error occurred. */
   isError?: boolean;
+  /** Custom message to display when the data array is empty. */
   noDataMessage?: string;
+  /** Optional callback triggered when a row is clicked. */
   onRowClick?: (item: T) => void;
 }
 
+/**
+ * A flexible, generic table component for displaying structured data.
+ * Features include loading states, error handling, mobile responsiveness,
+ * and custom cell rendering.
+ * 
+ * @template T - The type of data object represented by each row.
+ * @param props - Component props following DataTableProps interface.
+ */
 const DataTable = <T extends object>({
   data,
   columns,

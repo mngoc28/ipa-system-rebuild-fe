@@ -22,16 +22,29 @@ const buildMockIdentityHeaders = () => {
   }
 };
 
+/**
+ * Represents a system or process notification sent to a user.
+ */
 export interface NotificationItem {
+  /** Unique ID of the notification */
   id: string;
+  /** Categorization (e.g., TASK_ASSIGNED, DELEGATION_UPDATE) */
   type?: string;
+  /** Subject line or summary */
   title?: string;
+  /** detailed message or content */
   description?: string;
+  /** alternative message field */
   message?: string;
+  /** Name of the database table for the linked object */
   refTable?: string;
+  /** ID of the specific record in refTable */
   refId?: string | number;
+  /** Importance level (e.g., 1-5) */
   severity?: number;
+  /** ISO creation timestamp */
   createdAt?: string;
+  /** Timestamp when the user read this notification, or null if unread */
   readAt?: string | null;
 }
 
@@ -39,7 +52,15 @@ export interface NotificationsData extends PaginatedData<NotificationItem> {
   unreadCount: number;
 }
 
+/**
+ * API service for user notifications, updates, and lifecycle management.
+ */
 export const notificationsApi = {
+  /**
+   * Fetches a paginated list of notifications.
+   * @param query - Optional filter to show only unread items and pagination context.
+   * @returns Notification data including list of items and unread count.
+   */
   list: async (query?: { unreadOnly?: boolean; page?: number; pageSize?: number }) => {
     const response = await axiosClient.get<ApiEnvelope<NotificationsData>>("/api/v1/staff/notifications", {
       params: query,
@@ -47,18 +68,39 @@ export const notificationsApi = {
     });
     return response.data;
   },
+
+  /**
+   * Marks a specific notification as read.
+   * @param id - The target notification ID.
+   * @returns Update confirmation with the readAt timestamp.
+   */
   read: async (id: string) => {
     const response = await axiosClient.patch<ApiEnvelope<{ readAt: string }>>(`/api/v1/staff/notifications/${id}/read`, { read: true }, { headers: buildMockIdentityHeaders() });
     return response.data;
   },
+
+  /**
+   * Marks all pending notifications for the current user as read.
+   * @returns The number of notifications updated.
+   */
   readAll: async () => {
     const response = await axiosClient.patch<ApiEnvelope<{ updatedCount: number }>>("/api/v1/staff/notifications/read-all", {}, { headers: buildMockIdentityHeaders() });
     return response.data;
   },
+
+  /**
+   * Permanently deletes notifications that have already been read.
+   * @returns The number of notifications deleted.
+   */
   deleteRead: async () => {
     const response = await axiosClient.delete<ApiEnvelope<{ deletedCount: number }>>("/api/v1/staff/notifications/read", { headers: buildMockIdentityHeaders() });
     return response.data;
   },
+
+  /**
+   * Retrieves the current count of unread notifications.
+   * @returns The unread count object.
+   */
   getCount: async () => {
     const response = await axiosClient.get<ApiEnvelope<{ unreadCount: number }>>("/api/v1/staff/notifications/count", { headers: buildMockIdentityHeaders() });
     return response.data;

@@ -4,6 +4,10 @@ import { ChevronUp } from "lucide-react";
 
 const SCROLL_TRIGGER = 240;
 
+/**
+ * A floating button that appears after scrolling down, allowing the user 
+ * to smoothly jump back to the top of the page.
+ */
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { t } = useTranslation();

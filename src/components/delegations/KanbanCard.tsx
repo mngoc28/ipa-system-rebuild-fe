@@ -20,14 +20,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+/**
+ * Props for the KanbanCard component.
+ */
 interface KanbanCardProps {
+  /** The delegation item data to display. */
   item: DelegationItem;
+  /** Whether the card is currently being dragged (overlay mode). */
   isOverlay?: boolean;
+  /** Callback triggered when the delete action is selected. */
   onDelete?: (id: string | number) => void;
+  /** Optional override for the status indicator color. */
   color?: string;
 }
 
 
+/**
+ * A draggable card representing a delegation within a Kanban column.
+ * Displays summary metadata, priority status, staff avatar, and action menus.
+ * 
+ * @param props - Component props following KanbanCardProps interface.
+ */
 export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
@@ -51,7 +64,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
       if (onDelete) {
         onDelete(item.id);
       } else {
-        toast.info("Yêu cầu xóa đoàn công tác: " + item.name);
+        toast.info("Request to delete delegation: " + item.name);
       }
     }
   };
@@ -98,17 +111,17 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem onClick={(e) => handleAction(e, "view")}>
-                  <Eye size={14} className="mr-2" /> Xem chi tiết
+                  <Eye size={14} className="mr-2" /> View details
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={(e) => handleAction(e, "edit")}>
-                  <Edit2 size={14} className="mr-2" /> Chỉnh sửa
+                  <Edit2 size={14} className="mr-2" /> Edit delegation
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={(e) => handleAction(e, "delete")}
                   className="text-rose-600 focus:bg-rose-50 focus:text-rose-600"
                 >
-                  <Trash2 size={14} className="mr-2" /> Xóa bản ghi
+                  <Trash2 size={14} className="mr-2" /> Delete record
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -151,7 +164,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-[10px] font-bold uppercase tracking-widest">
-                  {item.actionItems.total} hạng mục Checklist
+                  {item.actionItems.total} Checklist items
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

@@ -5,7 +5,10 @@ import { TOKEN_EXPIRATION_BUFFER_MS, TOKEN_REFRESH_THRESHOLD_MINUTES } from "@/c
 import { useAuthStore } from "@/store/useAuthStore";
 
 /**
- * Decode JWT token to get payload
+ * Safely decodes a JWT string to retrieve its JSON payload.
+ * Does not verify the signature.
+ * @param token - The JWT token to decode.
+ * @returns The decoded payload object or null if formatting is invalid.
  */
 export const decodeToken = (token: string): JwtPayload | null => {
   try {
@@ -23,6 +26,11 @@ export const decodeToken = (token: string): JwtPayload | null => {
   }
 };
 
+/**
+ * Heuristic check to determine if a string looks like a valid JWT with an expiration.
+ * @param token - The candidate string.
+ * @returns true if it appears to be a valid JWT.
+ */
 export const isJwtToken = (token: string | null): boolean => {
   if (!token) {
     return false;
@@ -33,9 +41,9 @@ export const isJwtToken = (token: string | null): boolean => {
 };
 
 /**
- * Check if token is expired
- * @param token - JWT token string
- * @returns true if token is expired or invalid, false otherwise
+ * Checks if a JWT is expired or within the dangerous expiration buffer.
+ * @param token - JWT token string.
+ * @returns true if token is missing, malformed, or past its expiration window.
  */
 export const isTokenExpired = (token: string | null): boolean => {
   if (!token) {
@@ -53,7 +61,9 @@ export const isTokenExpired = (token: string | null): boolean => {
 };
 
 /**
- * Get token expiration time in milliseconds
+ * Extracts the absolute expiration timestamp from a JWT.
+ * @param token - The JWT string.
+ * @returns Expiration time in milliseconds, or null if unavailable.
  */
 export const getTokenExpirationTime = (token: string | null): number | null => {
   if (!token) {
@@ -69,7 +79,9 @@ export const getTokenExpirationTime = (token: string | null): number | null => {
 };
 
 /**
- * Get time until token expires in milliseconds
+ * Calculates the remaining lifespan of the token in milliseconds.
+ * @param token - The JWT string.
+ * @returns Remaining time, or 0 if already expired, or null if invalid.
  */
 export const getTimeUntilExpiration = (token: string | null): number | null => {
   const expirationTime = getTokenExpirationTime(token);
@@ -82,10 +94,9 @@ export const getTimeUntilExpiration = (token: string | null): number | null => {
 };
 
 /**
- * Refresh access token using authApi
- * Note: This uses authApi.refresh() directly (same as mutationFn in useRefreshTokenMutation)
- * Cannot use React hooks in utility functions, so we call the API directly
- * @returns Promise<string | null> - New access token or null if refresh failed
+ * Attempts to obtain a new access token using the stored refresh token.
+ * This function interacts with both the low-level API and the global auth store.
+ * @returns Promise<string | null> - The new access token, or null on failure.
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
   try {
@@ -113,10 +124,10 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 };
 
 /**
- * Check if token should be refreshed (when remaining time is less than threshold)
- * @param token - JWT token string
- * @param thresholdMinutes - Threshold in minutes (default: TOKEN_REFRESH_THRESHOLD_MINUTES)
- * @returns true if token should be refreshed
+ * Determines if a token has entered its proactive refresh window.
+ * @param token - The JWT string to evaluate.
+ * @param thresholdMinutes - How many minutes before expiry to consider a refresh 'due'.
+ * @returns true if proactive refresh is recommended.
  */
 export const shouldRefreshToken = (token: string | null, thresholdMinutes: number = TOKEN_REFRESH_THRESHOLD_MINUTES): boolean => {
   if (!token) {

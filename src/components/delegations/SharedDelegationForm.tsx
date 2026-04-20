@@ -18,39 +18,75 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 
+/** Represents a member of a delegation as received from or sent to the API. */
 type DelegationMemberApi = {
+  /** Full name of the member. */
   full_name?: string;
+  /** Professional title or role (e.g., CEO, Director). */
   title?: string;
+  /** Name of the organization they represent. */
   organization_name?: string;
+  /** Gender: 'male', 'female', or 'other'. */
   gender?: string;
+  /** National identity or passport number. */
   identity_number?: string;
+  /** Flag for VIP status. */
   is_vip?: boolean;
 };
 
+/** Represents an event or schedule item in a delegation. */
 type DelegationEventApi = {
+  /** Unique identifier for the event. */
   id: string | number;
+  /** Starting timestamp (ISO 8601). */
   start_at: string;
+  /** Activity title. */
   title?: string;
+  /** Detailed description of the activity. */
   description?: string;
+  /** Location ID reference from master data. */
   location_id?: number;
+  /** User ID of the Person in Charge (PIC). */
   staff_id?: number;
+  /** Logistics details such as transportation. */
   logistics_note?: string;
 };
 
+/** Represents a checklist item assigned to a delegation. */
 type DelegationChecklistApi = {
+  /** Name or description of the task. */
   item_name?: string;
+  /** User ID of the assignee. */
   assignee_user_id?: number | string;
+  /** Execution status: 0 (Pending), 1 (Completed). */
   status: number;
 };
 
+/** Represents the results and next steps for a delegation. */
 type DelegationOutcomeApi = {
+  /** Satisfaction rating (1-5). */
   rating?: number;
+  /** Summary of key results/achievements. */
   summary?: string;
+  /** Actions required after the delegation ends. */
   next_steps?: string;
 };
 
-type DelegationContactApi = { name?: string; role_name?: string; phone?: string; email?: string; is_primary?: boolean };
+/** External contact point for the delegation partners. */
+type DelegationContactApi = { 
+  /** Full name of the contact. */
+  name?: string; 
+  /** Job title or role. */
+  role_name?: string; 
+  /** Phone number. */
+  phone?: string; 
+  /** Email address. */
+  email?: string; 
+  /** Whether this is the primary point of contact. */
+  is_primary?: boolean 
+};
 
+/** Extended view model for delegation details including related entities. */
 type DelegationDetailView = Omit<DelegationApiItem, "members" | "events" | "outcomes" | "checklist" | "contacts" | "partners" | "sectors"> & {
   members?: DelegationMemberApi[];
   events?: DelegationEventApi[];
@@ -61,6 +97,7 @@ type DelegationDetailView = Omit<DelegationApiItem, "members" | "events" | "outc
   sectors?: Array<{ id: number }>;
 };
 
+/** local UI state for a delegation member in the form. */
 type FormMemberItem = {
   fullName: string;
   role: string;
@@ -70,26 +107,47 @@ type FormMemberItem = {
   isVip: boolean;
 };
 
+/** Item in the delegation checklist local UI state. */
 type FormChecklistItem = {
+  /** Name or description of the task. */
   itemName: string;
+  /** User ID assigned to the task. */
   assigneeId?: number;
+  /** Status: 0 (Pending), 1 (Completed). */
   status: number;
 };
 
+/** Schedule/Event item for the delegation visit local UI state. */
 type FormScheduleItem = {
+  /** Unique ID for the item. */
   id: string;
+  /** Date of the event (YYYY-MM-DD). */
   date: string;
+  /** Main title/activity. */
   title: string;
+  /** Detailed descriptions or notes. */
   note: string;
+  /** Location ID from master data. */
   location_id?: number;
+  /** PIC User ID for this item. */
   staff_id?: number;
+  /** Logistics details (vehicle, driver, etc). */
   logistics_note?: string;
 };
 
+/** Props for the SharedDelegationForm component. */
 interface SharedDelegationFormProps {
+  /** User role for permission-based UI logic. */
   role: "admin" | "director" | "manager" | "staff";
 }
 
+/**
+ * A comprehensive form for creating or editing delegation records.
+ * Supports multi-tab organization: Basic Info, Members, Schedule, Checklist, and Follow-up.
+ * Includes auto-saving draft functionality to prevent data loss.
+ * 
+ * @param props - Component props following SharedDelegationFormProps interface.
+ */
 export default function SharedDelegationForm({ role }: SharedDelegationFormProps) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -134,7 +192,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   const sectorOptions = React.useMemo(() => 
-    (sectorsData?.data?.items ?? []).map(s => ({ label: s.name_vi, value: String(s.id) })),
+    (sectorsData?.data?.items ?? []).map(s => ({ label: s.name_vi || s.name_en || "", value: String(s.id) })),
     [sectorsData]
   );
 
@@ -144,14 +202,14 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   const locationOptions = React.useMemo(() => 
-    (locationsData?.data?.items ?? []).map(l => ({ label: l.name_vi, value: String(l.id) })),
+    (locationsData?.data?.items ?? []).map(l => ({ label: l.name_vi || l.name_en || "", value: String(l.id) })),
     [locationsData]
   );
 
   const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 });
   const countries = options.countries;
   const userOptions = usersData?.data?.items?.map(u => ({ label: u.fullName, value: String(u.id) })) || [];
-  const formError = detailData === undefined && isEdit && !isDetailLoading && id ? "Không thể tải dữ liệu chỉnh sửa." : null;
+  const formError = detailData === undefined && isEdit && !isDetailLoading && id ? "Unable to load delegation record for editing." : null;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -230,7 +288,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       scheduleItems: initialScheduleItems,
     },
     isSubmitting,
-    restoreToastMessage: "Đã khôi phục bản nháp chưa lưu.",
+    restoreToastMessage: "Unsaved draft has been restored.",
     restoreToastId: "delegation-form-draft-restored",
     onRestore: (draftValue) => {
       const normalized = draftValue as {
@@ -309,18 +367,24 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     }
   }, [detailData]);
 
+  /**
+   * Validates and submits the delegation form data to the server.
+   * Handles both creation of new records and updating existing ones.
+   * 
+   * @param overrideStatus - Optional status ID to override the current form status (e.g., submitting for approval).
+   */
   const handleSave = async (overrideStatus?: number) => {
     if (isSubmitting) {
       return;
     }
 
     if (!formData.name || !formData.start_date || !formData.end_date) {
-      toast.error("Vui lòng điền các trường bắt buộc.", { id: "delegation-required-fields" });
+      toast.error("Please fill in all required fields (*).", { id: "delegation-required-fields" });
       return;
     }
 
     if (formData.start_date > formData.end_date) {
-      toast.error("Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.", { id: "delegation-date-range" });
+      toast.error("End date must be greater than or equal to start date.", { id: "delegation-date-range" });
       return;
     }
 
@@ -374,7 +438,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       updateMutation.mutate({ id: id!, data: payload }, {
         onSuccess: () => {
           clearDraft();
-          toast.success(finalStatus === 1 ? "Đã gửi hồ sơ chờ phê duyệt." : "Đã cập nhật hồ sơ đoàn.");
+          toast.success(finalStatus === 1 ? "Delegation record submitted for approval." : "Delegation record updated successfully.");
           navigate(`/delegations`);
         }
       });
@@ -382,7 +446,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       createMutation.mutate(payload, {
         onSuccess: () => {
           clearDraft();
-          toast.success(finalStatus === 1 ? "Đã tạo và gửi hồ sơ chờ phê duyệt." : "Đã tạo hồ sơ đoàn (Bản nháp).");
+          toast.success(finalStatus === 1 ? "Delegation record created and submitted for approval." : "Delegation record created (Draft).");
           navigate(`/delegations`);
         }
       });
@@ -392,7 +456,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   if (isEdit && isDetailLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LoadingSpinner label="Đang tải dữ liệu hồ sơ..." />
+        <LoadingSpinner label="Loading delegation data..." />
       </div>
     );
   }
@@ -400,13 +464,13 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   if (formError) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-rose-100 bg-rose-50 p-8 text-center">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Không tải được dữ liệu</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Load Error</p>
         <p className="max-w-md text-sm font-medium text-rose-700">{formError}</p>
         <button
           onClick={() => navigate(-1)}
           className="rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-700"
         >
-          Quay lại
+          Go Back
         </button>
       </div>
     );
@@ -416,11 +480,11 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     <div className="mx-auto max-w-5xl pb-20 duration-500 animate-in slide-in-from-bottom-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} title="Quay lại" aria-label="Quay lại" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
+          <button onClick={() => navigate(-1)} title="Go Back" aria-label="Go Back" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
           <h1 className="font-title text-2xl font-black text-slate-900">
-            {isEdit ? "Cập nhật Hồ sơ Đoàn" : "Thiết lập Hồ sơ Đoàn"}
+            {isEdit ? "Update Delegation Record" : "Setup New Delegation"}
           </h1>
         </div>
 
@@ -428,7 +492,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           {isDirty && (
             <span className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500">
               <span className="size-1.5 animate-pulse rounded-full bg-blue-500"></span>
-              ĐÃ LƯU BẢN NHÁP
+              DRAFT SAVED
             </span>
           )}
           {(!isEdit || formData.status === 0) && (
@@ -438,7 +502,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
               className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:opacity-60"
             >
               <Save size={16} />
-              Lưu nháp
+              Save Draft
             </button>
           )}
           
@@ -450,12 +514,12 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
             {role === "staff" && (formData.status === 0 || !isEdit) ? (
               <>
                 <Send size={16} />
-                {isSubmitting ? "Đang gửi..." : "Gửi phê duyệt"}
+                {isSubmitting ? "Submitting..." : "Submit for Approval"}
               </>
             ) : (
               <>
                 <Save size={16} />
-                {isSubmitting ? "Đang lưu..." : isEdit ? "Cập nhật" : "Lưu hồ sơ"}
+                {isSubmitting ? "Saving..." : isEdit ? "Update Changes" : "Save Record"}
               </>
             )}
           </button>
@@ -463,18 +527,18 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       </div>
 
       <div className="mb-8 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-1">
-        <TabButton active={activeTab === "basic"} onClick={() => setActiveTab("basic")} icon={<Building2 size={16} />} label="Thông tin chung" />
-        <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} icon={<Users size={16} />} label="Thành viên đoàn" />
-        <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} icon={<Calendar size={16} />} label="Lịch trình" />
+        <TabButton active={activeTab === "basic"} onClick={() => setActiveTab("basic")} icon={<Building2 size={16} />} label="General Info" />
+        <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} icon={<Users size={16} />} label="Members" />
+        <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} icon={<Calendar size={16} />} label="Schedule" />
         <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} icon={<Send size={16} />} label="Checklist" />
-        {isEdit && <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} icon={<FileText size={16} />} label="Theo dõi" />}
+        {isEdit && <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} icon={<FileText size={16} />} label="Follow-up" />}
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-8">
         {activeTab === "basic" && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
-               <label htmlFor="delegation-name" className="text-xs font-bold uppercase text-slate-500">Tên đoàn công tác *</label>
+               <label htmlFor="delegation-name" className="text-xs font-bold uppercase text-slate-500">Delegation Name *</label>
                <input 
                  id="delegation-name"
                  name="name"
@@ -484,39 +548,39 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                />
             </div>
             <div className="space-y-2">
-               <label htmlFor="delegation-direction" className="text-xs font-bold uppercase text-slate-500">Loại đoàn *</label>
+               <label htmlFor="delegation-direction" className="text-xs font-bold uppercase text-slate-500">Visit Type *</label>
                <SelectField 
                  id="delegation-direction"
                  name="direction"
                  value={formData.direction === 1 ? "inbound" : "outbound"}
                  onValueChange={(v) => setFormData({...formData, direction: v === "inbound" ? 1 : 2})}
-                 options={[{label: "Inbound (Đoàn đến)", value: "inbound"}, {label: "Outbound (Đoàn đi)", value: "outbound"}]}
+                 options={[{label: "Inbound (Arrival)", value: "inbound"}, {label: "Outbound (Departure)", value: "outbound"}]}
                />
             </div>
              <div className="space-y-2">
-                <label htmlFor="delegation-country" className="text-xs font-bold uppercase text-slate-500">Quốc gia *</label>
+                <label htmlFor="delegation-country" className="text-xs font-bold uppercase text-slate-500">Country *</label>
                 <SelectField 
                   id="delegation-country"
                   name="country_id"
                   value={String(formData.country_id)}
                   onValueChange={(v) => setFormData({...formData, country_id: Number(v)})}
                   options={countries.map(c => ({ label: c.label, value: String(c.id) }))}
-                  placeholder="Chọn quốc gia..."
+                  placeholder="Select country..."
                 />
              </div>
              <div className="space-y-2">
-                <label htmlFor="delegation-unit" className="text-xs font-bold uppercase text-slate-500">Đơn vị chủ trì *</label>
+                <label htmlFor="delegation-unit" className="text-xs font-bold uppercase text-slate-500">Host Unit *</label>
                 <SelectField 
                   id="delegation-unit"
                   name="host_unit_id"
                   value={String(formData.host_unit_id)}
                   onValueChange={(v) => setFormData({...formData, host_unit_id: Number(v)})}
                   options={unitOptions}
-                  placeholder="Chọn đơn vị..."
+                  placeholder="Select unit..."
                 />
              </div>
              <div className="space-y-2">
-                <label htmlFor="delegation-potential" className="text-xs font-bold uppercase text-slate-500">Tiềm năng vốn (VND/USD)</label>
+                <label htmlFor="delegation-potential" className="text-xs font-bold uppercase text-slate-500">Investment Potential (VND/USD)</label>
                 <input 
                   id="delegation-potential"
                   name="investment_potential"
@@ -524,78 +588,78 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                   className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-primary focus:bg-white"
                   value={formData.investment_potential}
                   onChange={(e) => setFormData({...formData, investment_potential: Number(e.target.value)})}
-                  placeholder="Nhập số vốn dự kiến..."
+                  placeholder="Enter expected amount..."
                 />
              </div>
              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="delegation-sectors" className="text-xs font-bold uppercase text-slate-500">Lĩnh vực quan tâm</label>
+                <label htmlFor="delegation-sectors" className="text-xs font-bold uppercase text-slate-500">Sectors of Interest</label>
                 <MultiSelectField 
                   id="delegation-sectors"
                   name="sector_ids"
                   values={formData.sector_ids.map(String)}
                   onValuesChange={(v) => setFormData({...formData, sector_ids: v.map(Number)})}
                   options={sectorOptions}
-                  placeholder="Tìm và chọn lĩnh vực..."
+                  placeholder="Search and select sectors..."
                   triggerClassName="h-[48px]"
                 />
              </div>
 
              <div className="mt-4 space-y-4 rounded-xl border border-slate-100 bg-slate-50/50 p-6 md:col-span-2">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Thông tin đầu mối (Contact Point)</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Main Contact Point</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1">
-                    <label htmlFor="contact-name" className="text-[10px] font-bold text-slate-500">Họ tên người liên hệ *</label>
+                    <label htmlFor="contact-name" className="text-[10px] font-bold text-slate-500">Full Name *</label>
                     <input 
                       id="contact-name"
                       value={formData.contact_name}
                       onChange={(e) => setFormData({...formData, contact_name: e.target.value})}
-                      placeholder="Ông/Bà..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
+                      placeholder="Mr/Ms..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="contact-job" className="text-[10px] font-bold text-slate-500">Chức vụ</label>
+                    <label htmlFor="contact-job" className="text-[10px] font-bold text-slate-500">Position / Title</label>
                     <input 
                       id="contact-job"
                       value={formData.contact_job}
                       onChange={(e) => setFormData({...formData, contact_job: e.target.value})}
-                      placeholder="Giám đốc kinh doanh..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
+                      placeholder="Sales Manager..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="contact-phone" className="text-[10px] font-bold text-slate-500">Số điện thoại/Zalo/WhatsApp</label>
+                    <label htmlFor="contact-phone" className="text-[10px] font-bold text-slate-500">Phone / WhatsApp</label>
                     <input 
                       id="contact-phone"
                       value={formData.contact_phone}
                       onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
-                      placeholder="+84..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
+                      placeholder="+..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="contact-email" className="text-[10px] font-bold text-slate-500">Email</label>
+                    <label htmlFor="contact-email" className="text-[10px] font-bold text-slate-500">Email Address</label>
                     <input 
                       id="contact-email"
                       value={formData.contact_email}
                       onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
-                      placeholder="example@gmail.com" className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
+                      placeholder="example@email.com" className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" 
                     />
                   </div>
                 </div>
              </div>
 
              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="delegation-partner" className="text-xs font-bold uppercase text-slate-500">Đối tác (Chọn nhiều)</label>
+                <label htmlFor="delegation-partner" className="text-xs font-bold uppercase text-slate-500">Partners (Multiple)</label>
                 <MultiSelectField 
                   id="delegation-partner"
                   name="partner_ids"
                   values={formData.partner_ids.map(String)}
                   onValuesChange={(v) => setFormData({...formData, partner_ids: v.map(Number)})}
                   options={partnerOptions}
-                  placeholder="Tìm và chọn đối tác..."
+                  placeholder="Search and select partners..."
                   triggerClassName="h-[48px]"
                 />
              </div>
             <div className="space-y-2">
-               <label htmlFor="delegation-start-date" className="text-xs font-bold uppercase text-slate-500">Ngày bắt đầu *</label>
+               <label htmlFor="delegation-start-date" className="text-xs font-bold uppercase text-slate-500">Start Date *</label>
                <DatePicker 
                  id="delegation-start-date"
                  name="start_date"
@@ -604,7 +668,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                />
             </div>
             <div className="space-y-2">
-               <label htmlFor="delegation-end-date" className="text-xs font-bold uppercase text-slate-500">Ngày kết thúc *</label>
+               <label htmlFor="delegation-end-date" className="text-xs font-bold uppercase text-slate-500">End Date *</label>
                <DatePicker 
                  id="delegation-end-date"
                  name="end_date"
@@ -613,7 +677,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label htmlFor="delegation-objective" className="text-xs font-bold uppercase text-slate-500">Mục tiêu</label>
+              <label htmlFor="delegation-objective" className="text-xs font-bold uppercase text-slate-500">Objective</label>
               <textarea 
                 id="delegation-objective"
                 name="objective"
@@ -624,7 +688,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label htmlFor="delegation-description" className="text-xs font-bold uppercase text-slate-500">Nội dung</label>
+              <label htmlFor="delegation-description" className="text-xs font-bold uppercase text-slate-500">Content / Details</label>
                <textarea 
                  id="delegation-description"
                  name="description"
@@ -641,59 +705,59 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-6 md:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1 lg:col-span-2">
-                <label htmlFor="member-name" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Họ tên *</label>
+                <label htmlFor="member-name" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name *</label>
                 <input 
                   id="member-name"
                   type="text" 
-                  placeholder="Nguyễn Văn A" 
+                  placeholder="Enter name..." 
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold outline-none focus:border-primary" 
                   value={newMember.fullName}
                   onChange={(e) => setNewMember({...newMember, fullName: e.target.value})}
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="member-gender" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Giới tính</label>
+                <label htmlFor="member-gender" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gender</label>
                 <SelectField 
                   id="member-gender"
                   value={newMember.gender}
                   onValueChange={(v) => setNewMember({...newMember, gender: v})}
                   options={[
-                    { label: "Nam", value: "male" },
-                    { label: "Nữ", value: "female" },
-                    { label: "Khác", value: "other" }
+                    { label: "Male", value: "male" },
+                    { label: "Female", value: "female" },
+                    { label: "Other", value: "other" }
                   ]}
-                  placeholder="Chọn..."
+                  placeholder="Select..."
                   triggerClassName="h-[38px] px-4 py-2 bg-white"
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="member-role" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chức vụ</label>
+                <label htmlFor="member-role" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Title / Role</label>
                 <input 
                   id="member-role"
                   type="text" 
-                  placeholder="Giám đốc" 
+                  placeholder="Director..." 
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold outline-none focus:border-primary" 
                   value={newMember.role}
                   onChange={(e) => setNewMember({...newMember, role: e.target.value})}
                 />
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label htmlFor="member-org" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tổ chức/Doanh nghiệp</label>
+                <label htmlFor="member-org" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Organization / Enterprise</label>
                 <input 
                   id="member-org"
                   type="text" 
-                  placeholder="Samsung Electronics" 
+                  placeholder="Company Name..." 
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold outline-none focus:border-primary" 
                   value={newMember.organizationName}
                   onChange={(e) => setNewMember({...newMember, organizationName: e.target.value})}
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="member-identity" className="text-[10px] font-black uppercase tracking-widest text-slate-400">CCCD/Passport</label>
+                <label htmlFor="member-identity" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Identity / Passport</label>
                 <input 
                   id="member-identity"
                   type="text" 
-                  placeholder="B1234567" 
+                  placeholder="ID Number..." 
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold shadow-sm outline-none focus:border-primary" 
                   value={newMember.identityNumber}
                   onChange={(e) => setNewMember({...newMember, identityNumber: e.target.value})}
@@ -707,14 +771,14 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                     checked={newMember.isVip}
                     onChange={(e) => setNewMember({...newMember, isVip: e.target.checked})}
                   />
-                  <span className="text-xs font-bold text-slate-600">Thẻ VIP</span>
+                  <span className="text-xs font-bold text-slate-600">VIP Ticket</span>
                 </label>
               </div>
               <button 
                 type="button"
                 onClick={() => {
                   if (!newMember.fullName) {
-                    toast.error("Vui lòng nhập họ tên thành viên");
+                    toast.error("Please enter member name.");
                     return;
                   }
 
@@ -735,7 +799,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 }}
                 className="rounded-lg bg-slate-900 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-slate-800 active:scale-95 lg:col-span-4"
               >
-                Thêm vào danh sách
+                Add Member to List
               </button>
             </div>
 
@@ -743,11 +807,11 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
               <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400">
                   <tr>
-                    <th className="px-6 py-4">Thành viên</th>
-                    <th className="px-6 py-4">Tổ chức</th>
-                    <th className="px-6 py-4">Định danh</th>
+                    <th className="px-6 py-4">Member Info</th>
+                    <th className="px-6 py-4">Organization</th>
+                    <th className="px-6 py-4">Identity</th>
                     <th className="px-6 py-4 text-center">VIP</th>
-                    <th className="px-6 py-4 text-right">Thao tác</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -755,7 +819,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                     <tr key={idx} className="group hover:bg-slate-50/50">
                       <td className="px-6 py-4">
                         <div className="font-bold text-slate-700">{m.fullName}</div>
-                        <div className="text-xs text-slate-400">{m.role || "Chưa cập nhật chức vụ"}</div>
+                        <div className="text-xs text-slate-400">{m.role || "Role not set"}</div>
                       </td>
                       <td className="px-6 py-4 text-slate-600">{m.organizationName || "-"}</td>
                       <td className="px-6 py-4 font-mono text-xs text-slate-500">{m.identityNumber || "-"}</td>
@@ -774,7 +838,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                   ))}
                   {formData.members.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-400">Chưa có thành viên nào được thêm.</td>
+                      <td colSpan={5} className="py-12 text-center text-slate-400">No members added yet.</td>
                     </tr>
                   )}
                 </tbody>
@@ -787,59 +851,59 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-6 md:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-1">
-                <label htmlFor="sched-date" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngày *</label>
+                <label htmlFor="sched-date" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Date *</label>
                 <DatePicker 
                   id="sched-date" name="d" date={scheduleDraft.date} 
                   setDate={(v) => setScheduleDraft({...scheduleDraft, date: v})} 
                 />
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label htmlFor="sched-title" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nội dung chính *</label>
+                <label htmlFor="sched-title" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Main Content / Activity *</label>
                 <input 
                   id="sched-title"
                   value={scheduleDraft.title}
                   onChange={(e) => setScheduleDraft({...scheduleDraft, title: e.target.value})}
-                  placeholder="Làm việc tại..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none" 
+                  placeholder="Meeting at..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none" 
                 />
               </div>
               <div className="space-y-1 lg:col-span-3">
-                <label htmlFor="sched-note" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ghi chú</label>
+                <label htmlFor="sched-note" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Notes / Details</label>
                 <textarea
                   id="sched-note"
                   rows={3}
                   value={scheduleDraft.note}
                   onChange={(e) => setScheduleDraft({...scheduleDraft, note: e.target.value})}
-                  placeholder="Mô tả chi tiết nội dung làm việc..."
+                  placeholder="Detailed description of the activity..."
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="sched-loc" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Địa điểm</label>
+                <label htmlFor="sched-loc" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location</label>
                 <SelectField 
                   id="sched-loc" name="l" 
                   value={String(scheduleDraft.location_id || "")}
                   onValueChange={(v) => setScheduleDraft({...scheduleDraft, location_id: Number(v)})}
                   options={locationOptions}
-                  placeholder="Chọn địa điểm..."
+                  placeholder="Select location..."
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="sched-staff" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Cán bộ phụ trách</label>
+                <label htmlFor="sched-staff" className="text-[10px] font-black uppercase tracking-widest text-slate-400">PIC / Officer In-charge</label>
                 <SelectField 
                    id="sched-staff" name="s" 
                    value={String(scheduleDraft.staff_id || "")}
                    onValueChange={(v) => setScheduleDraft({...scheduleDraft, staff_id: Number(v)})}
                    options={userOptions}
-                   placeholder="Chọn cán bộ..."
+                   placeholder="Select staff..."
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="sched-logistics" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hậu cần (Xe, Driver...)</label>
+                <label htmlFor="sched-logistics" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Logistics (Vehicle, Driver...)</label>
                 <input 
                   id="sched-logistics"
                   value={scheduleDraft.logistics_note}
                   onChange={(e) => setScheduleDraft({...scheduleDraft, logistics_note: e.target.value})}
-                  placeholder="Xe 7 chỗ, Tài xế A..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none" 
+                  placeholder="Car info, Driver name..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none" 
                 />
               </div>
               <button 
@@ -854,7 +918,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 }}
                 className="rounded-lg bg-primary py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 lg:col-span-3"
               >
-                Thêm vào lịch trình
+                Add to Schedule
               </button>
             </div>
 
@@ -892,15 +956,15 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                <div className="space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Thêm hạng mục chuẩn bị</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Add Preparation Item</h3>
                   <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-5">
-                     <input id="chk-name" placeholder="Ví dụ: Đặt xe 16 chỗ..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" />
+                     <input id="chk-name" placeholder="E.g., Book 16-seater van..." className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:border-primary" />
                      <SelectField 
                         id="chk-pic" name="p" 
                         value={tempChecklistPic}
                         onValueChange={(v) => setTempChecklistPic(v)}
                         options={userOptions}
-                        placeholder="Cán bộ phụ trách..."
+                        placeholder="Assign to..."
                      />
                      <button 
                         onClick={() => {
@@ -918,12 +982,12 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                           setTempChecklistPic("");
                         }}
                         className="w-full rounded-lg bg-slate-900 py-2.5 text-[10px] font-black uppercase tracking-widest text-white"
-                     >Thêm hạng mục</button>
+                     >Add Task</button>
                   </div>
                </div>
 
                <div className="space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Danh sách Checklist</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Checklist Summary</h3>
                   <div className="space-y-2">
                      {formData.checklist_items.map((item, idx) => (
                        <div key={idx} className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
@@ -949,7 +1013,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                           </button>
                        </div>
                      ))}
-                     {formData.checklist_items.length === 0 && <p className="py-8 text-center text-xs text-slate-400">Trống</p>}
+                     {formData.checklist_items.length === 0 && <p className="py-8 text-center text-xs text-slate-400">No items in checklist.</p>}
                   </div>
                </div>
             </div>
@@ -958,7 +1022,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
         {activeTab === "followup" && (
           <div className="space-y-8">
             <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-8 text-center">
-               <h3 className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-amber-600">Đánh giá tiềm năng đoàn</h3>
+               <h3 className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-amber-600">Delegation Evaluation</h3>
                <div className="mb-4 flex justify-center gap-2">
                  {[1, 2, 3, 4, 5].map((star) => (
                    <button 
@@ -971,29 +1035,29 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                    </button>
                  ))}
                </div>
-               <p className="text-sm font-medium text-amber-700">Hãy chọn mức độ ưu tiên xử lý sau chuyến thăm</p>
+               <p className="text-sm font-medium text-amber-700">Please select the priority for post-visit processing</p>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                <div className="space-y-2">
-                  <label htmlFor="outcome-summary" className="text-xs font-black uppercase tracking-widest text-slate-400">Kết quả đạt được</label>
+                  <label htmlFor="outcome-summary" className="text-xs font-black uppercase tracking-widest text-slate-400">Outcomes Achieved</label>
                   <textarea 
                     id="outcome-summary"
                     rows={6}
                     value={formData.outcome_summary}
                     onChange={(e) => setFormData({...formData, outcome_summary: e.target.value})}
-                    placeholder="Ghi tóm tắt kết quả (VD: Đã ký MOU, Cần cung cấp thêm hồ sơ đất đai...)"
+                    placeholder="Summary of results (e.g., MOU signed, Land documents requested...)"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-primary focus:bg-white"
                   />
                </div>
                <div className="space-y-2">
-                  <label htmlFor="next-steps" className="text-xs font-black uppercase tracking-widest text-slate-400">Nhiệm vụ tiếp theo (Next Steps)</label>
+                  <label htmlFor="next-steps" className="text-xs font-black uppercase tracking-widest text-slate-400">Next Steps / Actions Required</label>
                   <textarea 
                     id="next-steps"
                     rows={6}
                     value={formData.next_steps}
                     onChange={(e) => setFormData({...formData, next_steps: e.target.value})}
-                    placeholder="Các công việc cần phân công để duy trì liên hệ..."
+                    placeholder="Tasks to be assigned to maintain contact..."
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-primary focus:bg-white"
                   />
                </div>
@@ -1013,12 +1077,12 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
               members: formData.members.filter((_, i) => i !== memberToDelete)
             });
             setMemberToDelete(null);
-            toast.success("Đã xóa thành viên khỏi danh sách.");
+            toast.success("Member removed from list.");
           }
         }}
-        title="Xóa thành viên?"
-        description="Bạn có chắc chắn muốn xóa thành viên này khỏi hồ sơ đoàn?"
-        confirmText="Xác nhận xóa"
+        title="Remove Member?"
+        description="Are you sure you want to remove this member from the delegation record?"
+        confirmText="Confirm Removal"
       />
 
       <ConfirmModal
@@ -1028,17 +1092,18 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           if (scheduleToDelete !== null) {
             setScheduleItems(scheduleItems.filter(i => i.id !== scheduleToDelete));
             setScheduleToDelete(null);
-            toast.success("Đã xóa đầu mục lịch trình.");
+            toast.success("Schedule item removed.");
           }
         }}
-        title="Xóa lịch trình?"
-        description="Bạn có chắc chắn muốn xóa đầu mục lịch trình này?"
-        confirmText="Xác nhận xóa"
+        title="Delete Schedule Item?"
+        description="Are you sure you want to delete this schedule item? This action cannot be undone."
+        confirmText="Confirm Delete"
       />
     </div>
   );
 }
 
+/** Specialized button for navigation tabs in the delegation form. */
 function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
     <button

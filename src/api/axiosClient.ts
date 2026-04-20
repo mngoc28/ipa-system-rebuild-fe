@@ -3,6 +3,10 @@ import { getAuthToken, useAuthStore } from "@/store/useAuthStore";
 import { getAccessToken, getRefreshToken } from "@/utils/storage";
 import { decodeToken, refreshAccessToken } from "@/utils/tokenUtils";
 
+/**
+ * Configured Axios instance for all API communications.
+ * Includes base URL, timeout settings, and standard headers.
+ */
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8001",
   timeout: 15000,
@@ -11,7 +15,11 @@ const axiosClient = axios.create({
   },
 });
 
+/**
+ * Extended request config to track retry attempts for failed requests.
+ */
 type RetryableRequestConfig = AxiosRequestConfig & {
+  /** Internal flag to prevent infinite retry loops on 401 errors */
   _retry?: boolean;
 };
 

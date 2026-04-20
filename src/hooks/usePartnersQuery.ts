@@ -11,15 +11,29 @@ import {
   type PartnerPatchPayload,
 } from "@/dataHelper/partners.dataHelper";
 
+/**
+ * Parameters for filtering and paginating the partners list.
+ */
 export interface PartnersQueryOptions {
+  /** Filter by numeric status ID. */
   status?: number;
+  /** Page number (1-indexed). */
   page?: number;
+  /** Number of items per page. */
   pageSize?: number;
+  /** Full-text search string for partner name or contact info. */
   search?: string;
+  /** Filter by industry sector. */
   sectorId?: number;
+  /** Filter by country of origin. */
   countryId?: number;
 }
 
+/**
+ * Hook to retrieve a filtered and paginated list of partners.
+ * Transforms raw API items into UI-ready items.
+ * @param options - Filtering and pagination criteria.
+ */
 export const usePartnersListQuery = (options: PartnersQueryOptions = {}) => {
   const partnersQuery = useQuery({
     queryKey: ["partners", options],
@@ -32,6 +46,10 @@ export const usePartnersListQuery = (options: PartnersQueryOptions = {}) => {
   return { partnersQuery, partners, meta };
 };
 
+/**
+ * Hook to retrieve full detailed information for a specific partner.
+ * @param id - The partner unique ID.
+ */
 export const usePartnerDetailQuery = (id?: string) => {
   return useQuery({
     queryKey: ["partner", id],
@@ -40,6 +58,9 @@ export const usePartnerDetailQuery = (id?: string) => {
   });
 };
 
+/**
+ * Hook to retrieve available dropdown options (countries, sectors) for partner forms.
+ */
 export const usePartnerOptionsQuery = () => {
   const optionsQuery = useQuery({
     queryKey: ["partner-options"],
@@ -52,6 +73,9 @@ export const usePartnerOptionsQuery = () => {
   };
 };
 
+/**
+ * Hook to onboard a new partner organization.
+ */
 export const useCreatePartnerMutation = () => {
   const queryClient = useQueryClient();
 
@@ -60,12 +84,15 @@ export const useCreatePartnerMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner-options"] });
-      toast.success("Đã thêm đối tác mới vào danh sách.");
+      toast.success("New partner added successfully.");
     },
-    onError: () => toast.error("Không thể thêm đối tác mới."),
+    onError: () => toast.error("Failed to add partner."),
   });
 };
 
+/**
+ * Hook to update an existing partner's profile information.
+ */
 export const useUpdatePartnerMutation = () => {
   const queryClient = useQueryClient();
 
@@ -74,12 +101,15 @@ export const useUpdatePartnerMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner"] });
-      toast.success("Đã cập nhật thông tin đối tác.");
+      toast.success("Partner information updated.");
     },
-    onError: () => toast.error("Không thể cập nhật đối tác."),
+    onError: () => toast.error("Failed to update partner."),
   });
 };
 
+/**
+ * Hook to remove a partner from the system.
+ */
 export const useDeletePartnerMutation = () => {
   const queryClient = useQueryClient();
 
@@ -87,30 +117,37 @@ export const useDeletePartnerMutation = () => {
     mutationFn: (id: string) => partnersApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("Đã xóa đối tác.");
+      toast.success("Partner deleted.");
     },
-    onError: () => toast.error("Không thể xóa đối tác."),
+    onError: () => toast.error("Failed to delete partner."),
   });
 };
 
+/**
+ * Hook to quickly add a placeholder contact for a partner and generate a draft email.
+ */
 export const useAddPartnerContactMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (partnerId: string) =>
       partnersApi.addContact(partnerId, {
-        fullName: "Đầu mối đối tác",
+        fullName: "Partner Point of Contact",
         email: "partner@example.com",
         isPrimary: true,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("Đã tạo email nháp gửi đối tác.");
+      toast.success("Draft email for partner generated.");
     },
-    onError: () => toast.error("Không thể tạo liên hệ nhanh."),
+    onError: () => toast.error("Failed to create quick contact."),
   });
 };
 
+/**
+ * Hook to synchronize local partner data with the external CRM system.
+ * Simulates scoring updates for the first few partners.
+ */
 export const useSyncPartnersMutation = (partners: PartnerUiItem[]) => {
   const queryClient = useQueryClient();
 
@@ -123,12 +160,15 @@ export const useSyncPartnersMutation = (partners: PartnerUiItem[]) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("Đã đồng bộ dữ liệu CRM và cập nhật điểm đánh giá.");
+      toast.success("CRM synchronized and partner scores updated.");
     },
-    onError: () => toast.error("Đồng bộ CRM thất bại."),
+    onError: () => toast.error("CRM synchronization failed."),
   });
 };
 
+/**
+ * Hook to advance a partner's relationship status to the next level.
+ */
 export const usePromotePartnerStatusMutation = () => {
   const queryClient = useQueryClient();
 
@@ -145,15 +185,15 @@ export const usePromotePartnerStatusMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner"] });
-      toast.success("Đã tiến cấp trạng thái đối tác.");
+      toast.success("Partner status promoted.");
     },
     onError: (error) => {
       if (error instanceof Error && error.message === "MAX_STATUS_REACHED") {
-        toast.info("Đối tác đã ở trạng thái cao nhất.");
+        toast.info("Partner is already at the highest status.");
         return;
       }
 
-      toast.error("Không thể tiến cấp trạng thái.");
+      toast.error("Failed to promote status.");
     },
   });
 };

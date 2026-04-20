@@ -9,30 +9,51 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
+/**
+ * Standard option structure for the MultiSelectField component.
+ */
 interface Option {
+  /** Readable label displayed to the user. */
   label: string;
+  /** Underlying technical value. */
   value: string;
 }
 
+/**
+ * Props for the MultiSelectField component.
+ */
 interface MultiSelectFieldProps {
+  /** Unique identifier for the element. */
   id?: string;
+  /** Form field name. */
   name?: string;
+  /** Array of currently selected values. */
   values: string[];
+  /** Callback triggered when the selection set changes. */
   onValuesChange: (values: string[]) => void;
+  /** List of selectable options. */
   options: Option[];
+  /** Default text shown when the selection is empty. */
   placeholder?: string;
+  /** CSS classes for the outer wrapper. */
   className?: string;
+  /** CSS classes for the selection trigger area. */
   triggerClassName?: string;
+  /** Whether the field is interactive. */
   disabled?: boolean;
 }
 
+/**
+ * A robust multi-select dropdown supporting searching and tag-based visualization 
+ * of selected items.
+ */
 export function MultiSelectField({
   id,
   name,
   values,
   onValuesChange,
   options,
-  placeholder = "Chọn các tùy chọn...",
+  placeholder = "Select options...",
   className,
   triggerClassName,
   disabled = false,
@@ -97,7 +118,7 @@ export function MultiSelectField({
             <input
               type="text"
               className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-              placeholder="Tìm kiếm..."
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.stopPropagation()}
@@ -105,7 +126,7 @@ export function MultiSelectField({
           </div>
           <div className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-500">Không tìm thấy kết quả</div>
+              <div className="p-4 text-center text-xs text-slate-500">No results found</div>
             ) : (
               filteredOptions.map((option) => (
                 <DropdownMenuCheckboxItem

@@ -9,16 +9,11 @@ import { useTranslation } from "react-i18next";
  * @template T - The type of data object represented by each row.
  */
 export interface Column<T> {
-  /** The rendered header content for this column. */
-  header: ReactNode;
-  /** The key in the data object to access, or a string for custom rendering. */
-  accessorKey: keyof T | string;
-  /** Optional custom rendering function for cells in this column. */
-  cell?: (item: T) => ReactNode;
-  /** Optional CSS classes for both header and data cells. */
-  className?: string;
-  /** Whether to hide this column on mobile screens. */
-  hideOnMobile?: boolean;
+    header: ReactNode;
+    accessorKey: keyof T | string;
+    cell?: (item: T) => ReactNode;
+    className?: string;
+    hideOnMobile?: boolean;
 }
 
 /**
@@ -26,18 +21,12 @@ export interface Column<T> {
  * @template T - The type of data object represented by each row.
  */
 interface DataTableProps<T> {
-  /** The array of data objects to display. */
-  data: T[];
-  /** Configuration for the table columns. */
-  columns: Column<T>[];
-  /** Whether the table is currently fetching data. */
-  isLoading?: boolean;
-  /** Whether a data fetching error occurred. */
-  isError?: boolean;
-  /** Custom message to display when the data array is empty. */
-  noDataMessage?: string;
-  /** Optional callback triggered when a row is clicked. */
-  onRowClick?: (item: T) => void;
+    data: T[];
+    columns: Column<T>[];
+    isLoading?: boolean;
+    isError?: boolean;
+    noDataMessage?: string;
+    onRowClick?: (item: T) => void;
 }
 
 /**

@@ -6,34 +6,20 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a business or cooperation project tracked in the investment pipeline.
  */
 export interface PipelineProject {
-  /** Unique project ID */
-  id: string;
-  /** Machine-readable tracking code */
-  project_code: string;
-  /** Human-readable project name */
-  project_name: string;
-  /** Optional ID of the associated partner organization */
-  partner_id?: string | null;
-  /** Optional ID of the linked delegation */
-  delegation_id?: string | null;
-  /** ID of the country of origin/investment */
-  country_id: string;
-  /** ID of the industry sector */
-  sector_id: string;
-  /** ID of the current workflow stage */
-  stage_id: string;
-  /** Potential financial value of the project */
-  estimated_value?: number | null;
-  /** Estimated percentage of success */
-  success_probability?: number | null;
-  /** Expected date for project conclusion/signing */
-  expected_close_date?: string | null;
-  /** ID of the user responsible for this project */
-  owner_user_id: string;
-  /** System visibility status */
-  status: "active" | "hidden";
-  /** Last update timestamp */
-  changed_at?: string;
+    id: string;
+    project_code: string;
+    project_name: string;
+    partner_id?: string | null;
+    delegation_id?: string | null;
+    country_id: string;
+    sector_id: string;
+    stage_id: string;
+    estimated_value?: number | null;
+    success_probability?: number | null;
+    expected_close_date?: string | null;
+    owner_user_id: string;
+    status: "active" | "hidden";
+    changed_at?: string;
 }
 
 export interface PipelineSummaryStageItem {
@@ -61,32 +47,20 @@ export interface PipelineSummarySectorItem {
  * Aggregated trends and metrics for the city's investment pipeline.
  */
 export interface PipelineSummary {
-  /** Core counters for project conversion and health */
-  stats: {
-    /** Total number of projects across all stages */
-    projects: number;
-    /** Count of projects in 'active' lifecycle stages */
-    activeProjects: number;
-    /** Count of successfully concluded projects */
-    closedWonProjects: number;
-    /** Combined average success probability across pipeline */
-    averageProbability: number;
+    stats: {
+        projects: number;
+        activeProjects: number;
+        closedWonProjects: number;
+        averageProbability: number;
   };
-  /** Financial total and active values */
-  value: {
-    /** Total potential value of all projects */
-    total: number;
-    /** Potential value of active projects only */
-    active: number;
+    value: {
+        total: number;
+        active: number;
   };
-  /** Distribution of projects across workflow stages */
-  stageBreakdown: PipelineSummaryStageItem[];
-  /** Geographical project distribution */
-  countryBreakdown: PipelineSummaryCountryItem[];
-  /** Industry-based project distribution */
-  sectorBreakdown: PipelineSummarySectorItem[];
-  /** list of recently modified project records */
-  recentProjects: PipelineProject[];
+    stageBreakdown: PipelineSummaryStageItem[];
+    countryBreakdown: PipelineSummaryCountryItem[];
+    sectorBreakdown: PipelineSummarySectorItem[];
+    recentProjects: PipelineProject[];
 }
 
 /**

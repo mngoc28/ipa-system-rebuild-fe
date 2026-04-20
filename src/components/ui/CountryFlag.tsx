@@ -5,10 +5,8 @@ import { Globe } from "lucide-react";
  * Props for the CountryFlag component.
  */
 interface CountryFlagProps {
-  /** Full name of the country in Vietnamese or English (e.g., "Hàn Quốc" or "Korea"). */
-  countryName: string;
-  /** Optional CSS classes for additional styling. */
-  className?: string;
+    countryName: string;
+    className?: string;
 }
 
 /**

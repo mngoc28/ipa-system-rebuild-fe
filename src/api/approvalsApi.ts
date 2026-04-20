@@ -5,22 +5,14 @@ import { ApiEnvelope, PaginatedData } from "@/types/api";
  * Represents an approval request or item in the workflow.
  */
 export interface ApprovalItem {
-  /** Unique ID of the approval request */
-  id: string;
-  /** Type of approval (e.g., DELEGATION_PLAN, BUDGET) */
-  type: string;
-  /** Subject line or title */
-  title?: string;
-  /** ID of the user who initiated the request */
-  requesterId?: string;
-  /** ID of the current assigned approver */
-  approverId?: string;
-  /** Lifecycle status (e.g., PENDING, APPROVED, REJECTED) */
-  status: string;
-  /** ISO timestamp of request creation */
-  createdAt?: string;
-  /** Deadline for the decision */
-  dueAt?: string;
+    id: string;
+    type: string;
+    title?: string;
+    requesterId?: string;
+    approverId?: string;
+    status: string;
+    createdAt?: string;
+    dueAt?: string;
 }
 
 export interface ApprovalDetail {

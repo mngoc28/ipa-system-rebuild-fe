@@ -2,10 +2,8 @@
  * Represents a task or action item extracted from meeting minutes.
  */
 export interface MinutesTaskItem {
-  /** The descriptive title of the task */
-  title: string;
-  /** Current execution status: "done" or "pending" */
-  status: "done" | "pending";
+    title: string;
+    status: "done" | "pending";
 }
 
 /**

@@ -20,70 +20,46 @@ import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 
 /** Represents a member of a delegation as received from or sent to the API. */
 type DelegationMemberApi = {
-  /** Full name of the member. */
-  full_name?: string;
-  /** Professional title or role (e.g., CEO, Director). */
-  title?: string;
-  /** Name of the organization they represent. */
-  organization_name?: string;
-  /** Gender: 'male', 'female', or 'other'. */
-  gender?: string;
-  /** National identity or passport number. */
-  identity_number?: string;
-  /** Flag for VIP status. */
-  is_vip?: boolean;
+    full_name?: string;
+    title?: string;
+    organization_name?: string;
+    gender?: string;
+    identity_number?: string;
+    is_vip?: boolean;
 };
 
 /** Represents an event or schedule item in a delegation. */
 type DelegationEventApi = {
-  /** Unique identifier for the event. */
-  id: string | number;
-  /** Starting timestamp (ISO 8601). */
-  start_at: string;
-  /** Activity title. */
-  title?: string;
-  /** Detailed description of the activity. */
-  description?: string;
-  /** Location ID reference from master data. */
-  location_id?: number;
-  /** User ID of the Person in Charge (PIC). */
-  staff_id?: number;
-  /** Logistics details such as transportation. */
-  logistics_note?: string;
+    id: string | number;
+    start_at: string;
+    title?: string;
+    description?: string;
+    location_id?: number;
+    staff_id?: number;
+    logistics_note?: string;
 };
 
 /** Represents a checklist item assigned to a delegation. */
 type DelegationChecklistApi = {
-  /** Name or description of the task. */
-  item_name?: string;
-  /** User ID of the assignee. */
-  assignee_user_id?: number | string;
-  /** Execution status: 0 (Pending), 1 (Completed). */
-  status: number;
+    item_name?: string;
+    assignee_user_id?: number | string;
+    status: number;
 };
 
 /** Represents the results and next steps for a delegation. */
 type DelegationOutcomeApi = {
-  /** Satisfaction rating (1-5). */
-  rating?: number;
-  /** Summary of key results/achievements. */
-  summary?: string;
-  /** Actions required after the delegation ends. */
-  next_steps?: string;
+    rating?: number;
+    summary?: string;
+    next_steps?: string;
 };
 
 /** External contact point for the delegation partners. */
 type DelegationContactApi = { 
-  /** Full name of the contact. */
-  name?: string; 
-  /** Job title or role. */
-  role_name?: string; 
-  /** Phone number. */
-  phone?: string; 
-  /** Email address. */
-  email?: string; 
-  /** Whether this is the primary point of contact. */
-  is_primary?: boolean 
+    name?: string; 
+    role_name?: string; 
+    phone?: string; 
+    email?: string; 
+    is_primary?: boolean 
 };
 
 /** Extended view model for delegation details including related entities. */
@@ -109,36 +85,25 @@ type FormMemberItem = {
 
 /** Item in the delegation checklist local UI state. */
 type FormChecklistItem = {
-  /** Name or description of the task. */
-  itemName: string;
-  /** User ID assigned to the task. */
-  assigneeId?: number;
-  /** Status: 0 (Pending), 1 (Completed). */
-  status: number;
+    itemName: string;
+    assigneeId?: number;
+    status: number;
 };
 
 /** Schedule/Event item for the delegation visit local UI state. */
 type FormScheduleItem = {
-  /** Unique ID for the item. */
-  id: string;
-  /** Date of the event (YYYY-MM-DD). */
-  date: string;
-  /** Main title/activity. */
-  title: string;
-  /** Detailed descriptions or notes. */
-  note: string;
-  /** Location ID from master data. */
-  location_id?: number;
-  /** PIC User ID for this item. */
-  staff_id?: number;
-  /** Logistics details (vehicle, driver, etc). */
-  logistics_note?: string;
+    id: string;
+    date: string;
+    title: string;
+    note: string;
+    location_id?: number;
+    staff_id?: number;
+    logistics_note?: string;
 };
 
 /** Props for the SharedDelegationForm component. */
 interface SharedDelegationFormProps {
-  /** User role for permission-based UI logic. */
-  role: "admin" | "director" | "manager" | "staff";
+    role: "admin" | "director" | "manager" | "staff";
 }
 
 /**

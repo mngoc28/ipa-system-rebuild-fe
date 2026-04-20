@@ -11,20 +11,13 @@ import type {
  * Represents a commentary or feedback item linked to a task.
  */
 export interface TaskCommentApiItem {
-  /** Unique ID of the comment */
-  id: number | string;
-  /** The actual text content of the comment */
-  comment_text: string;
-  /** ISO timestamp of record creation */
-  created_at: string;
-  /** Information about the user who authored the comment */
-  commenter?: {
-    /** user ID */
-    id?: number | string;
-    /** user full name */
-    full_name?: string;
-    /** user avatar absolute URL */
-    avatar_url?: string | null;
+    id: number | string;
+    comment_text: string;
+    created_at: string;
+    commenter?: {
+        id?: number | string;
+        full_name?: string;
+        avatar_url?: string | null;
   };
 }
 
@@ -32,16 +25,11 @@ export interface TaskCommentApiItem {
  * Metadata for a file uploaded as an attachment to a task.
  */
 export interface TaskAttachmentApiItem {
-  /** Unique attachment ID */
-  id: number | string;
-  /** The original name of the uploaded file */
-  file_name: string;
-  /** Size of the file in bytes */
-  file_size: number;
-  /** Standard MIME type (e.g., application/pdf, image/png) */
-  mime_type?: string;
-  /** Upload timestamp */
-  created_at?: string;
+    id: number | string;
+    file_name: string;
+    file_size: number;
+    mime_type?: string;
+    created_at?: string;
 }
 
 const getPrefix = () => {

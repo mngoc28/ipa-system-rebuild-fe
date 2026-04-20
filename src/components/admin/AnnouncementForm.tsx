@@ -42,14 +42,10 @@ type AnnouncementFormValues = z.infer<typeof announcementSchema>;
  * Props for the AnnouncementForm component.
  */
 interface AnnouncementFormProps {
-  /** Optional existing data for editing mode. */
-  initialData?: Announcement | null;
-  /** Callback triggered on successful form submission. */
-  onSubmit: (values: AnnouncementFormValues) => Promise<void>;
-  /** Callback triggered when the action is cancelled. */
-  onCancel: () => void;
-  /** Whether the form is currently submitting. */
-  loading?: boolean;
+    initialData?: Announcement | null;
+    onSubmit: (values: AnnouncementFormValues) => Promise<void>;
+    onCancel: () => void;
+    loading?: boolean;
 }
 
 /**

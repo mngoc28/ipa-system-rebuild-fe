@@ -20,12 +20,9 @@ import { cn } from "@/lib/utils";
  * Structure for a single sidebar navigation item.
  */
 interface MenuItem {
-  /** Display title for the menu item. */
-  title: string;
-  /** Internal application path. */
-  path: string;
-  /** Lucide icon component to display. */
-  icon: ElementType;
+    title: string;
+    path: string;
+    icon: ElementType;
 }
 
 /**
@@ -43,14 +40,10 @@ const adminMenuItems: MenuItem[] = [
  * Props for the AdminSidebar component.
  */
 interface AdminSidebarProps {
-  /** Whether the sidebar is in its narrow (icon-only) state. */
-  isCollapsed: boolean;
-  /** Callback to toggle the collapsed state. */
-  setIsCollapsed: (val: boolean) => void;
-  /** Visibility state for small screen mobile drawer. */
-  isMobileOpen?: boolean;
-  /** Callback to close the mobile drawer. */
-  onMobileClose?: () => void;
+    isCollapsed: boolean;
+    setIsCollapsed: (val: boolean) => void;
+    isMobileOpen?: boolean;
+    onMobileClose?: () => void;
 }
 
 /**

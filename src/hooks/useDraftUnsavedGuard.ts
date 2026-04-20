@@ -5,32 +5,22 @@ import { toast } from "sonner";
  * Configuration options for the draft persistence hook.
  */
 interface UseDraftUnsavedGuardOptions<TValue> {
-  /** Whether the preservation logic is active for the current context. */
-  enabled: boolean;
-  /** The unique key used to partition this draft in localStorage. */
-  storageKey: string;
-  /** The current live state value to be persisted. */
-  value: TValue;
-  /** The baseline value used to determine if the state has changed. */
-  initialValue: TValue;
-  /** Flag to suppress the 'unsaved changes' warning during legitimate submissions. */
-  isSubmitting?: boolean;
-  /** Optional notification message shown when a draft is recovered. */
-  restoreToastMessage?: string;
-  /** Unique ID for the restoration toast to prevent duplication. */
-  restoreToastId?: string;
-  /** Callback triggered when a saved draft is successfully parsed and loaded. */
-  onRestore: (value: TValue) => void;
+    enabled: boolean;
+    storageKey: string;
+    value: TValue;
+    initialValue: TValue;
+    isSubmitting?: boolean;
+    restoreToastMessage?: string;
+    restoreToastId?: string;
+    onRestore: (value: TValue) => void;
 }
 
 /**
  * Return type providing the dirty state and a manual cleanup method.
  */
 interface UseDraftUnsavedGuardResult {
-  /** true if current value differs from initialValue. */
-  isDirty: boolean;
-  /** Silently removes the draft from localStorage. */
-  clearDraft: () => void;
+    isDirty: boolean;
+    clearDraft: () => void;
 }
 
 /**

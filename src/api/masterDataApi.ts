@@ -6,18 +6,12 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a standardized reference data item (e.g., status, type, region).
  */
 export interface MasterDataItem {
-  /** Unique ID */
-  id: string;
-  /** Machine-readable standard code */
-  code: string;
-  /** Display name in Vietnamese */
-  name_vi: string;
-  /** Optional display name in English */
-  name_en?: string;
-  /** Numeric preference for UI sorting */
-  sort_order?: number;
-  /** Visibility and toggle status */
-  is_active?: boolean;
+    id: string;
+    code: string;
+    name_vi: string;
+    name_en?: string;
+    sort_order?: number;
+    is_active?: boolean;
 }
 
 const getPrefix = () => {

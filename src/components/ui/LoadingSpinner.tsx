@@ -5,14 +5,10 @@ import { cn } from "@/lib/utils";
  * Props for the LoadingSpinner component.
  */
 interface LoadingSpinnerProps {
-  /** Optional CSS classes for the container. */
-  className?: string;
-  /** Diameter of the spinner in pixels. Defaults to 24. */
-  size?: number;
-  /** Optional text to display alongside the spinner. */
-  label?: string;
-  /** Unused variant property for future extensions. */
-  variant?: string;
+    className?: string;
+    size?: number;
+    label?: string;
+    variant?: string;
 }
 
 /**

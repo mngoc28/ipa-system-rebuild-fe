@@ -10,18 +10,12 @@ import { LIGHTBOX_DOUBLE_CLICK_DELAY, LIGHTBOX_DOUBLE_CLICK_MAX_STOPS, LIGHTBOX_
  * Props for the ImageLightbox component.
  */
 export interface ImageLightboxProps {
-  /** Visibility state of the lightbox. */
-  open: boolean;
-  /** Callback to close the lightbox. */
-  onClose: () => void;
-  /** Index of the image to show first. */
-  index: number;
-  /** List of images to display. */
-  slides: Array<{ src: string }>;
-  /** Maximum pixel ratio for zooming. */
-  maxZoomPixelRatio?: number;
-  /** Multiplier for each zoom step. */
-  zoomInMultiplier?: number;
+    open: boolean;
+    onClose: () => void;
+    index: number;
+    slides: Array<{ src: string }>;
+    maxZoomPixelRatio?: number;
+    zoomInMultiplier?: number;
 }
 /**
  * A full-screen image gallery and zoom viewer component.

@@ -11,10 +11,8 @@ import { CountryFlag } from "@/components/ui/CountryFlag";
  * Props for the ListView component.
  */
 interface ListViewProps {
-  /** Array of delegation items to display in the list. */
-  delegations: DelegationItem[];
-  /** Callback triggered when a delete action is confirmed for an item. */
-  onDelete?: (id: string | number) => Promise<void> | void;
+    delegations: DelegationItem[];
+    onDelete?: (id: string | number) => Promise<void> | void;
 }
 
 /**

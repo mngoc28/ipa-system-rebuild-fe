@@ -12,34 +12,23 @@ import { cn } from "@/lib/utils";
  * Standard option structure for the SelectField component.
  */
 interface Option {
-  /** Readable label displayed to the user. */
-  label: string;
-  /** Underlying technical value. */
-  value: string;
+    label: string;
+    value: string;
 }
 
 /**
  * Props for the SelectField component.
  */
 interface SelectFieldProps {
-  /** Unique identifier for the element. */
-  id?: string;
-  /** Form field name. */
-  name?: string;
-  /** Currently selected value. */
-  value: string;
-  /** Callback triggered when selection changes. */
-  onValueChange: (value: string) => void;
-  /** List of selectable options. */
-  options: Option[];
-  /** Default text shown when no value is selected. */
-  placeholder?: string;
-  /** CSS classes for the outer wrapper. */
-  className?: string;
-  /** CSS classes for the select trigger button. */
-  triggerClassName?: string;
-  /** Whether the field is interactive. */
-  disabled?: boolean;
+    id?: string;
+    name?: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    options: Option[];
+    placeholder?: string;
+    className?: string;
+    triggerClassName?: string;
+    disabled?: boolean;
 }
 
 /**

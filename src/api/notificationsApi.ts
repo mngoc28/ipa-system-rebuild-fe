@@ -26,26 +26,16 @@ const buildMockIdentityHeaders = () => {
  * Represents a system or process notification sent to a user.
  */
 export interface NotificationItem {
-  /** Unique ID of the notification */
-  id: string;
-  /** Categorization (e.g., TASK_ASSIGNED, DELEGATION_UPDATE) */
-  type?: string;
-  /** Subject line or summary */
-  title?: string;
-  /** detailed message or content */
-  description?: string;
-  /** alternative message field */
-  message?: string;
-  /** Name of the database table for the linked object */
-  refTable?: string;
-  /** ID of the specific record in refTable */
-  refId?: string | number;
-  /** Importance level (e.g., 1-5) */
-  severity?: number;
-  /** ISO creation timestamp */
-  createdAt?: string;
-  /** Timestamp when the user read this notification, or null if unread */
-  readAt?: string | null;
+    id: string;
+    type?: string;
+    title?: string;
+    description?: string;
+    message?: string;
+    refTable?: string;
+    refId?: string | number;
+    severity?: number;
+    createdAt?: string;
+    readAt?: string | null;
 }
 
 export interface NotificationsData extends PaginatedData<NotificationItem> {

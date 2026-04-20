@@ -13,34 +13,23 @@ import { Badge } from "@/components/ui/badge";
  * Standard option structure for the MultiSelectField component.
  */
 interface Option {
-  /** Readable label displayed to the user. */
-  label: string;
-  /** Underlying technical value. */
-  value: string;
+    label: string;
+    value: string;
 }
 
 /**
  * Props for the MultiSelectField component.
  */
 interface MultiSelectFieldProps {
-  /** Unique identifier for the element. */
-  id?: string;
-  /** Form field name. */
-  name?: string;
-  /** Array of currently selected values. */
-  values: string[];
-  /** Callback triggered when the selection set changes. */
-  onValuesChange: (values: string[]) => void;
-  /** List of selectable options. */
-  options: Option[];
-  /** Default text shown when the selection is empty. */
-  placeholder?: string;
-  /** CSS classes for the outer wrapper. */
-  className?: string;
-  /** CSS classes for the selection trigger area. */
-  triggerClassName?: string;
-  /** Whether the field is interactive. */
-  disabled?: boolean;
+    id?: string;
+    name?: string;
+    values: string[];
+    onValuesChange: (values: string[]) => void;
+    options: Option[];
+    placeholder?: string;
+    className?: string;
+    triggerClassName?: string;
+    disabled?: boolean;
 }
 
 /**

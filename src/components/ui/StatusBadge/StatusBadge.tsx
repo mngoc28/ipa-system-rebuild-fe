@@ -8,12 +8,9 @@ export type StatusType = "pending" | "approved" | "rejected" | "processing" | "c
  * Props for the StatusBadge component.
  */
 interface StatusBadgeProps {
-  /** The symbolic status value. */
-  status: StatusType | string;
-  /** Optional override for the badge text. */
-  children?: ReactNode;
-  /** Additional styling classes. */
-  className?: string;
+    status: StatusType | string;
+    children?: ReactNode;
+    className?: string;
 }
 
 /**

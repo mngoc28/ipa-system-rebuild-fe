@@ -14,22 +14,14 @@ import { AlertTriangle } from "lucide-react";
  * Props for the ConfirmModal component.
  */
 interface ConfirmModalProps {
-  /** Visibility state of the modal. */
-  isOpen: boolean;
-  /** Callback to close the modal without action. */
-  onClose: () => void;
-  /** Callback triggered when the user confirms the action. */
-  onConfirm: () => void;
-  /** Primary heading for the modal. */
-  title: string;
-  /** Supporting text or JSX content explaining the consequences. */
-  description: React.ReactNode;
-  /** Label for the primary action button. Defaults to "Confirm". */
-  confirmText?: string;
-  /** Label for the secondary dismissal button. Defaults to "Cancel". */
-  cancelText?: string;
-  /** Color scheme and icon style. */
-  variant?: "danger" | "warning" | "info" | "primary";
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    description: React.ReactNode;
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "danger" | "warning" | "info" | "primary";
 }
 
 /**

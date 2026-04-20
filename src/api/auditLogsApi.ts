@@ -7,38 +7,25 @@ export type AuditLogType = "info" | "success" | "warning" | "system";
  * Represents a historical log record of a user or system action.
  */
 export interface AuditLogItem {
-  /** Unique ID of the log record */
-  id: string;
-  /** Name of the user or system component that performed the action */
-  user: string;
-  /** High-level description of the action (e.g., LOGIN, DELETE_USER) */
-  action: string;
-  /** Detailed information or parameters of the action */
-  detail: string;
-  /** Timestamp of the event */
-  time: string;
-  /** Categorization of the log importance */
-  type: AuditLogType;
+    id: string;
+    user: string;
+    action: string;
+    detail: string;
+    time: string;
+    type: AuditLogType;
 }
 
 /**
  * Filtering and pagination criteria for audit log retrieval.
  */
 export interface AuditLogListQuery {
-  /** Search keyword for actions or details */
-  keyword?: string;
-  /** Filter by log category */
-  type?: AuditLogType;
-  /** Filter by the ID of the user who performed the action */
-  actorUserId?: number;
-  /** Specific action name to filter by */
-  action?: string;
-  /** filter by affected resource type (e.g., DELEGATION) */
-  resourceType?: string;
-  /** Page number for pagination */
-  page?: number;
-  /** Items per page */
-  pageSize?: number;
+    keyword?: string;
+    type?: AuditLogType;
+    actorUserId?: number;
+    action?: string;
+    resourceType?: string;
+    page?: number;
+    pageSize?: number;
 }
 
 /**

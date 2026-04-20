@@ -31,28 +31,20 @@ import { cn } from "@/lib/utils";
  * Structure for a single sidebar navigation item.
  */
 interface MenuItem {
-  /** Display title for the menu item. */
-  title: string;
-  /** Internal application path. */
-  path: string;
-  /** Lucide icon component to display. */
-  icon: ElementType;
-  /** List of roles authorized to view this item. */
-  roles: UserRole[];
-  /** Optional numeric notification badge. */
-  badge?: number;
+    title: string;
+    path: string;
+    icon: ElementType;
+    roles: UserRole[];
+    badge?: number;
 }
 
 /**
  * Structure for grouping related menu items under a header.
  */
 interface MenuGroup {
-  /** Display name of the category. */
-  group: string;
-  /** Optional roles authorized to view this entire group. */
-  roles?: UserRole[];
-  /** List of items within this category. */
-  items: MenuItem[];
+    group: string;
+    roles?: UserRole[];
+    items: MenuItem[];
 }
 
 const menuGroups: MenuGroup[] = [
@@ -118,14 +110,10 @@ const menuGroups: MenuGroup[] = [
  * Props for the Sidebar component.
  */
 interface SidebarProps {
-  /** Whether the sidebar is in its narrow (icon-only) state. */
-  isCollapsed: boolean;
-  /** Callback to toggle the collapsed state. */
-  setIsCollapsed: (val: boolean) => void;
-  /** Visibility state for small screen mobile drawer. */
-  isMobileOpen?: boolean;
-  /** Callback to close the mobile drawer. */
-  onMobileClose?: () => void;
+    isCollapsed: boolean;
+    setIsCollapsed: (val: boolean) => void;
+    isMobileOpen?: boolean;
+    onMobileClose?: () => void;
 }
 
 export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: SidebarProps) {

@@ -5,44 +5,31 @@ import { ApiEnvelope } from "@/types/api";
  * Represents a single configurable system configuration record.
  */
 export interface SystemSettingItem {
-  /** Unique key identifying the setting */
-  key: string;
-  /** Categorization for logical grouping (e.g., SMTP, CLOUDINARY, STORAGE) */
-  group: string;
-  /** readable title describing the setting */
-  label: string;
-  /** The current configuration value */
-  value: string | null;
-  /** Redacted or masked value for sensitive data (e.g., *******) */
-  maskedValue?: string | null;
-  /** If true, the value contains sensitive information and should be masked */
-  is_secret: boolean;
-  /** Computed indicator that a value has been set */
-  has_value?: boolean;
-  /** Potential list of predefined values for select-based configuration */
-  options?: string[];
-  /** Last modification timestamp */
-  updated_at?: string | null;
+    key: string;
+    group: string;
+    label: string;
+    value: string | null;
+    maskedValue?: string | null;
+    is_secret: boolean;
+    has_value?: boolean;
+    options?: string[];
+    updated_at?: string | null;
 }
 
 /**
  * Envelope for a list of system settings.
  */
 export interface SystemSettingsListData {
-  /** The collection of setting records */
-  items: SystemSettingItem[];
+    items: SystemSettingItem[];
 }
 
 /**
  * Data structure for batch updating system settings.
  */
 export interface SystemSettingsUpdatePayload {
-  /** List of key-value pairs to set */
-  items: Array<{
-    /** The configuration key */
-    key: string;
-    /** The new value to persist */
-    value: string;
+    items: Array<{
+        key: string;
+        value: string;
   }>;
 }
 
@@ -50,12 +37,9 @@ export interface SystemSettingsUpdatePayload {
  * Health check and performance data for an external integration.
  */
 export interface IntegrationTestData {
-  /** The name of the integrated provider */
-  provider: string;
-  /** Response status or result message */
-  status: string;
-  /** Execution time in milliseconds */
-  latencyMs: number;
+    provider: string;
+    status: string;
+    latencyMs: number;
 }
 
 /**

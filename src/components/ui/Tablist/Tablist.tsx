@@ -6,24 +6,18 @@ import { cn } from "@/lib/utils";
  * Represents a single tab item in the Tablist.
  */
 interface Tab {
-  /** Unique identifier for the tab. */
-  id: string;
-  /** Readable label displayed on the tab button. */
-  label: string;
+    id: string;
+    label: string;
 }
 
 /**
  * Props for the Tablist component.
  */
 interface TablistProps {
-  /** Array of tab configurations. */
-  tabs: Tab[];
-  /** The ID of the currently active tab (for controlled usage). */
-  activeTab?: string;
-  /** Callback triggered when a tab is clicked. */
-  onTabChange?: (id: string) => void;
-  /** Additional styling classes for the container. */
-  className?: string;
+    tabs: Tab[];
+    activeTab?: string;
+    onTabChange?: (id: string) => void;
+    className?: string;
 }
 
 /**

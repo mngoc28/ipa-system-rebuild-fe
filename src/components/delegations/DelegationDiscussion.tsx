@@ -22,10 +22,8 @@ import type { DelegationCommentApiItem } from "@/api/delegationsApi";
 
 /** Represents a team member that can be mentioned in a discussion. */
 type TeamMemberMention = {
-  /** The unique ID of the member. */
-  id: string;
-  /** The display name of the member. */
-  name: string;
+    id: string;
+    name: string;
 };
 
 // A simple textarea that resizes to fit its content
@@ -38,8 +36,7 @@ PlainTextarea.displayName = "PlainTextarea";
 
 /** Props for the DelegationDiscussion component. */
 interface DelegationDiscussionProps {
-  /** The ID of the delegation to which the discussion belongs. */
-  delegationId: string | number;
+    delegationId: string | number;
 }
 
 /**

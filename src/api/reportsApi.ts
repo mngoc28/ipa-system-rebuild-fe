@@ -6,18 +6,12 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a pre-defined report configuration or template.
  */
 export interface ReportDefinition {
-  /** Unique definition ID */
-  id: string;
-  /** Unique machine-readable code for the report type */
-  report_code: string;
-  /** Human-readable title of the report */
-  report_name: string;
-  /** Access scope (e.g., GLOBAL, UNIT) */
-  scope_type?: string;
-  /** Role allowed to generate this report */
-  owner_role_id?: string | null;
-  /** JSON configuration for data extraction and filtering */
-  query_config?: Record<string, unknown> | null;
+    id: string;
+    report_code: string;
+    report_name: string;
+    scope_type?: string;
+    owner_role_id?: string | null;
+    query_config?: Record<string, unknown> | null;
 }
 
 export interface ReportRun {
@@ -46,38 +40,23 @@ export interface ReportSummaryItem {
  * Aggregated dashboard statistics and recent report activity.
  */
 export interface ReportSummary {
-  /** High-level counters for report usage and health */
-  stats: {
-    /** Total number of available report definitions */
-    definitions: number;
-    /** Total number of reports generated */
-    runs: number;
-    /** Count of reports successfully completed */
-    successfulRuns: number;
-    /** internal system metrics count */
-    metrics: number;
+    stats: {
+        definitions: number;
+        runs: number;
+        successfulRuns: number;
+        metrics: number;
   };
-  /** Core key performance indicators for city investment */
-  kpis: {
-    /** New projects registered in the current period */
-    newProjects: number;
-    /** Total Foreign Direct Investment value */
-    fdiTotal: number;
-    /** Total Domestic Capital Investment value */
-    domesticCapital: number;
-    /** Current PCI index rating */
-    pciIndex: number;
+    kpis: {
+        newProjects: number;
+        fdiTotal: number;
+        domesticCapital: number;
+        pciIndex: number;
   };
-  /** list of the most recent report generation attempts */
-  recentRuns: ReportSummaryItem[];
-  /** Short-term economic or investment forecast highlight */
-  forecast: {
-    /** Category or title of the forecast */
-    title: string;
-    /** Main prediction highlight */
-    headline: string;
-    /** nuanced textual explanation */
-    detail: string;
+    recentRuns: ReportSummaryItem[];
+    forecast: {
+        title: string;
+        headline: string;
+        detail: string;
   };
 }
 

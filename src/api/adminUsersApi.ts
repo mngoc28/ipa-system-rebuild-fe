@@ -6,24 +6,15 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a user object managed within the administrative module.
  */
 export interface AdminUser {
-  /** Unique ID of the user */
-  id: string;
-  /** Full display name */
-  fullName: string;
-  /** Primary contact email */
-  email: string;
-  /** List of role identifier codes */
-  role_codes: string[];
-  /** List of granted permission codes */
-  permission_codes: string[];
-  /** Associated organizational unit details */
-  unit: { id: string; unit_code?: string; unit_name?: string } | null;
-  /** Account activation status (e.g., active, inactive) */
-  status: string;
-  /** Whether the account is currently locked/suspended */
-  locked: boolean;
-  /** Optional URL to avatar image */
-  avatar?: string;
+    id: string;
+    fullName: string;
+    email: string;
+    role_codes: string[];
+    permission_codes: string[];
+    unit: { id: string; unit_code?: string; unit_name?: string } | null;
+    status: string;
+    locked: boolean;
+    avatar?: string;
 }
 
 export interface AdminUsersQuery {

@@ -6,10 +6,8 @@ import { cn } from "@/lib/utils";
  * Props for the ButtonDetail component.
  */
 interface ButtonDetailProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Optional styling classes. */
-  className?: string;
-  /** Visual variant of the button. */
-  variant?: "default" | "outline";
+    className?: string;
+    variant?: "default" | "outline";
 }
 
 /**

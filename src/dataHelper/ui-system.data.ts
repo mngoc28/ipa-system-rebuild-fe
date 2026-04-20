@@ -22,16 +22,11 @@ export type StatusTone =
  * Represents a key performance indicator or status count on the dashboard.
  */
 export interface DashboardStat {
-  /** Unique identifier for the stat card */
-  id: string;
-  /** Label for the metric */
-  title: string;
-  /** Current numeric value */
-  value: number;
-  /** Contextual note (e.g., "+5 this week") */
-  note: string;
-  /** Visual icon category */
-  icon: "delegation" | "alert" | "task" | "bell";
+    id: string;
+    title: string;
+    value: number;
+    note: string;
+    icon: "delegation" | "alert" | "task" | "bell";
 }
 
 export interface DashboardTask {
@@ -47,39 +42,24 @@ export interface DashboardTask {
  * Detailed representation of a delegation item for list and board views.
  */
 export interface DelegationItem {
-  /** Primary identifier */
-  id: string | number;
-  /** Formatted tracking code */
-  code: string;
-  /** Human-readable delegation name */
-  name: string;
-  /** Country of origin/destination */
-  country: string;
-  /** Partner organization name */
-  partnerOrg: string;
-  /** Unit responsible for the delegation */
-  hostUnit: string;
-  /** Direction: coming into or going out of the city */
-  type: 'inbound' | 'outbound';
-  /** Urgency level for processing */
-  priority: 'low' | 'medium' | 'high';
-  /** Starting date of the visit */
-  startDate: string;
-  /** Ending date of the visit */
-  endDate: string;
-  /** Current workflow status */
-  status: StatusTone;
-  /** Total number of participants */
-  participants: number;
-  /** Brief overview or purpose */
-  description?: string;
-  /** Staff member assigned to coordinate */
-  staff: {
+    id: string | number;
+    code: string;
+    name: string;
+    country: string;
+    partnerOrg: string;
+    hostUnit: string;
+    type: 'inbound' | 'outbound';
+    priority: 'low' | 'medium' | 'high';
+    startDate: string;
+    endDate: string;
+    status: StatusTone;
+    participants: number;
+    description?: string;
+    staff: {
     name: string;
     avatar?: string;
   };
-  /** Progress on associated action items */
-  actionItems: {
+    actionItems: {
     total: number;
     overdue: number;
   };
@@ -89,24 +69,15 @@ export interface DelegationItem {
  * Represents a discrete session or event within a delegation's schedule.
  */
 export interface SessionItem {
-  /** Unique session identifier */
-  id: number;
-  /** Localized day of the week */
-  day: string;
-  /** Date of the session (DD/MM) */
-  date: string;
-  /** Descriptive title of the activity */
-  title: string;
-  /** Venue or location of the session */
-  location: string;
-  /** Scheduled time range */
-  time: string;
-  /** Current status of the session */
-  status: StatusTone;
-  /** Category of the session */
-  type: 'meeting' | 'siteVisit' | 'gala' | 'travel';
-  /** Optional additional details */
-  description?: string;
+    id: number;
+    day: string;
+    date: string;
+    title: string;
+    location: string;
+    time: string;
+    status: StatusTone;
+    type: 'meeting' | 'siteVisit' | 'gala' | 'travel';
+    description?: string;
 }
 
 export interface MinutesItem {

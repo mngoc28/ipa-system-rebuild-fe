@@ -2,58 +2,32 @@
  * Detailed representation of a delegation item from the API.
  */
 export interface DelegationApiItem {
-  /** Unique ID */
-  id: number;
-  /** Internal tracking code */
-  code: string;
-  /** Name of the delegation */
-  name: string;
-  /** Direction code (e.g., 1 for Inbound, 2 for Outbound) */
-  direction: number;
-  /** Status code (e.g., 0: Draft, 1: Pending, etc.) */
-  status: number;
-  /** Priority level code (e.g., 1: Low, 2: Medium, 3: High) */
-  priority: number;
-  /** ID of the associated country */
-  country_id: number;
-  /** ID of the host unit/department */
-  host_unit_id: number;
-  /** IDs of associated partner organizations */
-  partner_ids?: number[];
-  /** ID of the user managing this delegation */
-  owner_user_id: number;
-  /** Visit start date */
-  start_date: string;
-  /** Visit end date */
-  end_date: string;
-  /** Number of participants in the delegation */
-  participant_count: number;
-  /** Visit objectives */
-  objective: string;
-  /** Detailed description and background */
-  description: string;
-  /** Investment potential score or value */
-  investment_potential?: number;
-  /** IDs of associated business sectors */
-  sector_ids?: number[];
-  /** Remark provided during approval process */
-  approval_remark?: string | null;
-  /** Creation timestamp */
-  created_at: string;
-  /** Last update timestamp */
-  updated_at: string;
-  /** List of delegation members */
-  members?: unknown[];
-  /** List of related events */
-  events?: unknown[];
-  /** List of outcomes/results */
-  outcomes?: unknown[];
-  /** Associated business sectors detail */
-  sectors?: Array<{ id: number; name: string; name_vi?: string }>;
-  /** Checklist items status */
-  checklist?: unknown[];
-  /** Primary and secondary contact persons */
-  contacts?: Array<{
+    id: number;
+    code: string;
+    name: string;
+    direction: number;
+    status: number;
+    priority: number;
+    country_id: number;
+    host_unit_id: number;
+    partner_ids?: number[];
+    owner_user_id: number;
+    start_date: string;
+    end_date: string;
+    participant_count: number;
+    objective: string;
+    description: string;
+    investment_potential?: number;
+    sector_ids?: number[];
+    approval_remark?: string | null;
+    created_at: string;
+    updated_at: string;
+    members?: unknown[];
+    events?: unknown[];
+    outcomes?: unknown[];
+    sectors?: Array<{ id: number; name: string; name_vi?: string }>;
+    checklist?: unknown[];
+    contacts?: Array<{
     id: number;
     name: string;
     role_name?: string;
@@ -61,33 +35,28 @@ export interface DelegationApiItem {
     phone?: string;
     is_primary?: boolean;
   }>;
-  /** Country details */
-  country?: {
+    country?: {
     id: number;
     name_vi: string;
     name_en: string;
     code: string;
   };
-  /** Partner organization details */
-  partners?: Array<{
+    partners?: Array<{
     id: number;
     name: string;
     partner_name?: string;
   }>;
-  /** Hosting unit details */
-  host_unit?: {
+    host_unit?: {
     id: number;
     unit_name: string;
     unit_code: string;
   };
-  /** Owner user details */
-  owner?: {
+    owner?: {
     id: number;
     full_name: string;
     avatar_url?: string;
   };
-  /** List of associated tasks */
-  tasks?: Array<{
+    tasks?: Array<{
     id: number;
     due_at: string;
   }>;
@@ -97,22 +66,14 @@ export interface DelegationApiItem {
  * Query parameters for fetching delegations.
  */
 export interface DelegationsQuery {
-  /** Search keyword for filtering by name or code */
-  search?: string;
-  /** Filter by visit direction */
-  direction?: number;
-  /** Filter by current status */
-  status?: number;
-  /** Filter by priority level */
-  priority?: number;
-  /** Filter by country ID */
-  country_id?: number | string;
-  /** Filter by owner user ID */
-  owner_user_id?: number | string;
-  /** Page number for pagination */
-  page?: number;
-  /** Number of items per page */
-  per_page?: number;
+    search?: string;
+    direction?: number;
+    status?: number;
+    priority?: number;
+    country_id?: number | string;
+    owner_user_id?: number | string;
+    page?: number;
+    per_page?: number;
 }
 
 export interface CreateDelegationPayload {

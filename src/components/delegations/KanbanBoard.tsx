@@ -11,14 +11,10 @@ import { ConfirmModal } from "@/components/common/ConfirmModal";
  * Props for the KanbanBoard component.
  */
 interface KanbanBoardProps {
-  /** Array of delegation records to display in the board. */
-  delegations: DelegationItem[];
-  /** Callback triggered when an item is dropped into a new valid status column. */
-  onUpdateStatus?: (id: string | number, status: string) => void;
-  /** Callback triggered when an item is requested for deletion from a card. */
-  onDelete?: (id: string | number) => void;
-  /** Optional callback to switch back to list view. */
-  onViewList?: () => void;
+    delegations: DelegationItem[];
+    onUpdateStatus?: (id: string | number, status: string) => void;
+    onDelete?: (id: string | number) => void;
+    onViewList?: () => void;
 }
 
 /**

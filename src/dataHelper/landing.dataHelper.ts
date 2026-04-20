@@ -4,36 +4,27 @@ import { Building, Cpu, DollarSign, MapPin, Plane, TrendingUp, Users, type Lucid
  * Represents a highlight item displayed in the landing page's benefits section.
  */
 export interface LandingHighlightItem {
-  /** Icon component from lucide-react */
-  icon: LucideIcon;
-  /** Main title of the highlight */
-  title: string;
-  /** Detailed description or subtext */
-  desc: string;
+    icon: LucideIcon;
+    title: string;
+    desc: string;
 }
 
 /**
  * Represents a step in the investment process shown on the landing page.
  */
 export interface LandingStepItem {
-  /** Label/Title of the step */
-  title: string;
-  /** Explanation of what happens in this step */
-  desc: string;
+    title: string;
+    desc: string;
 }
 
 /**
  * Represents an investment sector category on the landing page.
  */
 export interface LandingSectorItem {
-  /** Visual icon representing the sector */
-  icon: LucideIcon;
-  /** Human-readable name of the sector */
-  name: string;
-  /** Statistical count of projects or other metrics */
-  count: string;
-  /** Tailwind CSS classes for custom styling */
-  color: string;
+    icon: LucideIcon;
+    name: string;
+    count: string;
+    color: string;
 }
 
 /**

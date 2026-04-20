@@ -24,14 +24,10 @@ import {
  * Props for the KanbanCard component.
  */
 interface KanbanCardProps {
-  /** The delegation item data to display. */
-  item: DelegationItem;
-  /** Whether the card is currently being dragged (overlay mode). */
-  isOverlay?: boolean;
-  /** Callback triggered when the delete action is selected. */
-  onDelete?: (id: string | number) => void;
-  /** Optional override for the status indicator color. */
-  color?: string;
+    item: DelegationItem;
+    isOverlay?: boolean;
+    onDelete?: (id: string | number) => void;
+    color?: string;
 }
 
 

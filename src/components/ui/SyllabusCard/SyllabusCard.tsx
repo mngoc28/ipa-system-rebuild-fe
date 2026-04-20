@@ -7,18 +7,12 @@ import { useNavigate } from "react-router-dom";
  * Props for the SyllabusCard component.
  */
 interface SyllabusCardProps {
-  /** Unique identifier for the syllabus/course. */
-  id: string;
-  /** Display title for the card. */
-  title: string;
-  /** Whether the card is currently pinned to the top of the list. */
-  isPinned: boolean;
-  /** Completion percentage (0-100). */
-  progress: number;
-  /** Additional styling classes. */
-  className?: string;
-  /** Callback triggered when the pin status is toggled. */
-  onTogglePin: (id: string, isPinned: boolean) => void;
+    id: string;
+    title: string;
+    isPinned: boolean;
+    progress: number;
+    className?: string;
+    onTogglePin: (id: string, isPinned: boolean) => void;
 }
 
 /**

@@ -6,40 +6,26 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a logical folder for file organization.
  */
 export interface FolderItem {
-  /** Unique folder ID */
-  id: string;
-  /** ID of the containing folder, or null for root */
-  parentFolderId?: string | null;
-  /** Display name of the folder */
-  folderName: string;
-  /** Access scope (e.g., GLOBAL, PROJECT, UNIT) */
-  scopeType: string;
+    id: string;
+    parentFolderId?: string | null;
+    folderName: string;
+    scopeType: string;
 }
 
 /**
  * Represents a metadata record for an uploaded file.
  */
 export interface FileItem {
-  /** Unique file ID */
-  id: string;
-  /** Original filename with extension */
-  fileName: string;
-  /** Payload size in bytes */
-  sizeBytes: number;
-  /** internal cloud storage reference */
-  storageKey?: string;
-  /** ID of the folder containing this file */
-  folderId?: string | null;
-  /** Optional attribution to a delegation */
-  delegationId?: string | null;
-  /** Optional attribution to a meeting minute record */
-  minutesId?: string | null;
-  /** Optional attribution to a specific task */
-  taskId?: string | null;
-  /** List of current user/role shares (details unknown) */
-  shares?: unknown[];
-  /** Historical versions of this file (details unknown) */
-  versions?: unknown[];
+    id: string;
+    fileName: string;
+    sizeBytes: number;
+    storageKey?: string;
+    folderId?: string | null;
+    delegationId?: string | null;
+    minutesId?: string | null;
+    taskId?: string | null;
+    shares?: unknown[];
+    versions?: unknown[];
 }
 
 export interface FilesData {

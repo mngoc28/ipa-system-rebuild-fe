@@ -4,46 +4,29 @@ import apiClient from "./axiosClient";
  * Represents a system-wide announcement or notification.
  */
 export interface Announcement {
-  /** Unique announcement ID */
-  id: number;
-  /** Subject line or title of the announcement */
-  title: string;
-  /** Detailed information or markdown content */
-  content: string;
-  /** Severity/category of the announcement */
-  type: "info" | "warning" | "success";
-  /** Scheduled start time for visibility */
-  starts_at: string | null;
-  /** Scheduled end time for visibility */
-  ends_at: string | null;
-  /** Toggle for manual activation/deactivation */
-  is_active: boolean;
-  /** ISO creation timestamp */
-  created_at: string;
+    id: number;
+    title: string;
+    content: string;
+    type: "info" | "warning" | "success";
+    starts_at: string | null;
+    ends_at: string | null;
+    is_active: boolean;
+    created_at: string;
 }
 
 /**
  * Snapshot of system operation metrics and health status.
  */
 export interface OperationalStats {
-  /** Count of users currently logged into the system */
-  online_users: number;
-  /** Count of new files uploaded in the last 24 hours */
-  new_files_24h: number;
-  /** Current count of unresolved tasks */
-  active_tasks: number;
-  /** Human-readable storage usage string (e.g., "1.2GB") */
-  storage_used: string;
-  /** Count of currently visible announcements */
-  active_announcements: number;
-  /** Total user population in the database */
-  total_users: number;
-  /** Current server CPU load percentage */
-  cpu_load: number;
-  /** Global database connection status */
-  db_status: boolean;
-  /** Count of outstanding security alerts */
-  security_alerts_count: number;
+    online_users: number;
+    new_files_24h: number;
+    active_tasks: number;
+    storage_used: string;
+    active_announcements: number;
+    total_users: number;
+    cpu_load: number;
+    db_status: boolean;
+    security_alerts_count: number;
 }
 
 /**

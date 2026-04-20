@@ -33,76 +33,47 @@ import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 
 /** API representation of a delegation member. */
 type DelegationMemberApi = {
-  /** The member's full name. */
-  full_name?: string;
-  /** The member's job title or role. */
-  title?: string;
-  /** The organization the member belongs to. */
-  organization_name?: string;
-  /** The gender of the member. */
-  gender?: string;
-  /** Identity card or passport number. */
-  identity_number?: string;
-  /** Whether the member has VIP status. */
-  is_vip?: boolean;
+    full_name?: string;
+    title?: string;
+    organization_name?: string;
+    gender?: string;
+    identity_number?: string;
+    is_vip?: boolean;
 };
 
 /** API representation of a delegation event/schedule item. */
 type DelegationEventApi = {
-  /** Unique identifier for the event. */
-  id: string | number;
-  /** Starting date/time in ISO format. */
-  start_at: string;
-  /** Title of the event. */
-  title?: string;
-  /** Detailed description of the event. */
-  description?: string;
-  /** ID of the location from master data. */
-  location_id?: number;
-  /** ID of the staff member in charge. */
-  staff_id?: number;
-  /** Notes regarding logistics (e.g., transport). */
-  logistics_note?: string;
-  /** Associated location object. */
-  location?: { name_vi?: string; name?: string };
-  /** Associated staff object. */
-  staff?: { name?: string };
+    id: string | number;
+    start_at: string;
+    title?: string;
+    description?: string;
+    location_id?: number;
+    staff_id?: number;
+    logistics_note?: string;
+    location?: { name_vi?: string; name?: string };
+    staff?: { name?: string };
 };
 
 /** API representation of a checklist item. */
 type DelegationChecklistApi = {
-  /** Unique identifier for the checklist item. */
-  id?: string | number;
-  /** Name of the task or item. */
-  item_name?: string;
-  /** Fallback name field. */
-  name?: string;
-  /** ID of the user assigned to this task. */
-  assignee_user_id?: number | string;
-  /** Completion status (e.g., 0 for pending, 2 for completed). */
-  status: number;
+    id?: string | number;
+    item_name?: string;
+    name?: string;
+    assignee_user_id?: number | string;
+    status: number;
 };
 
 /** API representation of a delegation outcome. */
 type DelegationOutcomeApi = {
-  /** Unique identifier for the outcome. */
-  id?: string | number;
-  /** Star rating (1-5). */
-  rating?: number;
-  /** Numeric score (often same as rating). */
-  score?: number;
-  /** Summary of the outcome. */
-  summary?: string;
-  /** Fallback summary field. */
-  outcome_summary?: string;
-  /** Content details. */
-  content?: string;
-  /** General notes. */
-  note?: string;
-  /** Planned next steps. */
-  next_steps?: string;
-  /** Fallback next steps field. */
-  nextSteps?: string;
+    id?: string | number;
+    rating?: number;
+    score?: number;
+    summary?: string;
+    outcome_summary?: string;
+    content?: string;
+    note?: string;
+    next_steps?: string;
+    nextSteps?: string;
 };
 
 type DelegationSectorApi = { id: number; name_vi?: string; name?: string };
@@ -121,46 +92,26 @@ type DelegationDetailView = Omit<DelegationApiItem, "members" | "events" | "outc
 
 /** Internal state for an item currently being edited in a modal. */
 type DelegationEditingItem = {
-  /** Index in the list when editing an existing item. */
-  _index?: number;
-  /** Unique identifier for the item. */
-  id?: string | number;
-  /** Full name for members. */
-  fullName?: string;
-  /** Job title or role for members. */
-  role?: string;
-  /** Organization name for members. */
-  organizationName?: string;
-  /** Gender for members. */
-  gender?: string;
-  /** ID number for members. */
-  identityNumber?: string;
-  /** VIP status for members. */
-  isVip?: boolean;
-  /** Date for schedule items. */
-  date?: string;
-  /** Title for schedule items. */
-  title?: string;
-  /** Description or notes for schedule items. */
-  note?: string;
-  /** Location ID for schedule items. */
-  location_id?: number;
-  /** Staff ID for schedule items. */
-  staff_id?: number;
-  /** Logistics notes for schedule items. */
-  logistics_note?: string;
-  /** Item name for checklists. */
-  itemName?: string;
-  /** Assignee ID for checklists. */
-  assigneeId?: number;
-  /** Status for checklists. */
-  status?: number;
-  /** Rating for outcomes. */
-  rating?: number;
-  /** Summary for outcomes. */
-  summary?: string;
-  /** Next steps for outcomes. */
-  next_steps?: string;
+    _index?: number;
+    id?: string | number;
+    fullName?: string;
+    role?: string;
+    organizationName?: string;
+    gender?: string;
+    identityNumber?: string;
+    isVip?: boolean;
+    date?: string;
+    title?: string;
+    note?: string;
+    location_id?: number;
+    staff_id?: number;
+    logistics_note?: string;
+    itemName?: string;
+    assigneeId?: number;
+    status?: number;
+    rating?: number;
+    summary?: string;
+    next_steps?: string;
 };
 
 type DelegationMemberPayload = {
@@ -189,8 +140,7 @@ type DelegationChecklistPayload = {
 
 /** Props for the SharedDelegationDetail component. */
 interface SharedDelegationDetailProps {
-  /** The current user's role, which determines available actions (e.g., approval). */
-  role: "admin" | "director" | "manager" | "staff";
+    role: "admin" | "director" | "manager" | "staff";
 }
 
 /**

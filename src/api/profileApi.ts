@@ -5,16 +5,11 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Response shape for avatar upload/update operations.
  */
 interface AvatarUpdateResponse {
-  /** Success status */
-  success: boolean;
-  /** Response message */
-  message: string;
-  /** Container for updated user avatar details */
-  data: {
-    /** The newly generated absolute URL of the avatar */
-    avatar_url: string;
-    /** The ID of the affected user */
-    id: string;
+    success: boolean;
+    message: string;
+    data: {
+        avatar_url: string;
+        id: string;
   };
 }
 
@@ -22,26 +17,19 @@ interface AvatarUpdateResponse {
  * Payload fields for updating a user's personal profile information.
  */
 interface ProfileUpdateData {
-  /** Updated display name */
-  fullName?: string;
-  /** Updated contact email */
-  email?: string;
-  /** Updated phone number */
-  phone?: string;
-  /** associated unit label (informational only) */
-  unit?: string;
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    unit?: string;
 }
 
 /**
  * Response shape for profile detail update operations.
  */
 interface ProfileUpdateResponse {
-  /** Success status */
-  success: boolean;
-  /** Response message */
-  message: string;
-  /** echoed updated profile data */
-  data: ProfileUpdateData;
+    success: boolean;
+    message: string;
+    data: ProfileUpdateData;
 }
 
 const getAdminPrefix = () => {

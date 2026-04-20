@@ -7,30 +7,21 @@ import { ZoomIn, ZoomOut, Check, X, Loader2 } from "lucide-react";
  * Represents the coordinates and dimensions of a selected crop area.
  */
 interface Area {
-  /** X coordinate of the top-left corner. */
-  x: number;
-  /** Y coordinate of the top-left corner. */
-  y: number;
-  /** Width of the cropped area. */
-  width: number;
-  /** Height of the cropped area. */
-  height: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 /**
  * Props for the AvatarCropper component.
  */
 interface AvatarCropperProps {
-  /** Base64 or URL string of the image to crop. */
-  image: string;
-  /** Callback triggered with the final cropped file. */
-  onCropComplete: (file: File) => void;
-  /** Callback to close the cropper without saving. */
-  onCancel: () => void;
-  /** Aspect ratio of the crop area (width / height). Defaults to 1 (square). */
-  aspect?: number;
-  /** Whether an upload operation is currently in progress. */
-  isUploading?: boolean;
+    image: string;
+    onCropComplete: (file: File) => void;
+    onCancel: () => void;
+    aspect?: number;
+    isUploading?: boolean;
 }
 
 /**

@@ -11,14 +11,10 @@ import type {
  * Represents a comment record associated with a delegation.
  */
 export interface DelegationCommentApiItem {
-  /** Unique identifier for the comment */
-  id: number | string;
-  /** The content of the comment */
-  comment_text: string;
-  /** Creation timestamp */
-  created_at: string;
-  /** Identity details of the commenter */
-  commenter?: {
+    id: number | string;
+    comment_text: string;
+    created_at: string;
+    commenter?: {
     id?: number | string;
     full_name?: string;
     avatar_url?: string | null;

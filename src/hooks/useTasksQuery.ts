@@ -12,16 +12,11 @@ import * as React from "react";
  * Parameters for filtering and paginating current tasks.
  */
 export interface TasksQueryOptions {
-  /** Filter by numeric status ID. */
-  status?: number;
-  /** Filter by priority level. */
-  priority?: number;
-  /** Text search for task title or description. */
-  search?: string;
-  /** Page number (1-indexed). */
-  page?: number;
-  /** Number of items per page. */
-  pageSize?: number;
+    status?: number;
+    priority?: number;
+    search?: string;
+    page?: number;
+    pageSize?: number;
 }
 
 /**

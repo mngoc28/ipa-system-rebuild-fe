@@ -6,28 +6,17 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Represents a scheduled event or activity, often linked to a delegation.
  */
 export interface EventItem {
-  /** Unique event ID */
-  id: string;
-  /** Optional ID of the associated delegation */
-  delegationId?: string | null;
-  /** Subject or title of the event */
-  title: string;
-  /** Categorization (e.g., MEETING, GALA, SITE_VISIT) */
-  eventType: string;
-  /** Lifecycle status (e.g., PLANNED, ONGOING, COMPLETED) */
-  status: string;
-  /** ISO start timestamp */
-  startAt: string;
-  /** ISO end timestamp */
-  endAt: string;
-  /** Optional ID of the location record */
-  locationId?: string | null;
-  /** ID of the user organizing the event */
-  organizerUserId: string;
-  /** List of user IDs invited to the event */
-  participantUserIds: string[];
-  /** Map of participant IDs to their attendance status */
-  joinStates?: Record<string, "JOINED" | "DECLINED">;
+    id: string;
+    delegationId?: string | null;
+    title: string;
+    eventType: string;
+    status: string;
+    startAt: string;
+    endAt: string;
+    locationId?: string | null;
+    organizerUserId: string;
+    participantUserIds: string[];
+    joinStates?: Record<string, "JOINED" | "DECLINED">;
 }
 
 export interface EventsQuery {

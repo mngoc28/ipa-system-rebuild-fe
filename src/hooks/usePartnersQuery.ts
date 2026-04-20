@@ -15,18 +15,12 @@ import {
  * Parameters for filtering and paginating the partners list.
  */
 export interface PartnersQueryOptions {
-  /** Filter by numeric status ID. */
-  status?: number;
-  /** Page number (1-indexed). */
-  page?: number;
-  /** Number of items per page. */
-  pageSize?: number;
-  /** Full-text search string for partner name or contact info. */
-  search?: string;
-  /** Filter by industry sector. */
-  sectorId?: number;
-  /** Filter by country of origin. */
-  countryId?: number;
+    status?: number;
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    sectorId?: number;
+    countryId?: number;
 }
 
 /**

@@ -2,54 +2,33 @@
  * Represents the raw delegation data structure from the API.
  */
 export interface DelegationApiItem {
-  /** Unique identifier */
-  id: string;
-  /** Internal tracking code */
-  code: string;
-  /** Name of the delegation */
-  name: string;
-  /** Direction of the delegation: INBOUND (coming in) or OUTBOUND (going out) */
-  direction: "INBOUND" | "OUTBOUND" | string;
-  /** Urgency level */
-  priority: "HIGH" | "MEDIUM" | "LOW" | string;
-  /** ID of the associated country */
-  countryId: string;
-  /** ID of the unit hosting the delegation */
-  hostUnitId: string;
-  /** ID of the user managing this delegation */
-  ownerId: string;
-  /** Current lifecycle status */
-  status: string;
-  /** Effective start date */
-  startDate: string;
-  /** Effective end date */
-  endDate: string;
-  /** Primary objective of the visit */
-  objective?: string;
-  /** Additional details or context */
-  description?: string;
-  /** Last update timestamp */
-  updatedAt?: string;
+    id: string;
+    code: string;
+    name: string;
+    direction: "INBOUND" | "OUTBOUND" | string;
+    priority: "HIGH" | "MEDIUM" | "LOW" | string;
+    countryId: string;
+    hostUnitId: string;
+    ownerId: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+    objective?: string;
+    description?: string;
+    updatedAt?: string;
 }
 
 /**
  * Represents a member participating in a delegation.
  */
 export interface DelegationMemberItem {
-  /** Member unique ID */
-  id: string;
-  /** Full name of the member */
-  fullName: string;
-  /** Professional title/position */
-  title?: string;
-  /** Name of the organization they belong to */
-  organizationName?: string;
-  /** Email address for contact */
-  contactEmail?: string;
-  /** Phone number for contact */
-  contactPhone?: string;
-  /** Type/Role of the member in the delegation */
-  memberType: string;
+    id: string;
+    fullName: string;
+    title?: string;
+    organizationName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    memberType: string;
 }
 
 export interface DelegationDetailResponse {
@@ -64,32 +43,19 @@ export interface DelegationDetailResponse {
  * Payload for creating a new delegation.
  */
 export interface CreateDelegationPayload {
-  /** Optional custom code */
-  code?: string;
-  /** Name of the delegation */
-  name: string;
-  /** Visit direction */
-  direction: "INBOUND" | "OUTBOUND";
-  /** Urgency priority */
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  /** Target country ID */
-  countryId: string;
-  /** Unit responsible for hosting */
-  hostUnitId: string;
-  /** User assigned as the primary owner */
-  ownerUserId: string;
-  /** Expected start date */
-  startDate: string;
-  /** Expected end date */
-  endDate: string;
-  /** Goals of the delegation */
-  objective: string;
-  /** Detailed background info */
-  description: string;
-  /** List of member IDs to associate */
-  members?: string[];
-  /** Proposed itinerary/schedule items */
-  schedule_items?: Array<{
+    code?: string;
+    name: string;
+    direction: "INBOUND" | "OUTBOUND";
+    priority: "HIGH" | "MEDIUM" | "LOW";
+    countryId: string;
+    hostUnitId: string;
+    ownerUserId: string;
+    startDate: string;
+    endDate: string;
+    objective: string;
+    description: string;
+    members?: string[];
+    schedule_items?: Array<{
     date: string;
     title: string;
     note?: string;

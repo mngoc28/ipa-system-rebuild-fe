@@ -18,18 +18,12 @@ import { formatDate } from "@/utils/dateUtils"
  * Props for the DatePicker component.
  */
 interface DatePickerProps {
-  /** The currently selected date as an ISO string or Date object. */
-  date?: string | Date
-  /** Callback triggered when a new date is selected, returning a YYYY-MM-DD string. */
-  setDate: (date: string) => void
-  /** Default text shown when no date is selected. */
-  placeholder?: string
-  /** CSS classes for the trigger button. */
-  className?: string
-  /** Unique identifier for the trigger button. */
-  id?: string
-  /** Form field name for the hidden input. */
-  name?: string
+    date?: string | Date
+    setDate: (date: string) => void
+    placeholder?: string
+    className?: string
+    id?: string
+    name?: string
 }
 
 /**

@@ -7,18 +7,12 @@ export type AuditLogType = "info" | "success" | "warning" | "system";
  * Interface representing a single audit log entry.
  */
 export interface AuditLogItem {
-  /** Unique ID of the log entry */
-  id: number;
-  /** Name of the user who performed the action */
-  user: string;
-  /** The action that was performed */
-  action: string;
-  /** Detailed description of the action */
-  detail: string;
-  /** Timestamp when the action occurred */
-  time: string;
-  /** The type/category of the log */
-  type: AuditLogType;
+    id: number;
+    user: string;
+    action: string;
+    detail: string;
+    time: string;
+    type: AuditLogType;
 }
 
 /**

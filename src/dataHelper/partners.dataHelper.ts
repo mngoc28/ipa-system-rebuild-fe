@@ -7,18 +7,12 @@ export type PartnerUiStatus = "Lead" | "Partner" | "Active";
  * Interface representing a contact person associated with a partner organization.
  */
 export interface PartnerContactItem {
-  /** Unique ID of the contact */
-  id: string;
-  /** Full name of the contact person */
-  fullName: string;
-  /** Job title or professional designation */
-  title?: string | null;
-  /** Professional email address */
-  email?: string | null;
-  /** Contact phone number */
-  phone?: string | null;
-  /** Flag indicating if this is the primary point of contact */
-  isPrimary?: boolean;
+    id: string;
+    fullName: string;
+    title?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    isPrimary?: boolean;
 }
 
 export interface PartnerApiItem {
@@ -48,10 +42,8 @@ export interface PartnerDetailInteractionItem {
  * Represents a partner organization with detailed fields for interaction tracking.
  */
 export interface PartnerDetailApiItem extends PartnerApiItem {
-  /** Supplemental background notes */
-  notes?: string | null;
-  /** Collection of recent meeting or communication summaries */
-  recentInteractions?: PartnerDetailInteractionItem[];
+    notes?: string | null;
+    recentInteractions?: PartnerDetailInteractionItem[];
 }
 
 export interface PartnerCreatePayload {

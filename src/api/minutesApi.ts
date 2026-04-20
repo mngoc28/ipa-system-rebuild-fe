@@ -6,28 +6,20 @@ import { useAuthStore } from "@/store/useAuthStore";
  * Data transfer object for a meeting minutes record.
  */
 export interface MinutesItemDto {
-  /** Unique ID of the minutes record */
-  id: string;
-  /** ID of the delegation this meeting is part of */
-  delegationId: string;
-  /** Optional ID of the specific event being documented */
-  eventId?: string | null;
-  /** The descriptive title of the meeting minutes */
-  title: string;
-  /** Lifecycle status (e.g., DRAFT, FINAL) */
-  status: string;
-  /** The highest version number available for these minutes */
-  currentVersionNo: number;
+    id: string;
+    delegationId: string;
+    eventId?: string | null;
+    title: string;
+    status: string;
+    currentVersionNo: number;
 }
 
 /**
  * Comprehensive detailed view of meeting minutes including history and feedback.
  */
 export interface MinutesDetailDto {
-  /** The parent minutes metadata */
-  minutes: MinutesItemDto;
-  /** Historical versions/revisions of the content */
-  versions: Array<{
+    minutes: MinutesItemDto;
+    versions: Array<{
     id: string;
     minutesId: string;
     versionNo: number;
@@ -36,8 +28,7 @@ export interface MinutesDetailDto {
     changeSummary?: string;
     editedAt?: string;
   }>;
-  /** threaded comments and feedback on the minutes */
-  comments: Array<{
+    comments: Array<{
     id: string;
     minutesId: string;
     versionId?: string | null;
@@ -45,8 +36,7 @@ export interface MinutesDetailDto {
     parentCommentId?: string | null;
     createdAt?: string;
   }>;
-  /** Approval workflow decisions for the final version */
-  approvals: Array<{
+    approvals: Array<{
     id: string;
     minutesId: string;
     decision: "APPROVE" | "REJECT";

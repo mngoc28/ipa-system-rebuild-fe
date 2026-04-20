@@ -1,0 +1,20 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Teams & Personnel,page_title,label,Đội nhóm & Nhân sự,,none,header,,,font-title text-2xl font-black uppercase,Main module heading
+Teams & Personnel,btn_add_member,button,THÊM THÀNH VIÊN,,click,header,,,bg-slate-900 text-white font-black,Opens 'Thêm thành viên' dialog
+Teams & Personnel,stat_total_members,card,Tổng nhân sự,,none,center,,,border-slate-200 bg-white,Summary of department size
+Teams & Personnel,stat_in_office,card,Đang văn phòng,,none,center,,,border-emerald-200 bg-emerald-50,Count of active in-office staff
+Teams & Personnel,stat_on_field,card,Đang công tác,,none,center,,,border-amber-200 bg-amber-50,Count of staff on business trips
+Teams & Personnel,member_card,card,,,[click],center,,,border-slate-200 bg-white,Individual member profile card
+Teams & Personnel,member_status_indicator,label,,,[none],center,,,rounded-full border-2,Color coded: green (Office); yellow (Field); grey (Leave)
+Teams & Personnel,performance_bar,progress,,,[none],center,,,h-1.5 rounded-full,Dynamic color: green (>90); blue (>75); yellow (others)
+Teams & Personnel,btn_member_email,button,,Gửi email cho [name],click,center,,,bg-slate-50 text-slate-400,Quick action to compose email
+Teams & Personnel,btn_member_chat,button,,Mở chat với [name],click,center,,,bg-slate-50 text-slate-400,Quick action to open internal chat
+Teams & Personnel,btn_member_permissions,button,,Mở phân quyền cho [name],click,center,,,bg-slate-50 text-slate-400,Navigates to role/permission management
+Teams & Personnel,pagination_prev,button,Trước,,click,bottom,,,border-slate-200 bg-white,Navigate to previous page
+Teams & Personnel,pagination_next,button,Sau,,click,bottom,,,border-slate-200 bg-white,Navigate to next page
+Teams & Personnel,activity_log_sidebar,list,Nhật ký hoạt động,,none,right,,,bg-white/5 border-white/10,Recent member actions log (Manager only)
+Teams & Personnel,dialog_add_title,label,Thêm thành viên,,none,modal,,,font-bold,Dialog header
+Teams & Personnel,input_full_name,input,,Nguyễn Văn A,type,modal,true,,border-slate-200,Member's full name
+Teams & Personnel,input_email,input,,a.nv@danang.gov.vn,type,modal,true,,border-slate-200,Email validation required
+Teams & Personnel,select_position,select,,Chọn chức danh,type,modal,true,,border-slate-200,Selector for POSITION_OPTIONS
+Teams & Personnel,btn_dialog_submit,button,Tạo thành viên,,submit,modal,,,bg-primary text-white,Submits member creation payload

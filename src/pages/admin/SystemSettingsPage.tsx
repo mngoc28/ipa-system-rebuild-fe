@@ -1,8 +1,16 @@
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, RefreshCcw, Save } from "lucide-react";
+import { RefreshCcw, Save } from "lucide-react";
 import { toast } from "sonner";
 import { systemSettingsApi, type SystemSettingItem } from "@/api/systemSettingsApi";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SelectField } from "@/components/ui/SelectField";
+
+const SMTP_SECURITY_OPTIONS = [
+  { label: "TLS", value: "TLS" },
+  { label: "SSL", value: "SSL" },
+  { label: "None", value: "None" },
+];
 
 type SystemSettingsForm = {
   smtpHost: string;
@@ -132,9 +140,13 @@ export default function SystemSettingsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Hệ thống & Tích hợp</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Hệ thống & Tích hợp</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Cấu hình SMTP, cổng kết nối API và branding hệ thống.</p>
-          {settingsQuery.isLoading && <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Đang tải cấu hình...</p>}
+          {settingsQuery.isLoading && (
+            <div className="mt-2">
+              <LoadingSpinner size={16} variant="small" label="Đang tải cấu hình..." />
+            </div>
+          )}
           {savedAt && <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-emerald-600">Đã lưu lúc {savedAt}</p>}
         </div>
         <div className="flex gap-2">
@@ -150,7 +162,7 @@ export default function SystemSettingsPage() {
             disabled={isBusy}
             className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {saveMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} LƯU THAY ĐỔI
+            {saveMutation.isPending ? <LoadingSpinner variant="small" className="text-white" /> : <Save size={14} />} LƯU THAY ĐỔI
           </button>
         </div>
       </div>
@@ -160,8 +172,9 @@ export default function SystemSettingsPage() {
           <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Mail Server (SMTP)</h3>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Host</label>
+              <label htmlFor="smtp-host" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Host</label>
               <input
+                id="smtp-host"
                 type="text"
                 value={form.smtpHost}
                 onChange={(e) => handleFieldChange("smtpHost", e.target.value)}
@@ -170,8 +183,9 @@ export default function SystemSettingsPage() {
             </div>
             <div className="flex gap-4">
               <div className="w-2/3">
-                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Port</label>
+                <label htmlFor="smtp-port" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Port</label>
                 <input
+                  id="smtp-port"
                   type="text"
                   value={form.smtpPort}
                   onChange={(e) => handleFieldChange("smtpPort", e.target.value)}
@@ -179,16 +193,14 @@ export default function SystemSettingsPage() {
                 />
               </div>
               <div className="w-1/3">
-                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Bảo mật</label>
-                <select
+                <label htmlFor="smtp-security" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Bảo mật</label>
+                <SelectField
+                  id="smtp-security"
                   value={form.smtpSecurity}
-                  onChange={(e) => handleFieldChange("smtpSecurity", e.target.value as SystemSettingsForm["smtpSecurity"])}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none focus:border-emerald-500 focus:bg-white"
-                >
-                  <option value="TLS">TLS</option>
-                  <option value="SSL">SSL</option>
-                  <option value="None">None</option>
-                </select>
+                  onValueChange={(v) => handleFieldChange("smtpSecurity", v as SystemSettingsForm["smtpSecurity"])}
+                  options={SMTP_SECURITY_OPTIONS}
+                  triggerClassName="focus:border-emerald-500"
+                />
               </div>
             </div>
           </div>
@@ -198,8 +210,9 @@ export default function SystemSettingsPage() {
           <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Kết nối Zalo ZNS</h3>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Zalo App ID</label>
+              <label htmlFor="zalo-appid" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Zalo App ID</label>
               <input
+                id="zalo-appid"
                 type="text"
                 value={form.zaloAppId}
                 onChange={(e) => handleFieldChange("zaloAppId", e.target.value)}
@@ -207,8 +220,9 @@ export default function SystemSettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Secret Key</label>
+              <label htmlFor="zalo-secret" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Secret Key</label>
               <input
+                id="zalo-secret"
                 type="password"
                 value={form.zaloSecret}
                 placeholder="Để trống nếu không thay đổi"
@@ -221,7 +235,7 @@ export default function SystemSettingsPage() {
               disabled={isBusy}
               className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-100 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {testMutation.isPending ? "Đang kiểm tra..." : "KIỂM TRA KẾT NỐI API"}
+              {testMutation.isPending ? <LoadingSpinner variant="small" label="Đang kiểm tra..." /> : "KIỂM TRA KẾT NỐI API"}
             </button>
             {zaloStatus === "ok" && <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Trạng thái API: Kết nối tốt</p>}
             {zaloStatus === "error" && <p className="text-[10px] font-black uppercase tracking-widest text-rose-600">Trạng thái API: Cần kiểm tra lại cấu hình</p>}

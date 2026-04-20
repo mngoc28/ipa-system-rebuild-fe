@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
-    <section className="relative flex min-h-[600px] lg:min-h-[85vh] items-center justify-center pt-20">
+    <section className="relative flex min-h-[600px] items-center justify-center pt-20 lg:min-h-[85vh]">
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1555921015-5532091f6026?q=80&w=2070&auto=format&fit=crop" 
           alt="Da Nang City" 
-          className="h-full w-full object-cover"
+          className="size-full object-cover"
         />
         <div className="absolute inset-0 bg-slate-900/70" />
       </div>

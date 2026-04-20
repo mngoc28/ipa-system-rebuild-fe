@@ -1,5 +1,6 @@
 import axiosClient from "@/api/axiosClient";
 import { ApiEnvelope, PaginatedData } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export interface PipelineProject {
   id: string;
@@ -56,35 +57,44 @@ export interface PipelineSummary {
   recentProjects: PipelineProject[];
 }
 
+/**
+ * Gets the base URL prefix based on the current user's role.
+ */
+const getPrefix = () => {
+  const role = useAuthStore.getState().user?.role || "staff";
+  const mappedRole = role.toLowerCase() === "admin" ? "director" : role.toLowerCase();
+  return `/api/v1/${mappedRole}/pipeline`;
+};
+
 export const pipelineApi = {
   summary: async () => {
-    const response = await axiosClient.get<ApiEnvelope<PipelineSummary>>("/api/v1/pipeline/summary");
+    const response = await axiosClient.get<ApiEnvelope<PipelineSummary>>(`${getPrefix()}/summary`);
     return response.data;
   },
   listProjects: async (query?: { stage_id?: string; delegation_id?: string; page?: number; per_page?: number }) => {
-    const response = await axiosClient.get<ApiEnvelope<PaginatedData<PipelineProject>>>("/api/v1/pipeline/projects", {
+    const response = await axiosClient.get<ApiEnvelope<PaginatedData<PipelineProject>>>(`${getPrefix()}/projects`, {
       params: query,
     });
     return response.data;
   },
   showProject: async (id: string) => {
-    const response = await axiosClient.get<ApiEnvelope<PipelineProject>>(`/api/v1/pipeline/projects/${id}`);
+    const response = await axiosClient.get<ApiEnvelope<PipelineProject>>(`${getPrefix()}/projects/${id}`);
     return response.data;
   },
   createProject: async (payload: Partial<PipelineProject>) => {
-    const response = await axiosClient.post<ApiEnvelope<PipelineProject>>("/api/v1/pipeline/projects", payload);
+    const response = await axiosClient.post<ApiEnvelope<PipelineProject>>(`${getPrefix()}/projects`, payload);
     return response.data;
   },
   updateProject: async (id: string, payload: Partial<PipelineProject>) => {
-    const response = await axiosClient.patch<ApiEnvelope<PipelineProject>>(`/api/v1/pipeline/projects/${id}`, payload);
+    const response = await axiosClient.patch<ApiEnvelope<PipelineProject>>(`${getPrefix()}/projects/${id}`, payload);
     return response.data;
   },
   deleteProject: async (id: string) => {
-    const response = await axiosClient.delete<ApiEnvelope<void>>(`/api/v1/pipeline/projects/${id}`);
+    const response = await axiosClient.delete<ApiEnvelope<void>>(`${getPrefix()}/projects/${id}`);
     return response.data;
   },
   patchStage: async (id: string, new_stage_id: string, reason?: string) => {
-    const response = await axiosClient.patch<ApiEnvelope<{ stage_id: string; changed_at: string }>>(`/api/v1/pipeline/projects/${id}/stage`, {
+    const response = await axiosClient.patch<ApiEnvelope<{ stage_id: string; changed_at: string }>>(`${getPrefix()}/projects/${id}/stage`, {
       new_stage_id,
       reason,
     });

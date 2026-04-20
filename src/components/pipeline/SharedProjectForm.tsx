@@ -42,16 +42,15 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
 }) => {
   const { data: currentUser } = useCurrentUserQuery();
   const [loading, setLoading] = React.useState(false);
-  const [countries, setCountries] = React.useState<any[]>([]);
-  const [sectors, setSectors] = React.useState<any[]>([]);
-  const [delegations, setDelegations] = React.useState<any[]>([]);
+  const [countries, setCountries] = React.useState<Array<{ id: string | number; code: string; name_vi: string }>>([]);
+  const [sectors, setSectors] = React.useState<Array<{ id: string | number; code: string; name_vi: string }>>([]);
+  const [delegations, setDelegations] = React.useState<Array<{ value: string | number; label: string }>>([]);
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-    reset,
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -79,13 +78,13 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
         setCountries(countryRes.data.items);
         setSectors(sectorRes.data.items);
         setDelegations(
-          delegationRes.data.data.map((d) => ({
+          (delegationRes.data.items || []).map((d: { id: string | number; code: string; name: string }) => ({
             value: d.id,
-            label: `${d.delegation_code} - ${d.delegation_name}`,
+            label: `${d.code} - ${d.name}`,
           }))
         );
-      } catch (error) {
-        console.error("Failed to fetch form data", error);
+      } catch {
+        console.error("Failed to fetch form data");
       }
     };
     fetchData();
@@ -105,7 +104,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
         toast.success("Tạo dự án mới thành công");
       }
       onSuccess();
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi, vui lòng thử lại");
     } finally {
       setLoading(false);
@@ -114,7 +113,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="project_name">Tên dự án *</Label>
           <Input id="project_name" {...register("project_name")} placeholder="Nhập tên dự án..." />
@@ -254,12 +253,12 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t">
+      <div className="flex justify-end gap-3 border-t pt-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           Hủy
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
           {initialData ? "Cập nhật" : "Tạo mới"}
         </Button>
       </div>

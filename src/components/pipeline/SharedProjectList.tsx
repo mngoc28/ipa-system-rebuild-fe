@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CircleDot, ExternalLink, MoreVertical, Edit, Trash2, Eye } from "lucide-react";
+import { CircleDot, ExternalLink, Edit, Trash2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { projectDataHelper } from "@/dataHelper/projects.dataHelper";
@@ -28,14 +28,14 @@ export const SharedProjectList: React.FC<SharedProjectListProps> = ({
           className="group flex flex-col justify-between gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-4 transition-all hover:border-primary/20 hover:bg-white hover:shadow-md md:flex-row md:items-center"
         >
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:text-primary group-hover:border-primary/20">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-primary/20 group-hover:text-primary">
               <CircleDot size={18} />
             </div>
             <div className="min-w-0">
-              <h4 className="text-sm font-bold text-slate-900 truncate transition-colors group-hover:text-primary">
+              <h4 className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-primary">
                 {project.project_name}
               </h4>
-              <div className="flex items-center gap-2 mt-0.5">
+              <div className="mt-0.5 flex items-center gap-2">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {project.country_id} | {project.project_code}
                 </span>
@@ -53,13 +53,13 @@ export const SharedProjectList: React.FC<SharedProjectListProps> = ({
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 md:flex-nowrap">
             <div className="text-right">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-tight">Giá trị</p>
+              <p className="text-[9px] font-black uppercase tracking-tight text-slate-400">Giá trị</p>
               <p className="text-sm font-black text-slate-900">
                 {projectDataHelper.formatVND(project.estimated_value)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-tight">Giai đoạn</p>
+              <p className="text-[9px] font-black uppercase tracking-tight text-slate-400">Giai đoạn</p>
               <button
                 onClick={() => onPatchStage?.(project.id, project.stage_id)}
                 className={cn(
@@ -72,12 +72,12 @@ export const SharedProjectList: React.FC<SharedProjectListProps> = ({
                 {projectDataHelper.getStageLabel(project.stage_id)}
               </button>
             </div>
-            <div className="hidden text-right sm:block min-w-[100px]">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-tight mb-1">
+            <div className="hidden min-w-[100px] text-right sm:block">
+              <p className="mb-1 text-[9px] font-black uppercase tracking-tight text-slate-400">
                 Xác suất thành công
               </p>
-              <div className="flex items-center gap-2 justify-end">
-                <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+              <div className="flex items-center justify-end gap-2">
+                <div className="h-1.5 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
                   <div
                     className="h-full rounded-full bg-emerald-500 transition-all duration-1000"
                     style={{ width: `${project.success_probability || 0}%` }}
@@ -90,22 +90,28 @@ export const SharedProjectList: React.FC<SharedProjectListProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 ml-4">
+            <div className="ml-4 flex items-center gap-2">
               <button
                 onClick={() => onView?.(project)}
-                className="p-1.5 text-slate-400 hover:text-primary transition-colors hover:bg-slate-100 rounded-md"
+                title={`Xem chi tiết ${project.project_name}`}
+                aria-label={`Xem chi tiết ${project.project_name}`}
+                className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-primary"
               >
                 <Eye size={16} />
               </button>
               <button
                 onClick={() => onEdit?.(project)}
-                className="p-1.5 text-slate-400 hover:text-amber-600 transition-colors hover:bg-slate-100 rounded-md"
+                title={`Chỉnh sửa ${project.project_name}`}
+                aria-label={`Chỉnh sửa ${project.project_name}`}
+                className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600"
               >
                 <Edit size={16} />
               </button>
               <button
                 onClick={() => onDelete?.(project)}
-                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors hover:bg-slate-100 rounded-md"
+                title={`Xóa ${project.project_name}`}
+                aria-label={`Xóa ${project.project_name}`}
+                className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-rose-600"
               >
                 <Trash2 size={16} />
               </button>
@@ -114,8 +120,8 @@ export const SharedProjectList: React.FC<SharedProjectListProps> = ({
         </div>
       ))}
       {projects.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
-          <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-20">
+          <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
             Chưa có dự án pipeline khớp bộ lọc
           </p>
         </div>

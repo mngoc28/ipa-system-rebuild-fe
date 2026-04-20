@@ -1,4 +1,4 @@
-import { forwardRef, HTMLAttributes, TextareaHTMLAttributes } from "react";
+import { forwardRef, TextareaHTMLAttributes } from "react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 type PlainTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { disableResize?: boolean };

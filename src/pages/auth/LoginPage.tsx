@@ -6,16 +6,19 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/hooks/useAuthQuery";
 import { getLoginRedirectPath } from "@/lib/routeHelpers";
-import { setAccessToken } from "@/utils/storage";
+import { setAccessToken, setRefreshToken } from "@/utils/storage";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [isVneidLoading, setIsVneidLoading] = useState(false);
+  const [showForgotForm, setShowForgotForm] = useState(false);
+  const [forgotValue, setForgotValue] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuthStore();
   const navigate = useNavigate();
-  const isDev = import.meta.env.DEV;
   const loginMutation = useLoginMutation();
 
   const mapRole = (roles: string[]): UserRole => {
@@ -42,18 +45,21 @@ export default function LoginPage() {
       });
 
       const payload = result.data;
-      const role = mapRole(payload.user.roles || []);
+      const role = mapRole(payload.user.role_codes || []);
       const normalizedUser = {
         id: payload.user.id,
         username: username.trim().toLowerCase(),
-        fullName: payload.user.fullName,
+        fullName: payload.user.full_name || payload.user.fullName || "",
         email: payload.user.email,
         role,
-        unit: payload.user.unit?.id,
-        permissions: payload.user.permissions || [],
+        unit: payload.user.unit?.unit_name || payload.user.unit?.name || "",
+        avatar: payload.user.avatar_url || payload.user.avatar || "",
+        phone: payload.user.phone || "",
+        permissions: payload.user.permission_codes || [],
       };
 
       setAccessToken(payload.accessToken);
+      setRefreshToken(payload.refreshToken);
       login(normalizedUser, payload.accessToken);
       toast.success(`Đăng nhập thành công với quyền ${role}!`);
       navigate(getLoginRedirectPath(role), { replace: true });
@@ -64,33 +70,40 @@ export default function LoginPage() {
     }
   };
 
-  const handleMockLogin = (role: UserRole, fullName: string) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const mockUser = {
-        id: Math.random().toString(36).substr(2, 9),
-        username: role.toLowerCase(),
-        fullName,
-        email: `${role.toLowerCase()}@danang.gov.vn`,
-        role: role,
-        unit: "IPA Đà Nẵng",
-      };
-      login(mockUser, "mock-jwt-token-xyz");
-      setIsLoading(false);
-      toast.success(`Đăng nhập bằng quyền ${role} thành công!`);
-      navigate(getLoginRedirectPath(role), { replace: true });
-    }, 800);
-  };
 
   const isSubmitting = loginMutation.isPending || isLoading;
 
+  const handleForgotPassword = async () => {
+    const emailOrUsername = forgotValue.trim();
+    if (!emailOrUsername) {
+      toast.error("Vui lòng nhập email hoặc tên đăng nhập để nhận hướng dẫn đặt lại mật khẩu.");
+      return;
+    }
+
+    setIsSendingReset(true);
+    window.setTimeout(() => {
+      setIsSendingReset(false);
+      toast.success(`Đã gửi hướng dẫn đặt lại mật khẩu tới tài khoản ${emailOrUsername}.`);
+      setShowForgotForm(false);
+      setForgotValue("");
+    }, 800);
+  };
+
+  const handleVneidLogin = () => {
+    setIsVneidLoading(true);
+    window.setTimeout(() => {
+      setIsVneidLoading(false);
+      toast.info("Tính năng đăng nhập VNeID đang trong giai đoạn tích hợp với cổng SSO. Vui lòng dùng đăng nhập tài khoản nội bộ.");
+    }, 700);
+  };
+
   return (
-    <main className="flex min-h-screen bg-slate-50 font-sans antialiased overflow-hidden">
+    <main className="flex min-h-screen overflow-hidden bg-slate-50 font-sans antialiased">
       {/* Left Column: Branding (45%) */}
-      <section className="hidden lg:flex lg:w-[45%] relative items-center justify-center overflow-hidden">
+      <section className="relative hidden items-center justify-center overflow-hidden lg:flex lg:w-[45%]">
         <div className="absolute inset-0 z-0">
           <img 
-            className="w-full h-full object-cover brightness-50 contrast-125" 
+            className="size-full object-cover brightness-50 contrast-125" 
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdvmaQVFgFiYfS03odpVko0lSI8HS3ffl5sxvKJGDEe8uLq7p2eV_CquvvvmJYbHqHR09I_2fwkczFcmQyuu4yhoGBaOYM3HZz_50QIq7Lq8S6jjUy4QWtPLTkyWEetaOLTId-ShTFh0B_dQvLndVEwd1tqiTOkVNLDml0dU10NclFPQjoHpZ_dyYAB2hpbhFB3N4HmSVynGEnKApctxlYUPiO0OTnL33R3C_832kvEiQtK4Ssato8OwHEmrunQoicP4gBk6t0a00"
             alt="Da Nang Skyline"
           />
@@ -98,52 +111,52 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-tr from-[#003fb1]/90 to-[#003fb1]/40 mix-blend-multiply"></div>
         </div>
 
-        <div className="relative z-10 w-full px-16 space-y-12">
+        <div className="relative z-10 w-full space-y-12 px-16">
           {/* Government Logo Container */}
           <div className="flex items-center space-x-6">
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center p-2 ring-1 ring-white/20">
+            <div className="flex size-20 items-center justify-center rounded-full bg-white/10 p-2 ring-1 ring-white/20 backdrop-blur-md">
               <img 
-                className="w-14 h-14 object-contain" 
+                className="size-14 object-contain" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA78iF6rVKRwAlnSpF-nsDDtPdwxd3iLf8ia10TYNd6CovRi9ziKmTSgaJPXQ5wnihvrWQljSiraLcJL2HVitPrVbDs4VDN14hJyUkPIA-hLA2oMkRmQLNAjGLRN_z1bmM6YSJNacswUUGclhIzKI-LWqVZ8whVEHyM2pmoNPd7vAr6ctf6lQVE9p1IA_LRppuK9gD_MVpsJsy22oU3P-x8H7v60RnXSHlAK3Hd8JT1K6LjKBcUCeroLHDMtrg8tNB_RDp1pEh3B3Q" 
                 alt="Emblem of Vietnam" 
               />
             </div>
-            <div className="text-white border-l border-white/20 pl-6">
-              <p className="font-bold text-lg leading-tight uppercase tracking-tight">ỦY BAN NHÂN DÂN</p>
-              <p className="font-black text-2xl tracking-tight uppercase">THÀNH PHỐ ĐÀ NẴNG</p>
+            <div className="border-l border-white/20 pl-6 text-white">
+              <p className="text-lg font-bold uppercase leading-tight tracking-tight">ỦY BAN NHÂN DÂN</p>
+              <p className="text-2xl font-black uppercase tracking-tight">THÀNH PHỐ ĐÀ NẴNG</p>
             </div>
           </div>
 
           {/* Strategic Messaging */}
           <div className="space-y-6">
-            <h1 className="font-title font-black text-5xl text-white leading-tight tracking-tight drop-shadow-sm uppercase">
+            <h1 className="font-title text-5xl font-black uppercase leading-tight tracking-tight text-white drop-shadow-sm">
               Hệ thống Quản lý <br/>Xúc tiến Đầu tư
             </h1>
             <div className="h-1 w-24 bg-emerald-400"></div>
-            <p className="text-blue-100 text-xl font-light tracking-wide italic">
+            <p className="text-xl font-light italic tracking-wide text-blue-100">
               "Nâng tầm đầu tư, phát triển bền vững"
             </p>
           </div>
 
           {/* Institutional Trust Badges */}
-          <div className="pt-8 flex gap-8 border-t border-white/10">
+          <div className="flex gap-8 border-t border-white/10 pt-8">
             <div>
-              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-1">Cơ quan thực hiện</p>
-              <p className="text-white font-bold text-sm">IPA Đà Nẵng</p>
+              <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-white/60">Cơ quan thực hiện</p>
+              <p className="text-sm font-bold text-white">IPA Đà Nẵng</p>
             </div>
             <div>
-              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-1">Phiên bản</p>
-              <p className="text-white font-bold text-sm tracking-widest uppercase">v2.4.0 High-Level</p>
+              <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-white/60">Phiên bản</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-white">v2.4.0 High-Level</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Right Column: Login Form (55%) */}
-      <section className="w-full lg:w-[55%] flex flex-col items-center justify-center px-6 lg:px-24 bg-[#f9f9ff] relative">
+      <section className="relative flex w-full flex-col items-center justify-center bg-[#f9f9ff] px-6 lg:w-[55%] lg:px-24">
         {/* Language Selector Sticky Corner */}
-        <div className="absolute top-8 right-8 flex items-center space-x-4">
-          <button className="flex items-center space-x-2 text-slate-500 hover:text-[#003fb1] transition-colors text-xs font-bold uppercase tracking-widest">
+        <div className="absolute right-8 top-8 flex items-center space-x-4">
+          <button className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-[#003fb1]">
             <Globe className="text-sm" size={16} />
             <span>Tiếng Việt</span>
             <ChevronDown size={14} />
@@ -152,28 +165,29 @@ export default function LoginPage() {
 
         {/* Login Card Container */}
         <div className="w-full max-w-md">
-          <div className="text-center lg:text-left mb-10">
-            <h2 className="font-title font-black text-3xl text-slate-900 mb-2">Chào mừng trở lại</h2>
-            <p className="text-slate-500 text-sm font-medium">Vui lòng đăng nhập để truy cập hệ thống quản lý.</p>
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="mb-2 font-title text-3xl font-black text-slate-900">Chào mừng trở lại</h2>
+            <p className="text-sm font-medium text-slate-500">Vui lòng đăng nhập để truy cập hệ thống quản lý.</p>
           </div>
 
-          <div className="bg-white rounded-[1.25rem] p-10 border border-slate-100 shadow-[0_20px_50px_rgba(18,28,42,0.05)] relative overflow-hidden group/card transition-all">
-            <form onSubmit={handleLogin} className="space-y-6 relative z-10">
+          <div className="group/card relative overflow-hidden rounded-[1.25rem] border border-slate-100 bg-white p-10 shadow-[0_20px_50px_rgba(18,28,42,0.05)] transition-all">
+            <form onSubmit={handleLogin} className="relative z-10 space-y-6">
               {/* Username Field */}
               <div className="space-y-2">
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1" htmlFor="username">Tên đăng nhập</label>
-                <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-300 group-focus-within:text-[#003fb1] transition-colors">
+                <label className="ml-1 block text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="username">Tên đăng nhập</label>
+                <div className="group relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-300 transition-colors group-focus-within:text-[#003fb1]">
                     <User size={18} />
                   </span>
                   <input 
-                    className="block w-full pl-12 pr-4 py-4 bg-[#eff3ff] border-none rounded-xl text-slate-900 placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20 transition-all outline-none text-sm font-medium" 
+                    className="block w-full rounded-xl border-none bg-[#eff3ff] py-4 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20" 
                     id="username" 
                     name="username" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Nhập email hoặc tên người dùng" 
                     type="text"
+                    autoComplete="username"
                     required
                   />
                 </div>
@@ -181,27 +195,39 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <div className="flex justify-between items-center px-1">
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest" htmlFor="password">Mật khẩu</label>
-                  <button type="button" className="text-[10px] font-black text-[#003fb1] hover:underline transition-colors uppercase tracking-widest">Quên mật khẩu?</button>
+                <div className="flex items-center justify-between px-1">
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="password">Mật khẩu</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotForm((prev) => !prev);
+                      setForgotValue(username.trim());
+                    }}
+                    className="text-[10px] font-black uppercase tracking-widest text-[#003fb1] transition-colors hover:underline"
+                  >
+                    Quên mật khẩu?
+                  </button>
                 </div>
-                <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-300 group-focus-within:text-[#003fb1] transition-colors">
+                <div className="group relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-300 transition-colors group-focus-within:text-[#003fb1]">
                     <Lock size={18} />
                   </span>
                   <input 
-                    className="block w-full pl-12 pr-12 py-4 bg-[#eff3ff] border-none rounded-xl text-slate-900 placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20 transition-all outline-none text-sm font-medium" 
+                    className="block w-full rounded-xl border-none bg-[#eff3ff] px-12 py-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20" 
                     id="password" 
                     name="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••" 
                     type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
                     required
                   />
                   <button 
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-[#003fb1] transition-colors" 
+                    title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition-colors hover:text-[#003fb1]" 
                     type="button"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -210,10 +236,39 @@ export default function LoginPage() {
               </div>
 
               {/* Remember Me */}
-              <div className="flex items-center space-x-3 ml-1">
-                <input className="w-4 h-4 rounded-md border-slate-200 text-[#003fb1] focus:ring-[#003fb1]/20 cursor-pointer" id="remember" type="checkbox"/>
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer select-none" htmlFor="remember">Ghi nhớ đăng nhập</label>
+              <div className="ml-1 flex items-center space-x-3">
+                <input className="size-4 cursor-pointer rounded-md border-slate-200 text-[#003fb1] focus:ring-[#003fb1]/20" id="remember" name="remember" type="checkbox"/>
+                <label className="cursor-pointer select-none text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="remember">Ghi nhớ đăng nhập</label>
               </div>
+
+              {showForgotForm && (
+                <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Khôi phục mật khẩu</p>
+                  <input
+                    value={forgotValue}
+                    onChange={(event) => setForgotValue(event.target.value)}
+                    placeholder="Nhập email hoặc tên đăng nhập"
+                    className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none focus:border-[#003fb1] focus:ring-2 focus:ring-[#003fb1]/20"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      disabled={isSendingReset}
+                      className="rounded-lg bg-[#003fb1] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                    >
+                      {isSendingReset ? "Đang gửi..." : "Gửi hướng dẫn"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotForm(false)}
+                      className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Login Button */}
               <button 
@@ -224,7 +279,7 @@ export default function LoginPage() {
                 type="submit"
                 disabled={isSubmitting}
               >
-                {isSubmitting && <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
+                {isSubmitting && <div className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
                 {isSubmitting ? "Đang xác thực..." : "Đăng nhập"}
               </button>
 
@@ -240,67 +295,37 @@ export default function LoginPage() {
 
               {/* VNeID Integration */}
               <button 
-                className="w-full flex items-center justify-center space-x-3 bg-white border-2 border-slate-50 text-[#003fb1] font-bold py-4 rounded-xl hover:bg-slate-50 active:scale-[0.98] transition-all group/vneid" 
+                onClick={handleVneidLogin}
+                className="group/vneid flex w-full items-center justify-center space-x-3 rounded-xl border-2 border-slate-50 bg-white py-4 font-bold text-[#003fb1] transition-all hover:bg-slate-50 active:scale-[0.98]" 
                 type="button"
+                disabled={isVneidLoading}
               >
                 <img 
-                  className="w-6 h-6 object-contain grayscale group-hover/vneid:grayscale-0 transition-all duration-500" 
+                  className="size-6 object-contain grayscale transition-all duration-500 group-hover/vneid:grayscale-0" 
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJSn_CEWm46o4BCymNR0Nc9L6fddl3y6khHQm1mwbDCJRBdd9Eh2darg2fr5v8UUYUh-JyyjNjTRC9vV3mg80UAze-UzHLTzYNabKjoIwJjh3TYYBUtyaFF7sC_Q54NhHsMnQZ4wW4by3RvjVWLknv5ZCLwpGsHRLubgzbIZWecaIH7FhJq9xWnF7UITTGoQJ29RjLj3TGFEuSaDLP1LPmgsAHf5INSdaeF3g1xW8W9tBLDFE2nbVmLCdO07JnYSbKvM71Kk8hWHs" 
                   alt="VNeID Logo" 
                 />
-                <span className="text-[11px] uppercase font-black tracking-widest text-slate-600 group-hover/vneid:text-[#003fb1] transition-colors">Đăng nhập bằng VNeID</span>
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 transition-colors group-hover/vneid:text-[#003fb1]">
+                  {isVneidLoading ? "Đang khởi tạo VNeID..." : "Đăng nhập bằng VNeID"}
+                </span>
               </button>
 
-              {isDev && <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Đăng nhập nhanh (Mock QA)</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleMockLogin("Staff", "Trần Thu Hà")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:border-primary/30 hover:text-primary"
-                  >
-                    Staff
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMockLogin("Manager", "Nguyễn Minh Châu")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:border-primary/30 hover:text-primary"
-                  >
-                    Manager
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMockLogin("Director", "Hồ Kỳ Minh")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:border-primary/30 hover:text-primary"
-                  >
-                    Director
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMockLogin("Admin", "Nguyễn Văn Quản Trị")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:border-primary/30 hover:text-primary"
-                  >
-                    Admin
-                  </button>
-                </div>
-                <p className="text-[10px] font-semibold text-slate-400">Tài khoản nhập tay: staff, manager, director, admin (mật khẩu bất kỳ).</p>
-              </div>}
             </form>
           </div>
 
           {/* Footer Text */}
-          <div className="mt-12 text-center space-y-2">
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em] leading-relaxed">
+          <div className="mt-12 space-y-2 text-center">
+            <p className="text-[9px] font-bold uppercase leading-relaxed tracking-widest text-slate-400">
               Bản quyền © 2024 Ban Xúc tiến và Hỗ trợ đầu tư Đà Nẵng (IPA Đà Nẵng).
             </p>
-            <p className="text-[8px] text-slate-300 uppercase tracking-[0.3em] font-medium">
+            <p className="text-[8px] font-medium uppercase tracking-[0.3em] text-slate-300">
               Trung tâm Phát triển hạ tầng CNTT - Sở TT&TT
             </p>
           </div>
         </div>
 
         {/* Floating Decoration */}
-        <div className="absolute bottom-[-100px] left-[-100px] w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="pointer-events-none absolute bottom-[-100px] left-[-100px] size-64 rounded-full bg-blue-500/5 blur-3xl"></div>
       </section>
     </main>
   );

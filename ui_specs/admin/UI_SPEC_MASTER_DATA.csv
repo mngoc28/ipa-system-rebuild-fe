@@ -1,0 +1,18 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Master Data,page_title,label,Danh mục hệ thống,,none,header,,,font-title text-2xl font-black uppercase,Metadata configuration root
+Master Data,category_list,list,countries; delegation-types; priorities; event-types,,click,left,,,rounded-xl border border-slate-200,Sidebar for switching domains
+Master Data,btn_request_it,button,GỬI YÊU CẦU IT,,click,left,,,bg-white/5 border-white/10,Triggers informational toast
+Master Data,search_input,input,,Tìm kiếm bản ghi...,type,center,false,,border-slate-200 shadow-sm,Filters metadata table by name or code
+Master Data,btn_add_record,button,THÊM MỚI BẢN GHI,,click,center,,,bg-primary text-white font-black,Opens creation dialog
+Master Data,data_table,table,,,[none],center,,,w-full text-left,Grid showing attribute name; key; and status
+Master Data,btn_edit_record,button,,Chỉnh sửa [name],click,center,,,text-slate-400 hover:text-primary,Opens edit dialog
+Master Data,btn_delete_record,button,,Xóa [name],click,center,,,text-slate-400 hover:text-rose-600,Opens deletion confirmation
+Master Data,pagination_prev,button,Trang trước,,click,center,,,border-slate-200 bg-white,Navigate to previous metadata page
+Master Data,pagination_next,button,Trang kế,,click,center,,,border-slate-200 bg-white,Navigate to next metadata page
+Master Data,dialog_create_title,label,Thêm bản ghi mới,,none,modal,,,font-bold,Dialog header
+Master Data,input_code,input,,COUNTRIES_5,type,modal,true,,border-slate-200,Unique key for entry
+Master Data,select_is_active,select,,Hoạt động,type,modal,true,,border-slate-200,Record availability toggle
+Master Data,input_name_vi,input,,Tên bản ghi,type,modal,true,,border-slate-200,Vietnamese display label
+Master Data,input_name_en,input,,Record name,type,modal,false,,border-slate-200,English display label
+Master Data,input_sort_order,input,,Thứ tự hiển thị,type,modal,true,numeric,border-slate-200,Controls display sequence
+Master Data,btn_dialog_save,button,Tạo bản ghi,,submit,modal,,,bg-primary text-white,Submits creation/update payload

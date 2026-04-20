@@ -1,0 +1,17 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Manager Dashboard,welcome_heading,label,"Quản lý đơn vị, [name]",,none,header,,,font-title text-3xl font-black uppercase,Greeting with user's full name
+Manager Dashboard,quick_search,input,,Tìm nhanh đoàn; tài liệu; đối tác...,type,header,false,,w-72 border-slate-200 text-[11px] font-bold,Global search for resources
+Manager Dashboard,quick_report_btn,button,BÁO CÁO NHANH,,navigate,header,,,bg-slate-950 text-white font-black,Navigates to /reports/unit
+Manager Dashboard,stat_partners,card,Đối tác trọng điểm,,none,center,,,text-blue-600 border-blue-100,Shows city.partners metric
+Manager Dashboard,stat_pipeline,card,Pipeline đang mở,,none,center,,,text-emerald-600 border-emerald-100,Shows city.pipelineProjects metric
+Manager Dashboard,stat_delegations,card,Đoàn công tác,,none,center,,,text-rose-600 border-rose-100,Shows city.activeDelegations metric
+Manager Dashboard,stat_events,card,Sự kiện sắp tới,,none,center,,,text-amber-600 border-amber-100,Shows city.upcomingEvents metric
+Manager Dashboard,task_feed_title,label,Đầu việc trọng tâm & Khẩn cấp,,none,left,,,font-title text-base font-black,Section header for task list
+Manager Dashboard,view_all_tasks_btn,link,XEM TẤT CẢ,,navigate,left,,,text-[10px] font-black text-primary,Navigates to /tasks
+Manager Dashboard,task_item,card,,,[click],left,,,border-slate-100 transition-all,Interactive task items with priority badges
+Manager Dashboard,high_priority_badge,badge,urgent,,none,left,,,bg-rose-500 text-white,Visual indicator for urgent tasks
+Manager Dashboard,highlight_card_delegation,card,QUẢN LÝ ĐOÀN,,navigate,right,,,bg-slate-900 text-white,Shortcut to delegations with progress bar
+Manager Dashboard,highlight_card_apac,card,XEM LỊCH TRÌNH,,navigate,right,,,bg-primary text-white,Shortcut to APAC ICT Summit schedule
+Manager Dashboard,timeline_title,label,SỰ KIỆN TRONG NGÀY,,none,right,,,text-xs font-black text-slate-900,Sidebar events heading
+Manager Dashboard,view_weekly_btn,button,XEM TOÀN BỘ LỊCH TUẦN,,navigate,right,,,bg-slate-50 border-slate-200,Navigates to /schedule
+Manager Dashboard,notification_teaser,card,THÔNG BÁO MỚI,,navigate,right,,,bg-slate-950 text-white shadow-2xl,Quick view of latest notification

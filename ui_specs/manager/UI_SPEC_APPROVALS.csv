@@ -1,0 +1,16 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Approvals,page_title,label,Danh sách Phê duyệt,,none,header,,,font-title text-2xl font-black uppercase,Main module heading
+Approvals,tab_pending,button,"Chờ duyệt ([count])",,filter,header,,,border-primary bg-primary/5,Active tab for pending requests
+Approvals,tab_processed,button,"Đã xử lý",,filter,header,,,border-slate-200 text-slate-500,Tab for past decisions
+Approvals,search_input,input,,Kiểm tra mã hồ sơ; đối tác...,type,center,false,,border-slate-200 text-xs font-medium,Filters approval list
+Approvals,approval_card,card,,,[click],center,,,border-slate-200 hover:shadow-lg,Individual approval request item
+Approvals,type_badge,badge,,,[none],center,,,bg-blue-50 text-blue-600,Indicates if request is Delegation; Task; or Document
+Approvals,priority_indicator,label,,,[none],center,,,text-rose-500 font-bold,Visible for 'high' priority requests
+Approvals,btn_view_detail,button,Xem Chi tiết,,navigate,center,,,bg-slate-900 text-white,Opens side panel or navigates to detail
+Approvals,btn_quick_approve,button,Phê duyệt nhanh,,submit,center,,,bg-emerald-600 text-white,Quick action for simple approvals
+Approvals,btn_quick_reject,button,Từ chối,,submit,center,,,bg-rose-600 text-white,Quick action for rejections
+Approvals,side_panel_title,label,Chi tiết Phê duyệt,,none,right,,,font-bold text-slate-900,Detail panel header
+Approvals,history_timeline,list,Lịch sử xử lý,,none,right,,,space-y-4 border-l,Shows previous steps in workflow
+Approvals,comment_box,input,,Nhập lý do phê duyệt/từ chối...,type,right,false,,border-slate-200 text-sm,Required for rejections
+Approvals,btn_panel_approve,button,PHÊ DUYỆT,,submit,right,,,bg-emerald-600 font-black,Final approval button in panel
+Approvals,btn_panel_reject,button,TỪ CHỐI,,submit,right,,,bg-rose-600 font-black,Final rejection button in panel

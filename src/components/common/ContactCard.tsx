@@ -13,11 +13,11 @@ const ContactCard: React.FC<ContactCardProps> = ({
 }) => {
   return (
     <div className={cn("flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md", className)}>
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 overflow-hidden">
+      <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400">
         {avatar ? (
-          <img src={avatar} alt={name} className="h-full w-full object-cover" />
+          <img src={avatar} alt={name} className="size-full object-cover" />
         ) : (
-          <User className="h-6 w-6" />
+          <User className="size-6" />
         )}
       </div>
       <div className="flex-1 space-y-2 overflow-hidden">
@@ -28,13 +28,13 @@ const ContactCard: React.FC<ContactCardProps> = ({
         <div className="space-y-1">
           {email && (
             <div className="flex items-center gap-2 text-xs text-slate-600">
-              <Mail className="h-3 w-3" />
+              <Mail className="size-3" />
               <span className="truncate">{email}</span>
             </div>
           )}
           {phone && (
             <div className="flex items-center gap-2 text-xs text-slate-600">
-              <Phone className="h-3 w-3" />
+              <Phone className="size-3" />
               <span className="truncate">{phone}</span>
             </div>
           )}

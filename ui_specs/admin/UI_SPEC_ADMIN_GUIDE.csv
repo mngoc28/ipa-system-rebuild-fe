@@ -1,0 +1,13 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Admin Guide,page_title,label,Hướng dẫn Quản trị,,none,header,,,font-title text-3xl font-black uppercase,Administrative operational handbook
+Admin Guide,btn_back,button,Quay lại Quản lý,,click,header,,,text-slate-500 hover:text-primary,Returns to Announcements page
+Admin Guide,nav_sidebar,list,Mục lục hướng dẫn,,click,left,,,sticky top-24,Smooth-scroll navigation to sections
+Admin Guide,section_dashboard,section,Dashboard & Chỉ số,,none,center,,,text-xl font-black uppercase,Infrastructure metrics documentation
+Admin Guide,card_online_users,card,Người dùng Online,,none,center,,,border-slate-100 bg-white,Explains online session tracking
+Admin Guide,card_storage_usage,card,Dung lượng lưu trữ,,none,center,,,border-slate-100 bg-white,Explains storage limit monitoring
+Admin Guide,section_announcements,section,Quản lý Thông báo,,none,center,,,text-xl font-black uppercase,Notification CRUD instructions
+Admin Guide,instruction_steps,list,Các bước thực hiện,,none,center,,,bg-slate-50 rounded-xl,Numbered workflow for creating notifications
+Admin Guide,section_visibility,section,Cài đặt Thời gian hiển thị,,none,center,,,text-xl font-black uppercase,Date-based logic documentation
+Admin Guide,alert_note,badge,Lưu ý thời gian,,none,center,,,bg-amber-50 text-amber-700,Critical manual override information
+Admin Guide,section_best_practices,section,Lưu ý vận hành an toàn,,none,center,,,bg-slate-900 text-slate-300,Compliance and etiquette rules
+Admin Guide,card_refresh_data,card,Làm mới dữ liệu,,none,center,,,text-white font-bold,Instruction on manual data refreshing

@@ -10,13 +10,22 @@ export interface JwtPayload {
 
 export interface AuthUser {
   id: string;
-  fullName: string;
+  username?: string;
+  fullName?: string;
+  full_name?: string; // Support snake_case from API
   email: string;
-  roles: string[];
-  permissions: string[];
-  unit?: { id: string };
-  status?: string;
+  phone?: string;
+  role_codes: string[];
+  permission_codes: string[];
+  unit?: { 
+    id: string | number;
+    unit_name?: string;
+    name?: string;
+  };
+  status?: string | number;
   locked?: boolean;
+  avatar_url?: string;
+  avatar?: string;
 }
 
 export interface LoginPayload {

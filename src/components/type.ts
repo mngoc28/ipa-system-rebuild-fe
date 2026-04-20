@@ -44,6 +44,8 @@ export interface LoadingProps {
   size?: "small" | "medium" | "large";
 }
 
+export type TranslationOptions = Record<string, unknown>;
+
 export interface SearchableSelectOption {
   value: string | number;
   label?: string;
@@ -68,12 +70,12 @@ export interface SearchableSelectProps {
 }
 
 export interface PropsInput {
-  value: any;
-  onChange: (value: any) => void;
+  value?: string | number | readonly string[] | null;
+  onChange?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type StatusType = "pending" | "approved" | "rejected" | "processing" | "completed" | "cancelled";

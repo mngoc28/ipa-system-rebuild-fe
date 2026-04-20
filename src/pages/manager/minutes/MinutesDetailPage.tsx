@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 import { minutesAttachments, minutesTasks } from "@/dataHelper/minutesDetail.dataHelper";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function MinutesDetailPage() {
   const queryClient = useQueryClient();
@@ -71,7 +72,11 @@ export default function MinutesDetailPage() {
   });
 
   if (detailQuery.isLoading) {
-    return <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">Đang tải biên bản...</div>;
+    return (
+      <div className="rounded-3xl border border-slate-200 bg-white p-12 text-sm font-semibold text-slate-500">
+        <LoadingSpinner label="Đang tải chi tiết biên bản..." />
+      </div>
+    );
   }
 
   if (detailQuery.isError || !detailData) {
@@ -337,7 +342,7 @@ export default function MinutesDetailPage() {
                   {comments.length === 0 ? <p className="text-xs font-semibold text-slate-500">Chưa có phản hồi nào.</p> : null}
                   {comments.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-slate-900">Người dùng</span>

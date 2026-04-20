@@ -17,6 +17,10 @@ export const authApi = {
     const response = await axiosClient.get<ApiEnvelope<AuthUser>>("/api/v1/auth/me");
     return response.data;
   },
+  logout: async () => {
+    const response = await axiosClient.post<ApiEnvelope<null>>("/api/v1/auth/logout");
+    return response.data;
+  },
   changePasswordFirstTime: async (payload: ChangePasswordFirstTimePayload) => {
     const response = await axiosClient.post<ApiEnvelope<{ changed: boolean }>>("/api/v1/auth/change-password-first-time", payload);
     return response.data;

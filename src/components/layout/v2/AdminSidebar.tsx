@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useState, ElementType } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { ElementType } from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -26,39 +26,48 @@ const adminMenuItems: MenuItem[] = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Định danh & Phân quyền", path: "/admin/users", icon: Users },
   { title: "Master Data", path: "/admin/master-data", icon: Server },
-  { title: "Cấu hình hệ thống", path: "/admin/system", icon: Settings },
+  { title: "Thông báo & Vận hành", path: "/admin/announcements", icon: Settings },
   { title: "Audit Log", path: "/admin/audit-log", icon: ShieldCheck },
 ];
 
 interface AdminSidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSidebarProps) {
+export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: AdminSidebarProps) {
   const { user, logout } = useAuthStore();
-  const location = useLocation();
 
   return (
-    <aside className={cn("fixed left-0 top-0 z-50 flex h-screen flex-col bg-slate-950 text-white transition-all duration-300 shadow-2xl shadow-black/20", isCollapsed ? "w-16" : "w-[240px]")}>
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-50 flex h-screen flex-col bg-slate-950 text-white shadow-2xl shadow-black/20",
+        "w-[240px] transition-transform duration-300 lg:transition-all",
+        isCollapsed ? "lg:w-16" : "lg:w-[240px]",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+      )}
+    >
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center overflow-hidden border-b border-white/5 px-4 bg-black/10">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-lg shadow-emerald-600/20">
+      <div className="flex h-16 shrink-0 items-center overflow-hidden border-b border-white/5 bg-black/10 px-4">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 shadow-lg shadow-emerald-600/20">
           <ShieldCheck size={16} className="text-white" />
         </div>
-        {!isCollapsed && <span className="ml-3 whitespace-nowrap font-title text-sm font-black tracking-widest text-emerald-400 uppercase">SYS_ADMIN</span>}
+        {!isCollapsed && <span className="ml-3 whitespace-nowrap font-title text-sm font-black uppercase tracking-widest text-emerald-400">SYS_ADMIN</span>}
       </div>
 
       {/* Navigation */}
       <nav className="scrollbar-hide flex-1 overflow-y-auto px-3 py-6">
         <div className="mb-4 px-2">
-           {!isCollapsed && <p className="text-[10px] font-black tracking-widest text-slate-500 uppercase">Bảng điều khiển</p>}
+           {!isCollapsed && <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bảng điều khiển</p>}
         </div>
         <ul className="space-y-1.5">
           {adminMenuItems.map((item) => (
             <li key={item.path}>
               <NavLink
                 to={item.path}
+                onClick={onMobileClose}
                 className={({ isActive }) => cn(
                   "group relative flex h-10 items-center rounded-lg px-3 transition-all duration-200", 
                   isActive 
@@ -67,7 +76,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
                 )}
               >
                 <item.icon size={18} className={cn("shrink-0 transition-transform group-hover:scale-110")} />
-                {!isCollapsed && <span className="ml-3 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-bold uppercase tracking-wider">{item.title}</span>}
+                {!isCollapsed && <span className="ml-3 truncate text-xs font-bold uppercase tracking-wider">{item.title}</span>}
 
                 {/* Tooltip on collapsed */}
                 {isCollapsed && (
@@ -80,15 +89,16 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
           ))}
         </ul>
 
-        <div className="mt-8 mb-4 px-2 border-t border-white/10 pt-4">
+        <div className="mb-4 mt-8 border-t border-white/10 px-2 pt-4">
            <NavLink
               to="/dashboard"
+              onClick={onMobileClose}
               className={cn(
                 "group relative flex h-10 items-center rounded-lg px-3 transition-all duration-200 text-amber-400 hover:bg-amber-400/10 hover:text-amber-300"
               )}
             >
               <ArrowLeft size={18} className={cn("shrink-0 transition-transform group-hover:-translate-x-1")} />
-              {!isCollapsed && <span className="ml-3 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-black uppercase tracking-wider">THOÁT ADMIN</span>}
+              {!isCollapsed && <span className="ml-3 truncate text-xs font-black uppercase tracking-wider">THOÁT ADMIN</span>}
               {isCollapsed && (
                   <div className="invisible absolute left-14 z-50 whitespace-nowrap rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 transition-all group-hover:visible group-hover:opacity-100">
                     Thoát Admin
@@ -101,8 +111,8 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
       {/* Bottom Profile */}
       <div className="space-y-1 border-t border-white/10 bg-slate-900/50 p-2">
         <div className={cn("flex h-12 items-center rounded-md px-2", isCollapsed ? "justify-center" : "")}>
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-emerald-500/50 bg-slate-800 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-            {user?.avatar ? <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" /> : <UserCircle size={20} className="text-emerald-400" />}
+          <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-emerald-500/50 bg-slate-800 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+            {user?.avatar ? <img src={user.avatar} alt="Avatar" className="size-full object-cover" /> : <UserCircle size={20} className="text-emerald-400" />}
           </div>
           {!isCollapsed && (
             <div className="ml-3 overflow-hidden">
@@ -113,7 +123,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
         </div>
 
         <div className="flex flex-col gap-px">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} aria-label={isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 transition-all hover:bg-white/5 hover:text-white">
             {isCollapsed ? (
               <ChevronRight size={20} />
             ) : (
@@ -124,7 +134,15 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
             )}
           </button>
 
-          <button onClick={logout} className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white">
+          <button
+            onClick={() => {
+              onMobileClose?.();
+              logout();
+            }}
+            title="Đăng xuất"
+            aria-label="Đăng xuất"
+            className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white"
+          >
             <LogOut size={20} />
             {!isCollapsed && <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Đăng xuất</span>}
           </button>

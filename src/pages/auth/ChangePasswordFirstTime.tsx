@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Eye, EyeOff, Lock, CheckCircle2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +32,7 @@ export default function ChangePasswordFirstTime() {
 
   const canSubmit = requirements.every((r) => r.met) && passwords.new === passwords.confirm && passwords.new !== "";
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canSubmit) return;
 
@@ -48,16 +49,16 @@ export default function ChangePasswordFirstTime() {
       <div className="w-full max-w-[500px]">
         {/* Header Branding */}
         <div className="mb-8 flex items-center justify-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-bold text-white shadow-lg shadow-primary/20">IPA</div>
+          <div className="flex size-10 items-center justify-center rounded-xl bg-primary font-bold text-white shadow-lg shadow-primary/20">IPA</div>
           <h1 className="border-l border-slate-300 pl-3 font-title text-xl font-black text-slate-900">ĐÀ NẴNG</h1>
         </div>
 
         <div className="relative overflow-hidden rounded-[32px] border border-slate-100 bg-white p-8 shadow-2xl shadow-slate-200/50 md:p-12">
           {/* Decorative bar */}
-          <div className="absolute left-0 right-0 top-0 h-2 bg-primary/10" />
+          <div className="absolute inset-x-0 top-0 h-2 bg-primary/10" />
 
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/5 text-primary ring-4 ring-primary/5">
+            <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary/5 text-primary ring-4 ring-primary/5">
               <ShieldCheck size={32} />
             </div>
             <h2 className="mb-3 font-title text-2xl font-extrabold text-slate-900">Cập nhật mật khẩu mới</h2>
@@ -66,12 +67,13 @@ export default function ChangePasswordFirstTime() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="ml-1 text-sm font-semibold text-slate-700">Mật khẩu mới</label>
+              <label htmlFor="new-password" title="Mật khẩu mới" className="ml-1 text-sm font-semibold text-slate-700">Mật khẩu mới</label>
               <div className="group relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-primary">
                   <Lock size={18} />
                 </div>
                 <input
+                  id="new-password"
                   type={showPass ? "text" : "password"}
                   required
                   value={passwords.new}
@@ -79,9 +81,12 @@ export default function ChangePasswordFirstTime() {
                   className="block w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-11 pr-12 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
                   placeholder="Nhập mật khẩu mới"
                 />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600">
+                <button type="button" onClick={() => setShowPass(!showPass)} aria-label={showPass ? "Ẩn mật khẩu" : "Hiện mật khẩu"} className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600">
                   {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+                <span className="pointer-events-none absolute -top-10 right-0 rounded-md bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white opacity-0 shadow-lg transition-opacity duration-75 group-focus-within:opacity-100 group-hover:opacity-100">
+                  {showPass ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                </span>
               </div>
 
               {/* Strength Meter */}
@@ -109,12 +114,13 @@ export default function ChangePasswordFirstTime() {
             </div>
 
             <div className="space-y-2">
-              <label className="ml-1 text-sm font-semibold text-slate-700">Xác nhận mật khẩu</label>
+              <label htmlFor="confirm-password" title="Xác nhận mật khẩu" className="ml-1 text-sm font-semibold text-slate-700">Xác nhận mật khẩu</label>
               <div className="group relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-primary">
                   <Lock size={18} />
                 </div>
                 <input
+                  id="confirm-password"
                   type={showPass ? "text" : "password"}
                   required
                   value={passwords.confirm}
@@ -138,7 +144,7 @@ export default function ChangePasswordFirstTime() {
               )}
             >
               {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                <div className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <>
                   Xác nhận thay đổi

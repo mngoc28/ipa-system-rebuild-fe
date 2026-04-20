@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FileStack, Upload, FolderPlus, Search, Filter, Grid, List, MoreVertical, FileText, FileImage, Download, Share2, Trash2, ChevronRight, Folder } from "lucide-react";
+import { Upload, FolderPlus, Search, Filter, Grid, List, MoreVertical, FileText, FileImage, Download, Share2, Trash2, ChevronRight, Folder } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -157,7 +157,7 @@ export default function DocumentListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Thư viện Tài liệu</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Thư viện Tài liệu</h1>
           <p className="mt-1 text-sm font-semibold text-slate-500">Lưu trữ, quản lý và chia sẻ tài liệu nghiệp vụ tập trung.</p>
         </div>
 
@@ -180,12 +180,12 @@ export default function DocumentListPage() {
             onClick={() => handleOpenFolder(folder.id)}
             className="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 text-slate-400 border border-slate-100 transition-all group-hover:bg-slate-900 group-hover:text-white">
+            <div className="flex size-12 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
               <Folder size={24} fill="currentColor" className="opacity-20 group-hover:opacity-40" />
             </div>
             <div>
               <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900">{folder.folderName}</h4>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
+              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
             </div>
             <ChevronRight className="ml-auto text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
           </div>
@@ -206,7 +206,7 @@ export default function DocumentListPage() {
               placeholder="Tìm tài liệu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:shadow-sm"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:shadow-sm"
             />
           </div>
 
@@ -219,7 +219,7 @@ export default function DocumentListPage() {
                 <List size={16} />
               </button>
             </div>
-            <button onClick={handleFilter} className="rounded-lg border border-slate-200 bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary hover:bg-white">
+            <button onClick={handleFilter} className="rounded-lg border border-slate-200 bg-slate-50 p-2 text-slate-400 transition-all hover:bg-white hover:text-primary">
               <Filter size={16} />
             </button>
           </div>
@@ -235,7 +235,7 @@ export default function DocumentListPage() {
                 <div className="absolute right-1 top-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg p-1.5 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-50 hover:text-slate-600">
+                      <button className="rounded-lg p-1.5 text-slate-300 opacity-0 transition-opacity hover:bg-slate-50 hover:text-slate-600 group-hover:opacity-100">
                         <MoreVertical size={14} />
                       </button>
                     </DropdownMenuTrigger>
@@ -249,10 +249,10 @@ export default function DocumentListPage() {
                 </div>
 
                 <div className="mb-4 flex flex-col items-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-white border border-slate-100 text-slate-400 shadow-sm transition-all group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950">
+                  <div className="mb-4 flex size-14 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-slate-950 group-hover:bg-slate-950 group-hover:text-white">
                     {doc.type === "image" ? <FileImage size={24} /> : <FileText size={24} />}
                   </div>
-                  <h4 className="mb-2 line-clamp-2 min-h-[2.5rem] px-1 text-[11px] font-black uppercase tracking-tight leading-relaxed text-slate-800 transition-colors group-hover:text-primary">{doc.name}</h4>
+                  <h4 className="mb-2 line-clamp-2 min-h-10 px-1 text-[11px] font-black uppercase leading-relaxed tracking-tight text-slate-800 transition-colors group-hover:text-primary">{doc.name}</h4>
                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.size}</p>
                 </div>
 
@@ -275,17 +275,17 @@ export default function DocumentListPage() {
             {visibleDocuments.map((doc) => (
               <div key={doc.id} className="group flex items-center justify-between bg-white px-5 py-4 transition-all hover:bg-slate-50/80 active:bg-slate-100">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded border border-slate-100 bg-slate-50 text-slate-400 group-hover:text-primary transition-colors">
+                  <div className="flex size-8 items-center justify-center rounded border border-slate-100 bg-slate-50 text-slate-400 transition-colors group-hover:text-primary">
                     <FileText size={16} />
                   </div>
                   <span className="text-[11px] font-black uppercase tracking-tight text-slate-700">{doc.name}</span>
                 </div>
                 <div className="flex items-center gap-8">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{doc.updated}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.updated}</span>
                   <span className="w-24 text-right text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.owner}</span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg p-2 text-slate-300 transition-all hover:bg-white hover:text-slate-600 active:scale-90 shadow-sm">
+                      <button className="rounded-lg p-2 text-slate-300 shadow-sm transition-all hover:bg-white hover:text-slate-600 active:scale-90">
                         <MoreVertical size={16} />
                       </button>
                     </DropdownMenuTrigger>
@@ -307,7 +307,7 @@ export default function DocumentListPage() {
             Dung lượng: {toSizeLabel(rawFiles.reduce((sum, item) => sum + item.sizeBytes, 0))} / 100GB
           </p>
           <p className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-300 animate-pulse" />
+            <span className="size-1.5 animate-pulse rounded-full bg-slate-300" />
             {visibleDocuments.length} tài liệu hiển thị
           </p>
         </div>

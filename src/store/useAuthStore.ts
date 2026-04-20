@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { removeRefreshToken } from '@/utils/storage';
+import { authApi } from '@/api/authApi';
 
 export type UserRole = 'Staff' | 'Manager' | 'Director' | 'Admin';
 
@@ -10,7 +12,9 @@ interface User {
   email: string;
   role: UserRole;
   avatar?: string;
+  phone?: string;
   unit?: string;
+  primary_unit_id?: number;
   permissions?: string[];
 }
 
@@ -22,13 +26,14 @@ interface AuthState {
   
   // Actions
   login: (user: User, token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   setToken: (token: string) => void;
 }
 
 // Token is stored in memory (not persisted)
 let inMemoryToken: string | null = null;
+let hasFetchedLatestUser: boolean = false;
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -40,12 +45,26 @@ export const useAuthStore = create<AuthState>()(
 
       login: (user, token) => {
         inMemoryToken = token;
+        hasFetchedLatestUser = true; // Mark as fetched right after login
         set({ user, token, isAuthenticated: true });
       },
 
-      logout: () => {
-        inMemoryToken = null;
-        set({ user: null, token: null, isAuthenticated: false });
+      logout: async () => {
+        try {
+          if (inMemoryToken) {
+            console.log('Logging out from server...');
+            await authApi.logout();
+          }
+        } catch (error) {
+          console.error('Logout API error (possibly session already invalid):', error);
+        } finally {
+          console.log('Clearing local auth state...');
+          inMemoryToken = null;
+          removeRefreshToken();
+          // Also clear access token from storage to be safe
+          localStorage.removeItem('accessToken');
+          set({ user: null, token: null, isAuthenticated: false });
+        }
       },
 
       updateUser: (userData) => {
@@ -73,3 +92,5 @@ export const useAuthStore = create<AuthState>()(
 
 // Helper to get token outside of hooks
 export const getAuthToken = () => inMemoryToken;
+export const getHasFetchedLatestUser = () => hasFetchedLatestUser;
+export const setHasFetchedLatestUserFlag = (val: boolean) => { hasFetchedLatestUser = val; };

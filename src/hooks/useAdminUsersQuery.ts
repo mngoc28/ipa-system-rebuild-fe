@@ -10,6 +10,7 @@ export const useAdminUsersListQuery = (query: AdminUsersQuery) => {
   return useQuery({
     queryKey: ["admin-users", query],
     queryFn: () => adminUsersApi.list(query),
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -48,6 +49,17 @@ export const useLockAdminUserMutation = () => {
 
   return useMutation({
     mutationFn: ({ userId, locked }: { userId: string; locked: boolean }) => adminUsersApi.lock(userId, locked),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+  });
+};
+
+export const useDeleteAdminUserMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => adminUsersApi.delete(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },

@@ -1,21 +1,38 @@
 import { useEffect, useState } from "react";
-import { isTokenExpired, getTimeUntilExpiration, shouldRefreshToken, refreshAccessToken } from "@/utils/tokenUtils";
+import { decodeToken, isTokenExpired, getTimeUntilExpiration, shouldRefreshToken, refreshAccessToken } from "@/utils/tokenUtils";
 import { getAccessToken } from "@/utils/storage";
-import { useUserStore } from "./useUserStore";
+import { useAuthStore } from "./useAuthStore";
 import { TOKEN_CHECK_INTERVAL, TOKEN_REFRESH_TIME } from "@/constant";
 
 export const useCheckTokenStore = () => {
-  const userEmail = useUserStore((state) => state.userEmail);
-  const logout = useUserStore((state) => state.logout);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
   const [token, setToken] = useState<string | null>(getAccessToken());
 
   useEffect(() => {
     const currentToken = getAccessToken();
     setToken(currentToken);
 
+    const currentPayload = currentToken ? decodeToken(currentToken) : null;
+
+    if (currentToken && !currentPayload?.exp) {
+      return;
+    }
+
     if (currentToken && isTokenExpired(currentToken)) {
-      logout();
-      setToken(null);
+      refreshAccessToken()
+        .then((newToken: string | null) => {
+          if (newToken) {
+            setToken(newToken);
+          } else {
+            logout();
+            setToken(null);
+          }
+        })
+        .catch(() => {
+          logout();
+          setToken(null);
+        });
       return;
     }
 
@@ -98,7 +115,7 @@ export const useCheckTokenStore = () => {
         document.removeEventListener("visibilitychange", handleVisibilityChange);
       };
     }
-  }, [userEmail, logout]);
+  }, [isAuthenticated, logout]);
 
   return token;
 };

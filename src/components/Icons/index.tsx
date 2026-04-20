@@ -12,7 +12,7 @@ interface IconProps {
 
 const Icon: FC<IconProps> = (props) => {
   const { color, size = "100%", icon, className = "" } = props;
-  return <IcomoonReact className={className} iconSet={iconSet as any} color={color} size={size} icon={icon} />;
+  return <IcomoonReact className={className} iconSet={iconSet as unknown as Record<string, unknown>} color={color} size={size} icon={icon} />;
 };
 
 export default Icon;

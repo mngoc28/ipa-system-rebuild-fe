@@ -4,14 +4,14 @@ import { cn } from "@/lib/utils";
 import { projectDataHelper } from "@/dataHelper/projects.dataHelper";
 
 interface ProjectFunnelProps {
-  projects: any[];
+  projects: Array<{ stage_id: string; estimated_value?: number | string | null }>;
 }
 
 export const ProjectFunnel: React.FC<ProjectFunnelProps> = ({ projects }) => {
   const funnelStages = projectDataHelper.calculateFunnelStats(projects);
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-slate-950 p-6 shadow-xl shadow-slate-950/20 lg:p-10 border border-slate-900">
+    <div className="relative overflow-hidden rounded-xl border border-slate-900 bg-slate-950 p-6 shadow-xl shadow-slate-950/20 lg:p-10">
       <div className="relative z-10 grid grid-cols-1 gap-3 lg:grid-cols-4">
         {funnelStages.map((stage, i) => (
           <div key={i} className="flex flex-col items-center">
@@ -23,7 +23,7 @@ export const ProjectFunnel: React.FC<ProjectFunnelProps> = ({ projects }) => {
               )}
             >
               <div className="text-center">
-                <p className="text-2xl font-black text-white leading-none tracking-tight">{stage.count}</p>
+                <p className="text-2xl font-black leading-none tracking-tight text-white">{stage.count}</p>
                 <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-white/50">{stage.title}</p>
               </div>
               {/* Connection arrow */}
@@ -34,14 +34,14 @@ export const ProjectFunnel: React.FC<ProjectFunnelProps> = ({ projects }) => {
               )}
             </div>
             <div className="text-center">
-              <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Giá trị ước tính</p>
-              <p className="text-lg font-black text-white tracking-tight leading-none">{stage.value}</p>
+              <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-500">Giá trị ước tính</p>
+              <p className="text-lg font-black leading-none tracking-tight text-white">{stage.value}</p>
             </div>
           </div>
         ))}
       </div>
       {/* Abstract background graphics */}
-      <div className="pointer-events-none absolute left-[-10%] top-[-30%] h-[400px] w-[400px] rounded-full bg-primary/10 blur-[100px]" />
+      <div className="pointer-events-none absolute left-[-10%] top-[-30%] size-[400px] rounded-full bg-primary/10 blur-[100px]" />
     </div>
   );
 };

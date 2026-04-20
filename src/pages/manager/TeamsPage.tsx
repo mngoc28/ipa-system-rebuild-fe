@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { teamsApi, type TeamCreateMemberPayload, type OrgUnitItem } from "@/api/teamsApi";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SelectField } from "@/components/ui/SelectField";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +34,7 @@ export default function TeamsPage() {
   const [page, setPage] = React.useState(1);
   const [createOpen, setCreateOpen] = React.useState(false);
   const [form, setForm] = React.useState<TeamCreateMemberPayload>(emptyForm());
+  const [loadingTimedOut, setLoadingTimedOut] = React.useState(false);
 
   const unitsQuery = useQuery({
     queryKey: ["teams-units"],
@@ -65,6 +68,21 @@ export default function TeamsPage() {
   const totalPages = Math.max(1, meta?.totalPages || meta?.total_pages || 1);
   const units = unitsQuery.data?.data?.items ?? [];
 
+  React.useEffect(() => {
+    if (!teamsQuery.isLoading) {
+      setLoadingTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setLoadingTimedOut(true);
+    }, 12000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [teamsQuery.isLoading]);
+
   const handleSubmit = () => {
     if (!form.fullName.trim() || !form.email.trim()) {
       toast.error("Vui lòng nhập họ tên và email.");
@@ -85,7 +103,7 @@ export default function TeamsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Đội nhóm & Nhân sự</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Đội nhóm & Nhân sự</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Quản lý hiệu suất và lịch trình làm việc của phòng ban.</p>
         </div>
         <button
@@ -107,7 +125,27 @@ export default function TeamsPage() {
         </div>
       )}
 
-      {teamsQuery.isLoading && <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm font-medium text-slate-500 shadow-sm">Đang tải dữ liệu đội nhóm...</div>}
+      {teamsQuery.isLoading && !loadingTimedOut && (
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-sm font-medium text-slate-500 shadow-sm">
+          <LoadingSpinner label="Đang tải dữ liệu đội nhóm..." />
+        </div>
+      )}
+
+      {teamsQuery.isLoading && loadingTimedOut && (
+        <div className="flex min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-amber-100 bg-amber-50 p-8 text-center">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">Đã quá thời gian tải dữ liệu đội nhóm</p>
+          <p className="max-w-md text-sm font-medium text-amber-800">Hệ thống chưa phản hồi trong thời gian kỳ vọng. Vui lòng thử tải lại danh sách đội nhóm.</p>
+          <button
+            onClick={() => {
+              setLoadingTimedOut(false);
+              void teamsQuery.refetch();
+            }}
+            className="rounded-lg bg-amber-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-amber-700"
+          >
+            Thử lại
+          </button>
+        </div>
+      )}
 
       {teamsQuery.isError && <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-sm font-medium text-rose-700 shadow-sm">Không thể tải dữ liệu đội nhóm.</div>}
 
@@ -117,8 +155,8 @@ export default function TeamsPage() {
         {members.map((member) => (
           <div key={member.id} className="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
             <div className="relative mb-4 inline-block">
-              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md">
-                <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.id}`} alt={member.name} className="h-full w-full object-cover" />
+              <div className="flex size-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md">
+                <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.id}`} alt={member.name} className="size-full object-cover" />
               </div>
               <div
                 className={cn(
@@ -153,14 +191,14 @@ export default function TeamsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-50">
-              <button aria-label={`Gửi email cho ${member.name}`} onClick={() => setLastAction(`Đã tạo email cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+            <div className="flex items-center justify-center gap-2 border-t border-slate-50 pt-2">
+              <button aria-label={`Gửi email cho ${member.name}`} title={`Gửi email cho ${member.name}`} onClick={() => setLastAction(`Đã tạo email cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <Mail size={16} />
               </button>
-              <button aria-label={`Mở chat với ${member.name}`} onClick={() => setLastAction(`Đã mở chat nội bộ với ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <button aria-label={`Mở chat với ${member.name}`} title={`Mở chat với ${member.name}`} onClick={() => setLastAction(`Đã mở chat nội bộ với ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <MessageSquare size={16} />
               </button>
-              <button aria-label={`Mở phân quyền cho ${member.name}`} onClick={() => setLastAction(`Đã mở phân quyền cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <button aria-label={`Mở phân quyền cho ${member.name}`} title={`Mở phân quyền cho ${member.name}`} onClick={() => setLastAction(`Đã mở phân quyền cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <Shield size={16} />
               </button>
             </div>
@@ -200,16 +238,16 @@ export default function TeamsPage() {
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-xl bg-slate-950 p-6 text-white lg:p-10 shadow-xl shadow-slate-950/20">
+      <div className="relative overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20 lg:p-10">
         <div className="relative z-10 flex flex-col items-center justify-between gap-10 lg:flex-row">
           <div className="max-w-lg space-y-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-amber-400 border border-white/5 shadow-inner">
+            <div className="flex size-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-400 shadow-inner">
               <Zap size={20} />
             </div>
             <div className="space-y-1">
               <h3 className="font-title text-2xl font-black uppercase tracking-tight">Trạng thái hạ tầng công việc</h3>
               <p className="text-sm leading-relaxed text-slate-400">
-                Hiện có {summary?.totalMembers ?? members.length} đầu mối đang theo dõi trong phòng ban. Hiệu suất trung bình toàn bộ phận đạt <span className="text-white font-bold">{members.length > 0 ? Math.round(members.reduce((sum, member) => sum + member.performance, 0) / members.length) : 0}%</span>.
+                Hiện có {summary?.totalMembers ?? members.length} đầu mối đang theo dõi trong phòng ban. Hiệu suất trung bình toàn bộ phận đạt <span className="font-bold text-white">{members.length > 0 ? Math.round(members.reduce((sum, member) => sum + member.performance, 0) / members.length) : 0}%</span>.
               </p>
             </div>
             <div className="flex gap-3">
@@ -225,14 +263,14 @@ export default function TeamsPage() {
           </div>
 
           <div className="w-full space-y-5 rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-md lg:w-80">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b border-white/5 pb-2">Nhật ký hoạt động</h4>
+            <h4 className="border-b border-white/5 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Nhật ký hoạt động</h4>
             <div className="space-y-4">
               {activities.map((act, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <div className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-white truncate">{act.user}</p>
-                    <p className="text-[10px] text-slate-400 truncate">{act.action}</p>
+                    <p className="truncate text-xs font-bold text-white">{act.user}</p>
+                    <p className="truncate text-[10px] text-slate-400">{act.action}</p>
                   </div>
                   <span className="ml-auto shrink-0 text-[8px] font-black uppercase text-slate-500">{act.time}</span>
                 </div>
@@ -250,18 +288,30 @@ export default function TeamsPage() {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Họ và tên" value={form.fullName} onChange={(value) => setForm((current) => ({ ...current, fullName: value }))} placeholder="Nguyễn Văn A" />
-            <Field label="Email" value={form.email} onChange={(value) => setForm((current) => ({ ...current, email: value }))} placeholder="a.nv@danang.gov.vn" />
-            <Field label="Tên đăng nhập" value={form.username || ""} onChange={(value) => setForm((current) => ({ ...current, username: value }))} placeholder="nguyenvana" />
-            <Field label="Số điện thoại" value={form.phone || ""} onChange={(value) => setForm((current) => ({ ...current, phone: value }))} placeholder="0900000000" />
-            <SelectField label="Chức danh" value={form.positionTitle || ""} onChange={(value) => setForm((current) => ({ ...current, positionTitle: value }))} options={POSITION_OPTIONS} />
-            <SelectField
-              label="Đơn vị"
-              value={form.unitId?.toString() || ""}
-              onChange={(value) => setForm((current) => ({ ...current, unitId: value.trim() ? Number(value) : undefined }))}
-              options={units.map((unit: OrgUnitItem) => ({ value: unit.id, label: `${unit.unitName} (${unit.unitCode})` }))}
-              placeholder={unitsQuery.isLoading ? "Đang tải đơn vị..." : "Chọn đơn vị"}
-            />
+            <Field label="Họ và tên" value={form.fullName} onChange={(value) => setForm((current) => ({ ...current, fullName: value }))} placeholder="Nguyễn Văn A" id="team-fullname" />
+            <Field label="Email" value={form.email} onChange={(value) => setForm((current) => ({ ...current, email: value }))} placeholder="a.nv@danang.gov.vn" id="team-email" />
+            <Field label="Tên đăng nhập" value={form.username || ""} onChange={(value) => setForm((current) => ({ ...current, username: value }))} placeholder="nguyenvana" id="team-username" />
+            <Field label="Số điện thoại" value={form.phone || ""} onChange={(value) => setForm((current) => ({ ...current, phone: value }))} placeholder="0900000000" id="team-phone" />
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="team-position" className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Chức danh</label>
+              <SelectField
+                id="team-position"
+                value={form.positionTitle || ""}
+                onValueChange={(value) => setForm((current) => ({ ...current, positionTitle: value }))}
+                options={POSITION_OPTIONS.map((opt) => ({ label: opt, value: opt }))}
+                placeholder="Chọn chức danh"
+              />
+            </div>
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="team-unit" className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Đơn vị</label>
+              <SelectField
+                id="team-unit"
+                value={form.unitId?.toString() || ""}
+                onValueChange={(value) => setForm((current) => ({ ...current, unitId: value.trim() ? Number(value) : undefined }))}
+                options={units.map((unit: OrgUnitItem) => ({ value: unit.id, label: `${unit.unitName} (${unit.unitCode})` }))}
+                placeholder={unitsQuery.isLoading ? "Đang tải đơn vị..." : "Chọn đơn vị"}
+              />
+            </div>
           </div>
 
           <DialogFooter>
@@ -269,7 +319,7 @@ export default function TeamsPage() {
               Hủy
             </Button>
             <Button size="sm" onClick={handleSubmit} disabled={createMemberMutation.isPending}>
-              {createMemberMutation.isPending ? "Đang lưu..." : "Tạo thành viên"}
+              {createMemberMutation.isPending ? <LoadingSpinner variant="small" label="Đang lưu..." /> : "Tạo thành viên"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -299,66 +349,28 @@ function Field({
   value,
   onChange,
   placeholder,
+  id,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  id: string;
 }) {
   return (
-    <label className="space-y-1.5 text-left">
-      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+    <div className="space-y-1.5 text-left">
+      <label htmlFor={id} className="block text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</label>
       <input
+        id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5"
       />
-    </label>
+    </div>
   );
 }
 
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: Array<string | { value: string; label: string }>;
-  placeholder?: string;
-}) {
-  return (
-    <label className="space-y-1.5 text-left">
-      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5"
-      >
-        <option value="">{placeholder || `Chọn ${label.toLowerCase()}`}</option>
-        {options.map((option) => {
-          if (typeof option === "string") {
-            return (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            );
-          }
-
-          return (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          );
-        })}
-      </select>
-    </label>
-  );
-}
 
 function buildPaginationPages(currentPage: number, totalPages: number): Array<number | "..."> {
   if (totalPages <= 7) {

@@ -4,13 +4,13 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS } from "@dnd-kit/utilities";
 import { SessionItem, weekSessions } from "@/dataHelper/ui-system.data";
 import { cn } from "@/lib/utils";
-import { MapPin, Clock, GripVertical, MoreVertical, Users, Coffee, Car, Briefcase, Camera } from "lucide-react";
+import { MapPin, GripVertical, MoreVertical, Users, Coffee, Car, Briefcase, Camera, type LucideIcon } from "lucide-react";
 
 interface ItineraryTimelineProps {
   sessions?: SessionItem[];
 }
 
-const typeStyles: Record<string, { color: string; icon: any; label: string }> = {
+const typeStyles: Record<string, { color: string; icon: LucideIcon; label: string }> = {
   meeting: { color: "border-blue-500 bg-blue-50 text-blue-700", icon: Briefcase, label: "Họp công tác" },
   siteVisit: { color: "border-emerald-500 bg-emerald-50 text-emerald-700", icon: Camera, label: "Khảo sát" },
   gala: { color: "border-orange-500 bg-orange-50 text-orange-700", icon: Coffee, label: "Tiệc/Nghỉ" },

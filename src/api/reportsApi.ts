@@ -1,5 +1,6 @@
 import axiosClient from "@/api/axiosClient";
 import { ApiEnvelope } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export interface ReportDefinition {
   id: string;
@@ -53,21 +54,30 @@ export interface ReportSummary {
   };
 }
 
+/**
+ * Gets the base URL prefix based on the current user's role.
+ */
+const getPrefix = () => {
+  const role = useAuthStore.getState().user?.role || "staff";
+  const mappedRole = role.toLowerCase() === "admin" ? "director" : role.toLowerCase();
+  return `/api/v1/${mappedRole}/reports`;
+};
+
 export const reportsApi = {
   summary: async () => {
-    const response = await axiosClient.get<ApiEnvelope<ReportSummary>>('/api/v1/reports/summary');
+    const response = await axiosClient.get<ApiEnvelope<ReportSummary>>(`${getPrefix()}/summary`);
     return response.data;
   },
   listDefinitions: async () => {
-    const response = await axiosClient.get<ApiEnvelope<{ items: ReportDefinition[] }>>("/api/v1/reports/definitions");
+    const response = await axiosClient.get<ApiEnvelope<{ items: ReportDefinition[] }>>(`${getPrefix()}/definitions`);
     return response.data;
   },
   createRun: async (payload: { report_code: string; params: Record<string, unknown> }) => {
-    const response = await axiosClient.post<ApiEnvelope<{ run_id: string; status: string }>>("/api/v1/reports/runs", payload);
+    const response = await axiosClient.post<ApiEnvelope<{ run_id: string; status: string }>>(`${getPrefix()}/runs`, payload);
     return response.data;
   },
   showRun: async (runId: string) => {
-    const response = await axiosClient.get<ApiEnvelope<ReportRun>>(`/api/v1/reports/runs/${runId}`);
+    const response = await axiosClient.get<ApiEnvelope<ReportRun>>(`${getPrefix()}/runs/${runId}`);
     return response.data;
   },
 };

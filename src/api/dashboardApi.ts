@@ -70,21 +70,26 @@ export interface DashboardTaskItem {
   title: string;
   delegation?: string;
   user?: string;
+  dueAt?: string;
   deadline?: string;
   time?: string;
-  priority?: string;
+  priority?: string | number;
+  status?: string | number;
+  isOverdue?: boolean;
   overdue?: boolean;
 }
 
 export const dashboardApi = {
   summary: async (scope: "staff" | "manager" | "director" | "admin") => {
-    const response = await axiosClient.get<ApiEnvelope<DashboardSummary>>("/api/v1/dashboard/summary", {
+    // Map 'admin' scope to 'director' prefix as per current backend routing structure
+    const rolePrefix = scope === 'admin' ? 'director' : scope;
+    const response = await axiosClient.get<ApiEnvelope<DashboardSummary>>(`/api/v1/${rolePrefix}/dashboard/summary`, {
       params: { scope },
     });
     return response.data;
   },
   tasks: async (query?: { status?: string; priority?: string; page?: number; pageSize?: number }) => {
-    const response = await axiosClient.get<ApiEnvelope<PaginatedData<DashboardTaskItem>>>("/api/v1/dashboard/tasks", {
+    const response = await axiosClient.get<ApiEnvelope<PaginatedData<DashboardTaskItem>>>("/api/v1/staff/dashboard/tasks", {
       params: query,
     });
     return response.data;

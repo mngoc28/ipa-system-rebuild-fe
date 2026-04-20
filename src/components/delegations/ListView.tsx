@@ -3,10 +3,13 @@ import { DelegationItem } from "@/dataHelper/ui-system.data";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, ArrowUpDown, Eye, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { parse } from "date-fns";
 import { toast } from "sonner";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 interface ListViewProps {
   delegations: DelegationItem[];
+  onDelete?: (id: string | number) => Promise<void> | void;
 }
 
 const statusColors: Record<string, { bg: string; text: string; label: string }> = {
@@ -19,16 +22,41 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
   cancelled: { bg: "bg-rose-100", text: "text-rose-700", label: "Đã hủy" },
 };
 
-export default function ListView({ delegations }: ListViewProps) {
+export default function ListView({ delegations, onDelete }: ListViewProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [deletedIds, setDeletedIds] = useState<Array<string | number>>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: keyof DelegationItem | null; direction: "asc" | "desc" }>({ key: null, direction: "asc" });
   const itemsPerPage = 8;
 
-  const visibleDelegations = delegations.filter((item) => !deletedIds.includes(item.id));
-  const totalPages = Math.max(1, Math.ceil(visibleDelegations.length / itemsPerPage));
+  const sortedDelegations = [...delegations].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    const directionFactor = sortConfig.direction === "asc" ? 1 : -1;
+
+    if (sortConfig.key === "startDate" || sortConfig.key === "endDate") {
+      const aTime = parse(String(a[sortConfig.key]), "dd/MM/yyyy", new Date()).getTime();
+      const bTime = parse(String(b[sortConfig.key]), "dd/MM/yyyy", new Date()).getTime();
+      return (aTime - bTime) * directionFactor;
+    }
+
+    const aValue = String(a[sortConfig.key] ?? "");
+    const bValue = String(b[sortConfig.key] ?? "");
+
+    if (aValue < bValue) return -1 * directionFactor;
+    if (aValue > bValue) return 1 * directionFactor;
+    return 0;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sortedDelegations.length / itemsPerPage));
   const normalizedPage = Math.min(currentPage, totalPages);
-  const paginatedItems = visibleDelegations.slice((normalizedPage - 1) * itemsPerPage, normalizedPage * itemsPerPage);
+  const paginatedItems = sortedDelegations.slice((normalizedPage - 1) * itemsPerPage, normalizedPage * itemsPerPage);
+
+  const handleSort = (key: keyof DelegationItem) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setCurrentPage(1);
+  };
 
   const handleView = (e: React.MouseEvent<HTMLButtonElement>, id: string | number) => {
     e.stopPropagation();
@@ -37,14 +65,22 @@ export default function ListView({ delegations }: ListViewProps) {
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
-    navigate(`/delegations/${item.id}`, { state: { mode: "edit" } });
+    navigate(`/delegations/${item.id}/edit`);
     toast.info(`Đang mở chỉnh sửa: ${item.name}`);
   };
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
-    setDeletedIds((prev) => [...prev, item.id]);
-    toast.success(`Đã xóa khỏi danh sách: ${item.name}`);
+    if (!onDelete) {
+      toast.error("Không thể thực hiện hành động xóa vào lúc này.");
+      return;
+    }
+
+    try {
+      await onDelete(item.id);
+    } catch {
+      toast.error("Không thể xóa hồ sơ đoàn.");
+    }
   };
 
   return (
@@ -53,14 +89,31 @@ export default function ListView({ delegations }: ListViewProps) {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/50">
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+              <th 
+                className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400"
+                onClick={() => handleSort("code")}
+              >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Mã Đoàn <ArrowUpDown size={10} />
+                  Mã Đoàn <ArrowUpDown size={10} className={cn(sortConfig.key === "code" && "text-primary")} />
                 </div>
               </th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Sự kiện / Đoàn công tác</th>
+              <th 
+                className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
+                  Sự kiện / Đoàn công tác <ArrowUpDown size={10} className={cn(sortConfig.key === "name" && "text-primary")} />
+                </div>
+              </th>
               <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Thời gian</th>
+              <th 
+                className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400"
+                onClick={() => handleSort("startDate")}
+              >
+                <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
+                  Thời gian <ArrowUpDown size={10} className={cn(sortConfig.key === "startDate" && "text-primary")} />
+                </div>
+              </th>
               <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</th>
               <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Nhân sự</th>
               <th className="px-6 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Thao tác</th>
@@ -73,13 +126,13 @@ export default function ListView({ delegations }: ListViewProps) {
                   <span className="rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600 transition-colors group-hover:bg-white">{item.code}</span>
                 </td>
                 <td className="px-6 py-4">
-                  <p className="line-clamp-1 text-xs font-black text-slate-900 transition-colors group-hover:text-primary uppercase tracking-tight">{item.name}</p>
-                  <p className="mt-0.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.partnerOrg}</p>
+                  <p className="line-clamp-1 text-xs font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.name}</p>
+                  <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.partnerOrg}</p>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">{item.country === "Hàn Quốc" ? "🇰🇷" : item.country === "Singapore" ? "🇸🇬" : item.country === "Nhật Bản" ? "🇯🇵" : "🌐"}</span>
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">{item.country}</span>
+                    <CountryFlag countryName={item.country} />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">{item.country}</span>
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
@@ -96,10 +149,10 @@ export default function ListView({ delegations }: ListViewProps) {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <div className="flex -space-x-1.5">
-                    <div className="h-7 w-7 overflow-hidden rounded-full border-2 border-white bg-slate-200">
-                      <img src={item.staff.avatar} alt={item.staff.name} className="h-full w-full object-cover" />
+                    <div className="size-7 overflow-hidden rounded-full border-2 border-white bg-slate-200">
+                      <img src={item.staff.avatar} alt={item.staff.name} className="size-full object-cover" />
                     </div>
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-[9px] font-black text-slate-400">+2</div>
+                    <div className="flex size-7 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-[9px] font-black text-slate-400">+2</div>
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right">
@@ -126,13 +179,13 @@ export default function ListView({ delegations }: ListViewProps) {
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
           HIỂN THỊ{" "}
           <span className="text-slate-900">
-            {visibleDelegations.length === 0 ? "0 - 0" : `${(normalizedPage - 1) * itemsPerPage + 1} - ${Math.min(normalizedPage * itemsPerPage, visibleDelegations.length)}`}
+            {sortedDelegations.length === 0 ? "0 - 0" : `${(normalizedPage - 1) * itemsPerPage + 1} - ${Math.min(normalizedPage * itemsPerPage, sortedDelegations.length)}`}
           </span>{" "}
-          TRÊN <span className="text-slate-900">{visibleDelegations.length}</span> KẾT QUẢ
+          TRÊN <span className="text-slate-900">{sortedDelegations.length}</span> KẾT QUẢ
         </p>
 
         <div className="flex items-center gap-1">
-          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} title="Trang trước" aria-label="Trang trước" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} className="rotate-180" />
           </button>
 
@@ -148,7 +201,7 @@ export default function ListView({ delegations }: ListViewProps) {
             ))}
           </div>
 
-          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} title="Trang sau" aria-label="Trang sau" className="p-2 text-slate-400 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -156,3 +209,4 @@ export default function ListView({ delegations }: ListViewProps) {
     </div>
   );
 }
+

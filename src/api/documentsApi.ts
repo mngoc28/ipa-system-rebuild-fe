@@ -1,5 +1,6 @@
 import axiosClient from "@/api/axiosClient";
 import { ApiEnvelope } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export interface FolderItem {
   id: string;
@@ -25,37 +26,43 @@ export interface FilesData {
   items: FileItem[];
 }
 
+const getBasePrefix = () => {
+  const role = useAuthStore.getState().user?.role || "staff";
+  const mappedRole = role.toLowerCase() === "admin" ? "director" : role.toLowerCase();
+  return `/api/v1/${mappedRole}`;
+};
+
 export const documentsApi = {
   listFolders: async (query?: { parentId?: string; scopeType?: string }) => {
-    const response = await axiosClient.get<ApiEnvelope<{ items: FolderItem[] }>>("/api/v1/folders", {
+    const response = await axiosClient.get<ApiEnvelope<{ items: FolderItem[] }>>(`${getBasePrefix()}/folders`, {
       params: query,
     });
     return response.data;
   },
   createFolder: async (payload: { folderName: string; scopeType: string; parentFolderId?: string }) => {
-    const response = await axiosClient.post<ApiEnvelope<FolderItem>>("/api/v1/folders", payload);
+    const response = await axiosClient.post<ApiEnvelope<FolderItem>>(`${getBasePrefix()}/folders`, payload);
     return response.data;
   },
   listFiles: async (query?: { folderId?: string }) => {
-    const response = await axiosClient.get<ApiEnvelope<FilesData>>("/api/v1/files", {
+    const response = await axiosClient.get<ApiEnvelope<FilesData>>(`${getBasePrefix()}/files`, {
       params: query,
     });
     return response.data;
   },
   uploadFile: async (payload: { fileName: string; sizeBytes: number; folderId?: string; delegationId?: string; minutesId?: string; taskId?: string }) => {
-    const response = await axiosClient.post<ApiEnvelope<FileItem>>("/api/v1/files/upload", payload);
+    const response = await axiosClient.post<ApiEnvelope<FileItem>>(`${getBasePrefix()}/files/upload`, payload);
     return response.data;
   },
   patchFile: async (id: string, payload: { fileName?: string }) => {
-    const response = await axiosClient.patch<ApiEnvelope<{ updated: boolean; file: FileItem }>>(`/api/v1/files/${id}`, payload);
+    const response = await axiosClient.patch<ApiEnvelope<{ updated: boolean; file: FileItem }>>(`${getBasePrefix()}/files/${id}`, payload);
     return response.data;
   },
   createDownloadUrl: async (id: string) => {
-    const response = await axiosClient.post<ApiEnvelope<{ url: string; expiresAt: string }>>(`/api/v1/files/${id}/download-url`, {});
+    const response = await axiosClient.post<ApiEnvelope<{ url: string; expiresAt: string }>>(`${getBasePrefix()}/files/${id}/download-url`, {});
     return response.data;
   },
   shareFile: async (id: string, payload: { permissionLevel: "VIEW" | "EDIT"; sharedWithUserId?: string; sharedWithRoleId?: string; expiresAt?: string }) => {
-    const response = await axiosClient.post<ApiEnvelope<{ shareId: string }>>(`/api/v1/files/${id}/share`, payload);
+    const response = await axiosClient.post<ApiEnvelope<{ shareId: string }>>(`${getBasePrefix()}/files/${id}/share`, payload);
     return response.data;
   },
 };

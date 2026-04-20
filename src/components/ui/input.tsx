@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ComponentProps, forwardRef } from "react"
 
-export interface InputProps extends ComponentProps<"input"> {}
+export type InputProps = ComponentProps<"input">;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {

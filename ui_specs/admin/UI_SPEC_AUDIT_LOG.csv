@@ -1,0 +1,19 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Audit Log,page_title,label,Audit Log,,none,header,,,font-title text-2xl font-black uppercase,Activity tracing module
+Audit Log,btn_reset_filters,button,XÓA BỘ LỌC,,click,header,,,border-slate-200 text-slate-700,Clears all search and filter states
+Audit Log,btn_export_csv,button,XUẤT NHẬT KÝ (CSV),,submit,header,,,border-slate-200 text-slate-700,Generates and downloads CSV of visible logs
+Audit Log,stat_total_hits,card,Tổng tải,,none,center,,,border-slate-200 bg-white,Total records matching criteria
+Audit Log,stat_success_count,card,Success,,none,center,,,text-emerald-600 border-slate-200,Count of successful operations
+Audit Log,stat_warning_count,card,Warning,,none,center,,,text-amber-600 border-slate-200,Count of warning/risk logs
+Audit Log,stat_system_count,card,System,,none,center,,,text-slate-900 border-slate-200,Count of system-level logs
+Audit Log,search_logs,input,,Tìm kiếm hành động, người dùng...,type,center,false,,bg-transparent text-xs,Keyword search across log details
+Audit Log,type_selector,select,,Tất cả loại,type,center,false,,border-slate-200 text-xs,Filters by AuditLogType (info/success/warning/system)
+Audit Log,action_filter,input,,Lọc theo action,type,center,false,,border-slate-200 text-xs,Filters by specific action name
+Audit Log,resource_type_filter,input,,Lọc theo resource type,type,center,false,,border-slate-200 text-xs,Filters by object type (Delegation/User/etc)
+Audit Log,actor_id_filter,input,,Actor user ID,type,center,false,,border-slate-200 text-xs,Filters by numeric user ID
+Audit Log,log_timeline_item,card,,,[click],center,,,border-slate-100 transition-all,Interactive log entry with color-coded type indicator
+Audit Log,btn_load_more,button,TẢI THÊM NHẬT KÝ,,click,bottom,,,text-slate-400 font-black,Infinite scroll trigger
+Audit Log,infrastructure_sidebar,list,Trạng thái Hạ tầng,,none,right,,,border-slate-200 bg-white,Real-time server performance indicators (Live)
+Audit Log,sidebar_stat_online,label,Người dùng Online,,none,right,,,text-emerald-500,Active login sessions count
+Audit Log,sidebar_stat_db,label,Cơ sở dữ liệu,,none,right,,,text-emerald-500,Database availability status (Sẵn sàng/Lỗi)
+Audit Log,sidebar_stat_compute,label,Hiệu năng tính toán,,none,right,,,text-amber-500,Simulated CPU load percentage

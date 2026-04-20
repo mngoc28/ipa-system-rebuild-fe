@@ -1,7 +1,8 @@
 import { JwtPayload } from "@/dataHelper/auth.dataHelper";
-import { getAccessToken, setAccessToken } from "./storage";
+import { getRefreshToken, setAccessToken } from "./storage";
 import { authApi } from "@/api/authApi";
 import { TOKEN_EXPIRATION_BUFFER_MS, TOKEN_REFRESH_THRESHOLD_MINUTES } from "@/constant";
+import { useAuthStore } from "@/store/useAuthStore";
 
 /**
  * Decode JWT token to get payload
@@ -20,6 +21,15 @@ export const decodeToken = (token: string): JwtPayload | null => {
     console.error("Error decoding token:", error);
     return null;
   }
+};
+
+export const isJwtToken = (token: string | null): boolean => {
+  if (!token) {
+    return false;
+  }
+
+  const payload = decodeToken(token);
+  return Boolean(payload && payload.exp);
 };
 
 /**
@@ -79,17 +89,19 @@ export const getTimeUntilExpiration = (token: string | null): number | null => {
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
   try {
-    const token = getAccessToken();
-    if (!token) {
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken || !isJwtToken(refreshToken)) {
       return null;
     }
 
-    const response = await authApi.refresh(token);
+    const response = await authApi.refresh(refreshToken);
 
     const newAccessToken = response?.data?.accessToken;
 
     if (newAccessToken) {
       setAccessToken(newAccessToken);
+      useAuthStore.getState().setToken(newAccessToken);
       return newAccessToken;
     }
 

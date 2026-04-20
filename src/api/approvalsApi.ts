@@ -34,17 +34,21 @@ export interface ApprovalDetail {
 
 export const approvalsApi = {
   list: async (query?: { status?: string; type?: string; page?: number; pageSize?: number }) => {
-    const response = await axiosClient.get<ApiEnvelope<PaginatedData<ApprovalItem>>>("/api/v1/approvals", {
+    const response = await axiosClient.get<ApiEnvelope<PaginatedData<ApprovalItem>>>("/api/v1/manager/approvals", {
       params: query,
     });
     return response.data;
   },
   getById: async (id: string) => {
-    const response = await axiosClient.get<ApiEnvelope<ApprovalDetail>>(`/api/v1/approvals/${id}`);
+    const response = await axiosClient.get<ApiEnvelope<ApprovalDetail>>(`/api/v1/manager/approvals/${id}`);
     return response.data;
   },
   decision: async (id: string, payload: { decision: "APPROVE" | "REJECT"; decisionNote?: string }) => {
-    const response = await axiosClient.post<ApiEnvelope<{ status: string; decidedAt: string }>>(`/api/v1/approvals/${id}/decision`, payload);
+    const response = await axiosClient.post<ApiEnvelope<{ status: string; decidedAt: string }>>(`/api/v1/manager/approvals/${id}/decision`, payload);
+    return response.data;
+  },
+  getSummary: async () => {
+    const response = await axiosClient.get<ApiEnvelope<{ pendingCount: number }>>("/api/v1/manager/approvals/summary");
     return response.data;
   },
 };

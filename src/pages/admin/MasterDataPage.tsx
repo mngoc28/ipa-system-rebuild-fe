@@ -5,6 +5,7 @@ import { Settings2, Map, Flag, Briefcase, Tags, Plus, Search, Edit3, Trash2, Che
 import { cn } from "@/lib/utils";
 import { MasterDataItem, masterDataApi } from "@/api/masterDataApi";
 import { Button } from "@/components/ui/button";
+import { SelectField } from "@/components/ui/SelectField";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,89 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+const ACTIVE_STATUS_OPTIONS = [
+  { label: "Hoạt động", value: "active" },
+  { label: "Không hoạt động", value: "inactive" },
+];
+
+type MasterDataFormState = {
+  code: string;
+  name_vi: string;
+  name_en: string;
+  sort_order: string;
+  is_active: boolean;
+};
+
+type MasterDataFormErrors = Partial<Record<keyof MasterDataFormState, string>>;
+
+interface ParsedApiError {
+  message: string;
+  fieldErrors: MasterDataFormErrors;
+}
+
+const defaultFormState: MasterDataFormState = {
+  code: "",
+  name_vi: "",
+  name_en: "",
+  sort_order: "0",
+  is_active: true,
+};
+
+const parseApiError = (error: unknown): ParsedApiError => {
+  const fallbackMessage = "Không thể xử lý yêu cầu. Vui lòng kiểm tra dữ liệu và thử lại.";
+  const payload = (error as {
+    response?: {
+      data?: {
+        error?: {
+          message?: string;
+          details?: Array<{ field?: string; message?: string }>;
+          errors?: Record<string, string[] | string>;
+        };
+      };
+    };
+  })?.response?.data?.error;
+
+  const fieldErrors: MasterDataFormErrors = {};
+
+  payload?.details?.forEach((detail) => {
+    const field = detail.field as keyof MasterDataFormState | undefined;
+    if (!field || !(field in defaultFormState)) {
+      return;
+    }
+
+    if (!fieldErrors[field] && detail.message) {
+      fieldErrors[field] = detail.message;
+    }
+  });
+
+  const payloadErrors = payload?.errors;
+  if (payloadErrors && typeof payloadErrors === "object") {
+    Object.entries(payloadErrors).forEach(([field, value]) => {
+      if (!(field in defaultFormState)) {
+        return;
+      }
+
+      if (fieldErrors[field as keyof MasterDataFormState]) {
+        return;
+      }
+
+      if (Array.isArray(value) && value.length > 0) {
+        fieldErrors[field as keyof MasterDataFormState] = value[0];
+        return;
+      }
+
+      if (typeof value === "string" && value.trim()) {
+        fieldErrors[field as keyof MasterDataFormState] = value;
+      }
+    });
+  }
+
+  return {
+    message: payload?.message || fallbackMessage,
+    fieldErrors,
+  };
+};
 
 type DomainKey = "countries" | "delegation-types" | "priorities" | "event-types";
 
@@ -34,13 +118,8 @@ export default function MasterDataPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MasterDataItem | null>(null);
   const [selectedDeleteItem, setSelectedDeleteItem] = useState<MasterDataItem | null>(null);
-  const [formState, setFormState] = useState({
-    code: "",
-    name_vi: "",
-    name_en: "",
-    sort_order: "0",
-    is_active: true,
-  });
+  const [formState, setFormState] = useState<MasterDataFormState>(defaultFormState);
+  const [formErrors, setFormErrors] = useState<MasterDataFormErrors>({});
   const pageSize = 5;
 
   const listQuery = useQuery({
@@ -49,13 +128,11 @@ export default function MasterDataPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (payload: { code: string; name_vi: string; name_en?: string; sort_order?: number; is_active?: boolean }) =>
-      masterDataApi.create(activeTab, payload),
+    mutationFn: (payload: { code: string; name_vi: string; name_en?: string; sort_order?: number; is_active?: boolean }) => masterDataApi.create(activeTab, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["master-data", activeTab] });
       toast.success("Đã thêm bản ghi mới.");
     },
-    onError: () => toast.error("Không thể thêm bản ghi."),
   });
 
   const patchMutation = useMutation({
@@ -64,7 +141,6 @@ export default function MasterDataPage() {
       queryClient.invalidateQueries({ queryKey: ["master-data", activeTab] });
       toast.success("Đã cập nhật bản ghi.");
     },
-    onError: () => toast.error("Không thể cập nhật bản ghi."),
   });
 
   const deleteMutation = useMutation({
@@ -91,6 +167,7 @@ export default function MasterDataPage() {
 
   const handleAddRecord = () => {
     setSelectedItem(null);
+    setFormErrors({});
     setFormState({
       code: "",
       name_vi: "",
@@ -103,6 +180,7 @@ export default function MasterDataPage() {
 
   const handleEditRecord = (item: MasterDataItem) => {
     setSelectedItem(item);
+    setFormErrors({});
     setFormState({
       code: item.code,
       name_vi: item.name_vi,
@@ -119,16 +197,24 @@ export default function MasterDataPage() {
   };
 
   const resetForm = () => {
-    setFormState({
-      code: "",
-      name_vi: "",
-      name_en: "",
-      sort_order: "0",
-      is_active: true,
+    setFormState(defaultFormState);
+    setFormErrors({});
+  };
+
+  const updateFormField = <K extends keyof MasterDataFormState>(field: K, value: MasterDataFormState[K]) => {
+    setFormState((prev) => ({ ...prev, [field]: value }));
+    setFormErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: undefined };
     });
   };
 
   const handleCreateSubmit = async () => {
+    setFormErrors({});
+
     try {
       await createMutation.mutateAsync({
         code: formState.code.trim(),
@@ -141,8 +227,9 @@ export default function MasterDataPage() {
       resetForm();
       setPage(1);
     } catch (error) {
-      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
-      toast.error(message || "Không thể thêm bản ghi.");
+      const parsed = parseApiError(error);
+      setFormErrors(parsed.fieldErrors);
+      toast.error(parsed.message, { id: "master-data-submit-error" });
     }
   };
 
@@ -150,6 +237,8 @@ export default function MasterDataPage() {
     if (!selectedItem) {
       return;
     }
+
+    setFormErrors({});
 
     try {
       await patchMutation.mutateAsync({
@@ -166,8 +255,9 @@ export default function MasterDataPage() {
       setSelectedItem(null);
       resetForm();
     } catch (error) {
-      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
-      toast.error(message || "Không thể cập nhật bản ghi.");
+      const parsed = parseApiError(error);
+      setFormErrors(parsed.fieldErrors);
+      toast.error(parsed.message, { id: "master-data-submit-error" });
     }
   };
 
@@ -188,11 +278,11 @@ export default function MasterDataPage() {
     <div className="flex flex-col gap-6 duration-500 animate-in fade-in lg:flex-row">
       <aside className="w-full shrink-0 space-y-6 lg:w-[320px]">
         <div>
-          <h1 className="flex items-center gap-3 font-title text-2xl font-black tracking-tight text-slate-900 uppercase">
+          <h1 className="flex items-center gap-3 font-title text-2xl font-black uppercase tracking-tight text-slate-900">
             <Database size={24} className="text-primary" />
             Danh mục hệ thống
           </h1>
-          <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-tight">Cấu hình dữ liệu nền cho toàn hệ thống.</p>
+          <p className="mt-1 text-xs font-medium uppercase tracking-tight text-slate-500">Cấu hình dữ liệu nền cho toàn hệ thống.</p>
         </div>
 
         <div className="space-y-1 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
@@ -219,20 +309,20 @@ export default function MasterDataPage() {
           ))}
         </div>
 
-        <div className="space-y-4 rounded-xl bg-slate-950 p-6 text-white border border-slate-900 shadow-xl">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-lg border border-primary/20">
+        <div className="space-y-4 rounded-xl border border-slate-900 bg-slate-950 p-6 text-white shadow-xl">
+          <div className="flex size-10 items-center justify-center rounded-lg border border-primary/20 bg-primary shadow-lg">
             <Settings2 size={20} />
           </div>
           <div className="space-y-1">
             <p className="text-xs font-black uppercase tracking-tight text-white">Yêu cầu bổ sung dữ liệu?</p>
-            <p className="text-[10px] font-medium leading-relaxed text-slate-500 uppercase tracking-widest">Liên hệ IT để cấu hình thêm các trường dữ liệu tùy chỉnh.</p>
+            <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-slate-500">Liên hệ IT để cấu hình thêm các trường dữ liệu tùy chỉnh.</p>
           </div>
           <button
             onClick={() => {
               setRequestSent(true);
               toast.success("Đã gửi yêu cầu bổ sung dữ liệu cho IT.");
             }}
-            className="w-full py-2.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-white/10"
           >
             {requestSent ? "ĐÃ GỬI YÊU CẦU" : "GỬI YÊU CẦU IT"}
           </button>
@@ -244,13 +334,15 @@ export default function MasterDataPage() {
           <div className="relative w-full md:w-[320px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
+              id="master-data-search"
+              name="search"
               placeholder="Tìm kiếm bản ghi..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5 shadow-sm"
+              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium shadow-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5"
             />
           </div>
           <button onClick={handleAddRecord} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
@@ -273,23 +365,23 @@ export default function MasterDataPage() {
               {pagedRecords.map((item) => (
                 <tr key={item.id} className="group transition-all hover:bg-slate-50/50">
                   <td className="whitespace-nowrap px-6 py-4">
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">{item.name_vi}</span>
+                    <span className="text-xs font-bold text-slate-900 transition-colors group-hover:text-primary">{item.name_vi}</span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <code className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-black text-slate-500 uppercase">{item.code}</code>
+                    <code className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-black uppercase text-slate-500">{item.code}</code>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <div className="size-1.5 rounded-full bg-emerald-500" />
                       {item.is_active === false ? "Không hoạt động" : "Hoạt động"}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-10 md:opacity-0 transition-opacity group-hover:opacity-100">
-                      <button onClick={() => handleEditRecord(item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-primary/5 hover:text-primary border border-transparent hover:border-primary/10">
+                    <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
+                      <button aria-label={`Chỉnh sửa ${item.name_vi}`} title={`Chỉnh sửa ${item.name_vi}`} onClick={() => handleEditRecord(item)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-primary/10 hover:bg-primary/5 hover:text-primary">
                         <Edit3 size={14} />
                       </button>
-                      <button onClick={() => handleDeleteRecord(item)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 border border-transparent hover:border-rose-100">
+                      <button aria-label={`Xóa ${item.name_vi}`} title={`Xóa ${item.name_vi}`} onClick={() => handleDeleteRecord(item)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -305,14 +397,22 @@ export default function MasterDataPage() {
             Tổng cộng <span className="text-slate-900">{filteredRecords.length}</span> bản ghi hệ thống
           </p>
           <div className="flex gap-1">
-            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled={normalizedPage === 1}>Trang trước</button>
+            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === 1}>Trang trước</button>
             <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white">{normalizedPage}</button>
-            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled={normalizedPage === totalPages}>Trang kế</button>
+            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === totalPages}>Trang kế</button>
           </div>
         </div>
       </main>
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open) {
+            resetForm();
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Thêm bản ghi mới</DialogTitle>
@@ -323,50 +423,60 @@ export default function MasterDataPage() {
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Key</span>
               <input
+                id="master-data-create-code"
+                name="code"
                 value={formState.code}
-                onChange={(e) => setFormState((prev) => ({ ...prev, code: e.target.value }))}
+                onChange={(e) => updateFormField("code", e.target.value)}
                 placeholder="COUNTRIES_5"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.code && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.code}</p>}
             </label>
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-create-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Trạng thái</span>
-              <select
+              <SelectField
+                id="master-data-create-status"
                 value={formState.is_active ? "active" : "inactive"}
-                onChange={(e) => setFormState((prev) => ({ ...prev, is_active: e.target.value === "active" }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
-              >
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Không hoạt động</option>
-              </select>
+                onValueChange={(v) => updateFormField("is_active", v === "active")}
+                options={ACTIVE_STATUS_OPTIONS}
+              />
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Việt</span>
               <input
+                id="master-data-create-name-vi"
+                name="name_vi"
                 value={formState.name_vi}
-                onChange={(e) => setFormState((prev) => ({ ...prev, name_vi: e.target.value }))}
+                onChange={(e) => updateFormField("name_vi", e.target.value)}
                 placeholder="Tên bản ghi"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.name_vi ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.name_vi && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_vi}</p>}
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Anh</span>
               <input
+                id="master-data-create-name-en"
+                name="name_en"
                 value={formState.name_en}
-                onChange={(e) => setFormState((prev) => ({ ...prev, name_en: e.target.value }))}
+                onChange={(e) => updateFormField("name_en", e.target.value)}
                 placeholder="Record name"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.name_en ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.name_en && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_en}</p>}
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500 md:col-span-2">
               <span>Thứ tự hiển thị</span>
               <input
+                id="master-data-create-sort-order"
+                name="sort_order"
                 type="number"
                 min="0"
                 value={formState.sort_order}
-                onChange={(e) => setFormState((prev) => ({ ...prev, sort_order: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                onChange={(e) => updateFormField("sort_order", e.target.value)}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.sort_order ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.sort_order && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.sort_order}</p>}
             </label>
           </div>
 
@@ -378,10 +488,22 @@ export default function MasterDataPage() {
               {createMutation.isPending ? "Đang lưu..." : "Tạo bản ghi"}
             </Button>
           </DialogFooter>
+          {createMutation.isPending && (
+            <p className="text-[11px] font-semibold text-amber-700">Đang gửi dữ liệu lên hệ thống, vui lòng chờ trong giây lát...</p>
+          )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      <Dialog
+        open={editOpen}
+        onOpenChange={(open) => {
+          setEditOpen(open);
+          if (!open) {
+            setSelectedItem(null);
+            resetForm();
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Chỉnh sửa bản ghi</DialogTitle>
@@ -392,47 +514,57 @@ export default function MasterDataPage() {
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Key</span>
               <input
+                id="master-data-edit-code"
+                name="code"
                 value={formState.code}
-                onChange={(e) => setFormState((prev) => ({ ...prev, code: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                onChange={(e) => updateFormField("code", e.target.value)}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.code && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.code}</p>}
             </label>
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-edit-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Trạng thái</span>
-              <select
+              <SelectField
+                id="master-data-edit-status"
                 value={formState.is_active ? "active" : "inactive"}
-                onChange={(e) => setFormState((prev) => ({ ...prev, is_active: e.target.value === "active" }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
-              >
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Không hoạt động</option>
-              </select>
+                onValueChange={(v) => updateFormField("is_active", v === "active")}
+                options={ACTIVE_STATUS_OPTIONS}
+              />
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Việt</span>
               <input
+                id="master-data-edit-name-vi"
+                name="name_vi"
                 value={formState.name_vi}
-                onChange={(e) => setFormState((prev) => ({ ...prev, name_vi: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                onChange={(e) => updateFormField("name_vi", e.target.value)}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.name_vi ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.name_vi && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_vi}</p>}
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Anh</span>
               <input
+                id="master-data-edit-name-en"
+                name="name_en"
                 value={formState.name_en}
-                onChange={(e) => setFormState((prev) => ({ ...prev, name_en: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                onChange={(e) => updateFormField("name_en", e.target.value)}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.name_en ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.name_en && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_en}</p>}
             </label>
             <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500 md:col-span-2">
               <span>Thứ tự hiển thị</span>
               <input
+                id="master-data-edit-sort-order"
+                name="sort_order"
                 type="number"
                 min="0"
                 value={formState.sort_order}
-                onChange={(e) => setFormState((prev) => ({ ...prev, sort_order: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5"
+                onChange={(e) => updateFormField("sort_order", e.target.value)}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.sort_order ? "border-rose-300" : "border-slate-200")}
               />
+              {formErrors.sort_order && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.sort_order}</p>}
             </label>
           </div>
 

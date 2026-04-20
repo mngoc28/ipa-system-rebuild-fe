@@ -87,7 +87,7 @@ export const projectDataHelper = {
     return colors[normalizedStageId] || "bg-slate-400";
   },
 
-  calculateFunnelStats: (projects: any[]) => {
+  calculateFunnelStats: (projects: Array<{ stage_id: string; estimated_value?: number | string | null }>) => {
     const stages = ["lead", "contacted", "proposal", "negotiation"];
     return stages.map((s) => {
       const matches = projects.filter((p) => projectDataHelper.normalizeStageId(p.stage_id) === s);

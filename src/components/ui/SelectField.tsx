@@ -14,6 +14,8 @@ interface Option {
 }
 
 interface SelectFieldProps {
+  id?: string;
+  name?: string;
   value: string;
   onValueChange: (value: string) => void;
   options: Option[];
@@ -24,6 +26,8 @@ interface SelectFieldProps {
 }
 
 export function SelectField({
+  id,
+  name,
   value,
   onValueChange,
   options,
@@ -36,6 +40,8 @@ export function SelectField({
     <div className={cn("w-full", className)}>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
         <SelectTrigger 
+          id={id}
+          name={name}
           className={cn(
             "h-auto w-full rounded-lg border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
             triggerClassName

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BarChart3, Download, Filter, Globe2, LayoutGrid, Plus, Search, Target, TrendingUp } from "lucide-react";
+import { BarChart3, Download, LayoutGrid, Plus, Search, Target, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { pipelineApi, PipelineProject } from "@/api/pipelineApi";
@@ -105,7 +105,7 @@ export default function DirectorPipelinePage() {
     return (
       <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
         <div className="max-w-md space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
             <TrendingUp size={22} />
           </div>
           <div className="space-y-1">
@@ -139,7 +139,7 @@ export default function DirectorPipelinePage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Director Pipeline</p>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Pipeline Xúc tiến Đầu tư</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Pipeline Xúc tiến Đầu tư</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi và quản lý phễu dòng vốn đầu tư chiến lược bằng dữ liệu thật từ backend.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export default function DirectorPipelinePage() {
           </button>
           <button
             onClick={() => toast.success("Đã tạo gói xuất báo cáo")}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 active:scale-95 shadow-sm"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
           >
             <Download size={14} /> Xuất báo cáo
           </button>
@@ -170,7 +170,7 @@ export default function DirectorPipelinePage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
+            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
               <Target size={20} className="text-primary" /> Dự án trọng điểm
             </h2>
             <div className="relative w-full sm:w-64">
@@ -179,7 +179,7 @@ export default function DirectorPipelinePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <div className="scrollbar-none flex items-center gap-2 overflow-x-auto pb-2">
             {stageFilterItems.map((item) => (
               <button
                 key={item.value || "all"}
@@ -200,13 +200,13 @@ export default function DirectorPipelinePage() {
         <div className="space-y-6">
           <div className="flex flex-col justify-between rounded-xl border border-primary/10 bg-primary p-6 text-white shadow-xl shadow-primary/20">
             <div className="space-y-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-300 shadow-inner">
+              <div className="flex size-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-300 shadow-inner">
                 <TrendingUp size={20} />
               </div>
               <div className="space-y-0.5">
                 <h3 className="text-lg font-black uppercase tracking-tight">Dòng vốn 2026</h3>
-                <p className="text-[10px] font-medium uppercase tracking-widest text-white/50 leading-relaxed">
-                  Tổng giá trị pipeline: <span className="text-amber-300 font-black">{formatCurrency(summary.value.total)}</span>
+                <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-white/50">
+                  Tổng giá trị pipeline: <span className="font-black text-amber-300">{formatCurrency(summary.value.total)}</span>
                 </p>
               </div>
 
@@ -295,7 +295,7 @@ function StatCard({ title, value, note, icon, color }: { title: string; value: s
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.98]">
-      <div className="absolute right-[-10px] top-[-10px] h-20 w-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
+      <div className="absolute right-[-10px] top-[-10px] size-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
       <div className="relative z-10 space-y-5">
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}>{icon}</div>
         <div>
@@ -313,7 +313,7 @@ function StatCard({ title, value, note, icon, color }: { title: string; value: s
 function SummaryLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 text-[11px] font-bold">
-      <span className="text-white/60 uppercase tracking-tight">{label}</span>
+      <span className="uppercase tracking-tight text-white/60">{label}</span>
       <span className="font-black text-white">{value}</span>
     </div>
   );
@@ -339,7 +339,7 @@ function EmptyState({ label }: { label: string }) {
 
 function PipelineSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="animate-pulse space-y-6">
       <div className="flex items-center justify-between gap-6">
         <div className="h-14 w-2/3 rounded-2xl bg-slate-200" />
         <div className="h-10 w-56 rounded-2xl bg-slate-200" />

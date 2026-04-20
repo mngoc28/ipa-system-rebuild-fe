@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PublicPaginationProps } from "../type";
 
@@ -63,17 +63,20 @@ const PublicPagination = ({
         {onPageSizeChange && pageSize && (
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-slate-700">{t("pagination.show")}</span>
-            <select
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm"
-              value={pageSize}
-              onChange={handlePerPageChange}
-            >
-              {[10, 20, 30, 50].map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                className="appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-8 text-sm font-medium text-slate-700 shadow-sm outline-none"
+                value={pageSize}
+                onChange={handlePerPageChange}
+              >
+                {[10, 20, 30, 50].map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            </div>
           </div>
         )}
         {totalItems !== undefined && (
@@ -94,7 +97,7 @@ const PublicPagination = ({
               : "border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50"
           )}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="size-4" />
           <span>{t("pagination.previous")}</span>
         </button>
 
@@ -102,7 +105,7 @@ const PublicPagination = ({
           {getVisiblePages().map((page, idx) => {
             if (page === "ellipsis") {
               return (
-                <span key={`ellipsis-${idx}`} className="flex h-10 w-10 items-center justify-center text-slate-400">
+                <span key={`ellipsis-${idx}`} className="flex size-10 items-center justify-center text-slate-400">
                   ···
                 </span>
               );
@@ -136,7 +139,7 @@ const PublicPagination = ({
           )}
         >
           <span>{t("pagination.next")}</span>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="size-4" />
         </button>
       </nav>
     </div>

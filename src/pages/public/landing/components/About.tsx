@@ -11,8 +11,8 @@ export default function About() {
 
         <div className="grid gap-8 md:grid-cols-3">
           {landingHighlights.map((item, idx) => (
-            <div key={idx} className="rounded-2xl bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-slate-100">
-              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <div key={idx} className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+              <div className="mb-6 inline-flex size-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                 <item.icon size={24} />
               </div>
               <h3 className="mb-3 text-lg font-bold text-slate-900">{item.title}</h3>

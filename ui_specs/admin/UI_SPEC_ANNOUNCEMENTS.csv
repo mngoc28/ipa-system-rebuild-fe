@@ -1,0 +1,13 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Announcements,page_title,label,Quản lý Thông báo,,none,header,,,font-title text-2xl font-black uppercase,Portal management for global notifications
+Announcements,btn_add_announcement,button,THÊM THÔNG BÁO,,click,header,,,bg-primary text-white shadow-lg,Opens modal to create new announcement
+Announcements,stat_total_announcements,card,Tổng thông báo,,none,center,,,text-primary bg-primary/5,Cumulative count of all records
+Announcements,stat_online_users,card,Người dùng Online,,none,center,,,text-slate-900 bg-slate-50,Real-time online session count
+Announcements,search_content,input,,Tìm kiếm nội dung...,type,center,false,,border-slate-100 text-sm,Keyword search across announcement text
+Announcements,data_table,table,,,[none],center,,,rounded-xl border shadow-sm,Main data grid for announcements
+Announcements,row_type_badge,badge,,,[none],center,,,rounded-full px-2 py-0.5 text-[10px],Color coded: blue (info), amber (update), rose (critical)
+Announcements,row_status_badge,badge,,,[none],center,,,rounded-full px-2 py-0.5 text-[10px],Indicates: Hoạt động, Chờ hiệu lực, Hết hạn, Tắt
+Announcements,btn_edit,button,,,[click],center,,,text-slate-400 hover:text-primary,Edit existing record
+Announcements,btn_delete,button,,,[click],center,,,text-slate-400 hover:text-rose-500,Delete record with confirmation
+Announcements,btn_reload,button,Làm mới dữ liệu,,click,bottom,,,text-slate-400 font-bold,Manual refetch of list and stats
+Announcements,pagination,pagination,,,click,bottom,,,text-xs text-slate-500,Page navigation for result set

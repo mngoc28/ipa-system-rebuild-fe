@@ -5,8 +5,6 @@ import { partnersApi } from "@/api/partnersApi";
 import {
   getNextPartnerStatus,
   mapPartnerItemsToUi,
-  type PartnerApiItem,
-  type PartnerDetailApiItem,
   type PartnerCreatePayload,
   type PartnerOptionsResponse,
   type PartnerUiItem,
@@ -29,7 +27,7 @@ export const usePartnersListQuery = (options: PartnersQueryOptions = {}) => {
   });
 
   const partners = React.useMemo(() => mapPartnerItemsToUi(partnersQuery.data?.data?.items ?? []), [partnersQuery.data]);
-  const meta = partnersQuery.data?.data?.meta;
+  const meta = partnersQuery.data?.meta;
 
   return { partnersQuery, partners, meta };
 };

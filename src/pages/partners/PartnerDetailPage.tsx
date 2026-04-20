@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getNextPartnerStatus, getPartnerStatusValue, mapPartnerStatus } from "@/dataHelper/partners.dataHelper";
 import { usePartnerDetailQuery, usePromotePartnerStatusMutation } from "@/hooks/usePartnersQuery";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function PartnerDetailPage() {
   const navigate = useNavigate();
@@ -13,7 +14,11 @@ export default function PartnerDetailPage() {
   const partner = detailQuery.data?.data;
 
   if (detailQuery.isLoading) {
-    return <div className="flex min-h-[60vh] items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Đang tải chi tiết đối tác...</div>;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingSpinner label="Đang tải chi tiết đối tác..." />
+      </div>
+    );
   }
 
   if (detailQuery.isError || !partner) {
@@ -38,7 +43,7 @@ export default function PartnerDetailPage() {
     <div className="mx-auto max-w-6xl space-y-8 pb-16 duration-500 animate-in fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <button onClick={() => navigate("/partners")} className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
+          <button onClick={() => navigate("/partners")} title="Quay lại" aria-label="Quay lại" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
           <div>

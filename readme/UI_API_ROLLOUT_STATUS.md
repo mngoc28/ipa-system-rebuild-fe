@@ -3,7 +3,7 @@
 ## Assumptions
 - FE calls BE through `/api/v1/*` with envelope `{ success, data, meta }`.
 - Priority batches: auth/permission -> admin core -> domain modules.
-- Current update covers Batch 1 -> Batch 7.
+- Current update covers Batch 1 -> Batch 8.
 
 ## Coverage Matrix
 
@@ -23,7 +23,7 @@
 | Notifications | `staff/notifications/NotificationsPage` and reused route | `/notifications*` | In progress |
 | Reports | `manager/UnitReportsPage`, `director/CityReportsPage` | `/reports/*` | In progress |
 | Pipeline | `director/PipelinePage` | `/pipeline/projects*` | In progress |
-| Admin System & Audit | `admin/SystemSettingsPage`, `admin/AuditLogPage` | `/admin/system-settings`, `/admin/audit-logs*`, `/admin/integrations/*/test` | Not started |
+| Admin System & Audit | `admin/SystemSettingsPage`, `admin/AuditLogPage` | `/admin/system-settings`, `/admin/audit-logs*`, `/admin/integrations/*/test` | Delivered |
 
 ## Batch 1 Delivered
 - Added React Query provider and shared query client.
@@ -66,10 +66,16 @@
 - Integrated director pipeline page with `/pipeline/projects` list/create and `/pipeline/projects/{id}/stage` stage transition action.
 - Added typed API clients for master-data, reports, and pipeline domains.
 
+## Batch 8 Delivered
+- Integrated `admin/SystemSettingsPage` with `/admin/system-settings` list/update flow.
+- Integrated `admin/SystemSettingsPage` with `/admin/integrations/{provider}/test` test action.
+- Integrated `admin/AuditLogPage` with `/admin/audit-logs` infinite list, filters, and CSV export.
+- Added admin/security seed data so the audit screen renders realistic activity records after reseed.
+
 ## Known Gaps / Blockers
 - FE currently does not persist refresh token, so automatic refresh flow is incomplete.
 - BE does not expose `DELETE /admin/users/{id}` endpoint for real delete action in Admin Users UI.
 - Many role pages are duplicated per role; rollout speed improves if shared hooks/components are extracted later.
 
 ## Next Batch Proposal
-- Batch 8: Admin System Settings + Audit Logs + Integrations.
+- Batch 9: pending rollout review after admin system/audit validation.

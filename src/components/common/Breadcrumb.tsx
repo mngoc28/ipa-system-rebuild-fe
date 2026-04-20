@@ -15,7 +15,7 @@ const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
 
           return (
             <li key={`${item.label}-${index}`} className="flex items-center gap-2">
-              {isFirst && <Home className="h-4 w-4 text-slate-400" />}
+              {isFirst && <Home className="size-4 text-slate-400" />}
               {item.href && !isLast ? (
                 <Link to={item.href} className="font-medium text-slate-600 transition-colors hover:text-sky-600">
                   {item.label}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TrendingUp, Users, Calendar, Clock, CheckCircle2, ChevronRight, ArrowUpRight, Zap, Briefcase, MapPin, ShieldCheck, Building2, PieChart, ClipboardList, Search, Bell, Settings } from "lucide-react";
+import { TrendingUp, Users, Calendar, Clock, CheckCircle2, ChevronRight, ArrowUpRight, Zap, Briefcase, MapPin, ShieldCheck, Building2, PieChart, ClipboardList, Search, Bell, Settings, Target, AlertTriangle, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { weekSessions } from "@/dataHelper/ui-system.data";
 import { onlineUsers } from "@/dataHelper/dashboard.dataHelper";
@@ -50,19 +50,45 @@ export default function DashboardPage() {
   const tasksQuery = useDashboardTasksQuery(scope);
 
   const summary = summaryQuery.data?.data;
+  const city = summary?.city;
   const taskFeed = tasksQuery.data?.data?.items || [];
   const timelineItems: TimelineItem[] = isAdmin ? onlineUsers : weekSessions.slice(0, 3);
+
+  const strategicBrief = React.useMemo(() => {
+    const stageBreakdown = city?.stageBreakdown ?? [];
+    const totalProjects = stageBreakdown.reduce((sum, item) => sum + item.projectCount, 0);
+    const activeValue = city?.activePipelineValue ?? 0;
+    const totalValue = city?.totalPipelineValue ?? 0;
+    const activeShare = totalValue > 0 ? Math.round((activeValue / totalValue) * 100) : 0;
+    const bottleneckStage = [...stageBreakdown].sort((left, right) => right.projectCount - left.projectCount)[0];
+    const topPartner = city?.topPartners?.[0];
+    const upcomingEvent = city?.upcomingEventsList?.[0];
+
+    return {
+      totalProjects,
+      activeShare,
+      bottleneckStage,
+      topPartner,
+      upcomingEvent,
+      pressureLabel:
+        activeShare >= 70
+          ? "Pipeline đang mở tốt, ưu tiên chốt deal lớn"
+          : activeShare >= 40
+            ? "Cần cân bằng giữa mở mới và chốt pipeline"
+            : "Pipeline đang mỏng, cần tăng tốc đẩy tiến độ",
+    };
+  }, [city]);
 
   return (
     <div className="space-y-8 duration-700 animate-in fade-in">
       {/* Welcome Section */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
-          <h1 className="font-title text-3xl font-black leading-tight text-slate-900 uppercase tracking-tight">
+          <h1 className="font-title text-3xl font-black uppercase leading-tight tracking-tight text-slate-900">
             {isDirector ? "Báo cáo chiến lược," : isManager ? "Quản lý đơn vị," : isAdmin ? "Quản trị hệ thống," : "Tin vắn nghiệp vụ,"}{" "}
             <span className="text-primary">{user?.fullName || "Cán bộ IPA"}</span> 👋
           </h1>
-          <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide opacity-70">
+          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500 opacity-70">
             {isAdmin ? "HỆ THỐNG ĐANG VẬN HÀNH ỔN ĐỊNH" : `IPA ĐÀ NẴNG • THỨ 6, 10/04/2026`}
           </p>
         </div>
@@ -92,10 +118,10 @@ export default function DashboardPage() {
           </>
         ) : isDirector ? (
           <>
-            <StatCard title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<TrendingUp size={20} />} color="emerald" />
-            <StatCard title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<Briefcase size={20} />} color="blue" />
-            <StatCard title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Events" icon={<PieChart size={20} />} color="purple" />
-            <StatCard title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Users size={20} />} color="amber" />
+            <StatCard title="Tổng vốn đầu tư" value={city ? String(city.totalPipelineValue ?? 0) : "N/A"} note={city ? "Từ city overview" : "Chưa đồng bộ city summary"} icon={<TrendingUp size={20} />} color="emerald" />
+            <StatCard title="Dự án Pipeline" value={city ? String(city.pipelineProjects ?? 0) : "N/A"} note={city ? "Dự án đang theo dõi" : "Chưa đồng bộ city summary"} icon={<Briefcase size={20} />} color="blue" />
+            <StatCard title="Đoàn công tác" value={city ? String(city.activeDelegations ?? 0) : "N/A"} note={city ? "Đang mở" : "Chưa đồng bộ city summary"} icon={<ClipboardList size={20} />} color="purple" />
+            <StatCard title="Sự kiện tới" value={city ? String(city.upcomingEvents ?? 0) : "N/A"} note={city ? "Đã xếp lịch" : "Chưa đồng bộ city summary"} icon={<Calendar size={20} />} color="amber" />
           </>
         ) : isManager ? (
           <>
@@ -114,11 +140,77 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {isDirector && (
+        <section className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <div className="rounded-xl bg-slate-950 p-3 text-white shadow-sm">
+                <Target size={18} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Director Control Center</p>
+                <h2 className="text-lg font-black uppercase tracking-tight text-slate-950">Tín hiệu chiến lược hiện tại</h2>
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              <MiniInsight
+                title="Tỉ trọng pipeline mở"
+                value={city ? `${strategicBrief.activeShare}%` : "N/A"}
+                detail={city ? strategicBrief.pressureLabel : "City summary chưa đồng bộ vào dashboard, mở tổng quan thành phố để xem số thật."}
+                icon={<Activity size={16} />}
+                tone="emerald"
+              />
+              <MiniInsight
+                title="Điểm cần chú ý"
+                value={city ? formatDisplayLabel(strategicBrief.bottleneckStage?.stageName, "Chưa xác định") : "N/A"}
+                detail={city ? (strategicBrief.bottleneckStage ? `${strategicBrief.bottleneckStage.projectCount} dự án trong stage này` : "Chưa có stage đủ dữ liệu") : "Chưa có stage insight từ dashboard summary"}
+                icon={<AlertTriangle size={16} />}
+                tone="amber"
+              />
+              <MiniInsight
+                title="Đối tác dẫn đầu"
+                value={city ? formatDisplayLabel(strategicBrief.topPartner?.partnerName, "Chưa có partner") : "N/A"}
+                detail={city ? (strategicBrief.topPartner ? `${strategicBrief.topPartner.projectCount} dự án đang nối` : "Chưa có dữ liệu top partner") : "Chưa có partner insight từ dashboard summary"}
+                icon={<Users size={16} />}
+                tone="blue"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Hành động ưu tiên</p>
+                <span className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">{strategicBrief.totalProjects} dự án</span>
+              </div>
+              <p className="text-sm font-semibold leading-6 text-slate-700">
+                {strategicBrief.upcomingEvent
+                  ? `Sự kiện gần nhất là ${formatDisplayLabel(strategicBrief.upcomingEvent.title, "sự kiện chưa đặt tên")} vào ${formatDateTime(strategicBrief.upcomingEvent.startAt)}.`
+                  : "Chưa có sự kiện sắp tới đủ dữ liệu để ưu tiên."}
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button onClick={() => navigate("/city-overview")} className="rounded-xl bg-slate-950 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800">
+                Mở tổng quan thành phố
+              </button>
+              <button onClick={() => navigate("/reports/city")} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 transition hover:bg-slate-50">
+                Mở báo cáo chiến lược
+              </button>
+              <button onClick={() => navigate("/approvals")} className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary transition hover:bg-primary/10">
+                Xem phê duyệt chờ xử lý
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
           <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-50 pb-5">
-              <h2 className="flex items-center gap-3 font-title text-base font-black text-slate-900 uppercase tracking-tight">
+              <h2 className="flex items-center gap-3 font-title text-base font-black uppercase tracking-tight text-slate-900">
                 {isAdmin ? <ShieldCheck size={20} className="text-primary" /> : <CheckCircle2 size={20} className="text-primary" />}
                 {isAdmin ? "Nhật ký vận hành hệ thống" : "Đầu việc trọng tâm & Khẩn cấp"}
               </h2>
@@ -150,7 +242,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-black text-slate-900 transition-colors group-hover:text-primary uppercase tracking-tight leading-tight">{item.title}</h4>
+                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.title}</h4>
                       {item.priority && (
                         <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-200")}>
                           {item.priority}
@@ -196,14 +288,14 @@ export default function DashboardPage() {
               <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{isAdmin ? "USERS ONLINE" : "SỰ KIỆN TRONG NGÀY"}</h2>
               <Calendar size={16} className="text-primary" />
             </div>
-            <div className="relative space-y-6 before:absolute before:bottom-2 before:left-3.5 before:top-2 before:w-px before:bg-slate-100">
+            <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-slate-100">
               {timelineItems.map((item) => (
                 <div key={item.id} className="group relative pl-10">
-                  <div className="absolute left-[8.5px] top-1.5 z-10 h-2 w-2 rounded-sm bg-slate-200 transition-all group-hover:bg-primary shadow-[0_0_0_4px_white] ring-1 ring-slate-100" />
+                  <div className="absolute left-[8.5px] top-1.5 z-10 size-2 rounded-sm bg-slate-200 shadow-[0_0_0_4px_white] ring-1 ring-slate-100 transition-all group-hover:bg-primary" />
                   <div className="space-y-1">
                     <p className="text-[9px] font-black uppercase tracking-widest text-primary">{item.time || item.role}</p>
-                    <h4 className="truncate text-xs font-black uppercase tracking-tight text-slate-900 leading-tight">{item.title || item.name}</h4>
-                    <p className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                    <h4 className="truncate text-xs font-black uppercase leading-tight tracking-tight text-slate-900">{item.title || item.name}</h4>
+                    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-slate-400">
                       <MapPin size={12} className="text-slate-300" /> {item.location || item.ip}
                     </p>
                   </div>
@@ -212,13 +304,13 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={() => navigate(isAdmin ? "/admin/users" : "/schedule")}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 transition-all hover:bg-slate-950 hover:text-white shadow-sm active:scale-95"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm transition-all hover:bg-slate-950 hover:text-white active:scale-95"
             >
               {isAdmin ? "QUẢN LÝ PHÂN QUYỀN" : "XEM TOÀN BỘ LỊCH TUẦN"}
             </button>
           </div>
 
-          <div onClick={() => navigate("/notifications")} className="group relative overflow-hidden rounded-xl bg-slate-950 p-7 text-white shadow-2xl shadow-slate-950/20 active:scale-[0.98] transition-all cursor-pointer">
+          <div onClick={() => navigate("/notifications")} className="group relative cursor-pointer overflow-hidden rounded-xl bg-slate-950 p-7 text-white shadow-2xl shadow-slate-950/20 transition-all active:scale-[0.98]">
             <div className="relative z-10 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="rounded-lg bg-white/10 p-2 text-amber-400 shadow-inner">
@@ -231,7 +323,7 @@ export default function DashboardPage() {
                 <p className="text-[11px] font-medium leading-relaxed text-white/60">Báo cáo Xúc tiến Đầu tư Quý I đã được lãnh đạo phê duyệt và ký số.</p>
               </div>
             </div>
-            <div className="absolute bottom-[-40px] right-[-40px] h-48 w-48 rounded-full bg-primary/10 blur-3xl transition-all group-hover:bg-primary/20" />
+            <div className="absolute bottom-[-40px] right-[-40px] size-48 rounded-full bg-primary/10 blur-3xl transition-all group-hover:bg-primary/20" />
           </div>
         </div>
       </div>
@@ -249,19 +341,87 @@ function StatCard({ title, value, note, icon, color }: StatCardProps) {
   };
   return (
     <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.98]">
-      <div className="absolute right-[-10px] top-[-10px] h-20 w-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:bg-primary/10 group-hover:scale-110" />
+      <div className="absolute right-[-10px] top-[-10px] size-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
       <div className="relative z-10 space-y-5">
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}> {icon} </div>
         <div>
           <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
           <p className="text-3xl font-black tracking-tighter text-slate-950">{value}</p>
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <ArrowUpRight size={14} className="animate-pulse" /> {note}
         </div>
       </div>
     </div>
   );
+}
+
+function MiniInsight({ title, value, detail, icon, tone }: { title: string; value: string; detail: string; icon: React.ReactNode; tone: "blue" | "emerald" | "amber" }) {
+  const toneClasses: Record<typeof tone, string> = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    amber: "bg-amber-50 text-amber-600 border-amber-100",
+  };
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl border", toneClasses[tone])}>{icon}</div>
+      <p className="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{title}</p>
+      <p className="mt-1 text-sm font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-1 text-[11px] font-medium leading-5 text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function formatDisplayLabel(value: string | null | undefined, fallback: string): string {
+  if (!value) {
+    return fallback;
+  }
+
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  const lowered = normalized.toLowerCase();
+  if (
+    lowered.includes("seed") ||
+    lowered.startsWith("ipa_") ||
+    lowered.startsWith("name_vi_") ||
+    lowered.startsWith("name_") ||
+    lowered.startsWith("title_") ||
+    lowered.startsWith("project_name_") ||
+    lowered.startsWith("partner_name_")
+  ) {
+    return fallback;
+  }
+
+  return normalized;
+}
+
+const dateFormatter = new Intl.DateTimeFormat("vi-VN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
+const timeFormatter = new Intl.DateTimeFormat("vi-VN", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  return `${dateFormatter.format(date)} · ${timeFormatter.format(date)}`;
 }
 
 function HighlightCard({ title, detail, action, color, icon, progress, onClick }: HighlightCardProps) {
@@ -272,7 +432,7 @@ function HighlightCard({ title, detail, action, color, icon, progress, onClick }
 
   return (
     <div className={cn("relative space-y-6 overflow-hidden rounded-xl p-8 text-white shadow-2xl transition-all active:scale-[0.98] cursor-pointer", color === "dark" ? "bg-slate-900 shadow-slate-900/10" : "bg-primary shadow-primary/10")}>
-      <div className="absolute right-6 top-6 text-white opacity-5 transform scale-150">{icon}</div>
+      <div className="absolute right-6 top-6 scale-150 text-white opacity-5">{icon}</div>
       <div className="space-y-1">
         <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">HỆ THỐNG IPA</p>
         <h3 className="font-title text-xl font-black uppercase tracking-tight">{title}</h3>
@@ -289,7 +449,7 @@ function HighlightCard({ title, detail, action, color, icon, progress, onClick }
         </div>
       ) : (
         <div className="rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm">
-          <p className="text-xs font-semibold leading-relaxed text-white/80 uppercase tracking-tight">{detail}</p>
+          <p className="text-xs font-semibold uppercase leading-relaxed tracking-tight text-white/80">{detail}</p>
         </div>
       )}
       <button

@@ -1,0 +1,14 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Unit Reports,page_title,label,Báo cáo Đơn vị,,none,header,,,font-title text-2xl font-black uppercase,Main module heading
+Unit Reports,btn_create_report,button,TẠO BÁO CÁO,,submit,header,,,bg-primary text-white font-black,Triggers report generation process
+Unit Reports,stat_templates,card,Mẫu báo cáo,,none,center,,,border-slate-200 bg-white,Shows count of report definitions
+Unit Reports,stat_last_status,card,Tiến trình gần nhất,,none,center,,,border-slate-200 bg-white,Shows status of active/latest run
+Unit Reports,stat_run_id,card,Mã chạy,,none,center,,,border-slate-200 bg-white,Shows latest run ID
+Unit Reports,kpi_summary_card,card,Hiệu suất Đạt 92.5%,,none,center,,,bg-slate-950 text-white shadow-xl,Highlight of monthly KPI results
+Unit Reports,btn_view_chart,button,Xem biểu đồ,,click,center,,,border-slate-200 font-black,Toggles KPI chart panel visibility
+Unit Reports,chart_panel,panel,Biểu đồ KPI: ...,,none,center,,,bg-white shadow-sm,Conditional panel showing analytical data
+Unit Reports,history_title,label,Lịch sử Báo cáo,,none,bottom,,,font-title text-lg font-black,Section header for run history
+Unit Reports,btn_filter_toggle,button,,Mở bộ lọc báo cáo,click,bottom,,,bg-slate-50 border-slate-100,Toggles filter dropdown
+Unit Reports,template_selector,select,,Chọn mẫu báo cáo,type,bottom,false,,border-slate-200 text-xs,Filters history by definition
+Unit Reports,report_item_row,card,,,[click],bottom,,,bg-slate-50/30 border-slate-100,Individual report run record
+Unit Reports,btn_download_report,button,Tải xuống,,click,bottom,,,bg-white border-slate-200 font-black,Available when status is 'Done'

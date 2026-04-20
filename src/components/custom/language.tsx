@@ -27,10 +27,10 @@ const Language = forwardRef<HTMLDivElement, ComponentProps<"div">>(({ className,
     >
       <Select value={lang} onValueChange={handleLanguageChange}>
         <div className="flex w-fit items-center justify-center">
-          <SelectTrigger className="border-none shadow-none hover:bg-slate-100 flex h-auto px-2">
+          <SelectTrigger className="flex h-auto border-none px-2 shadow-none hover:bg-slate-100">
             <SelectValue>
               <div className="flex flex-row items-center justify-center">
-                <img src={`/app/images/front/flag-${lang}.svg`} alt={lang} className="w-[1.5rem] shadow-sm lg:w-[2rem]" />
+                <img src={`/app/images/front/flag-${lang}.svg`} alt={lang} className="w-6 shadow-sm lg:w-8" />
                 <span className="ms-2 hidden text-nowrap font-bold lg:inline">{t(`lang-${lang}`)}</span>
               </div>
             </SelectValue>
@@ -40,7 +40,7 @@ const Language = forwardRef<HTMLDivElement, ComponentProps<"div">>(({ className,
               {LanguageOptions.map((l) => (
                 <SelectItem value={l} key={l} className="cursor-pointer">
                   <div className="flex w-full flex-row items-center py-1">
-                    <img src={`/app/images/front/flag-${l}.svg`} alt={l} className="w-[1.5rem] shadow-sm mr-2" />
+                    <img src={`/app/images/front/flag-${l}.svg`} alt={l} className="mr-2 w-6 shadow-sm" />
                     <span className="text-nowrap">{t(`lang-${l}`)}</span>
                   </div>
                 </SelectItem>

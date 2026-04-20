@@ -346,7 +346,7 @@ export const editServiceSchema = (t: (key: string) => string) =>
     description: z.string().optional(),
   })
 
-export const imageFilesSchema = (t: (key: string, options?: any) => string) =>
+export const imageFilesSchema = (t: (key: string, options?: Record<string, unknown>) => string) =>
   z.object({
     files: z.array(z.instanceof(File))
       .min(1, { message: t('room_images.no_valid_files') })

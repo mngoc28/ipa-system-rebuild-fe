@@ -5,7 +5,6 @@ import {
   Briefcase,
   Building2,
   CalendarDays,
-  ChevronRight,
   ClipboardList,
   Layers3,
   MapPinned,
@@ -59,7 +58,7 @@ export default function CityOverviewPage() {
     return (
       <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
         <div className="max-w-md space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
             <Sparkles size={22} />
           </div>
           <div className="space-y-1">
@@ -83,6 +82,13 @@ export default function CityOverviewPage() {
   const recentProjects = city?.recentProjects ?? [];
   const upcomingEvents = city?.upcomingEventsList ?? [];
   const topPartners = city?.topPartners ?? [];
+  const cityBrief = {
+    activeShare:
+      (city?.totalPipelineValue ?? 0) > 0 ? Math.round(((city?.activePipelineValue ?? 0) / (city?.totalPipelineValue ?? 0)) * 100) : 0,
+    bottleneckStage: [...stageBreakdown].sort((left, right) => right.projectCount - left.projectCount)[0],
+    nextEvent: upcomingEvents[0],
+    topPartner: topPartners[0],
+  };
 
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
@@ -93,9 +99,9 @@ export default function CityOverviewPage() {
         }}
       >
         <div className="absolute inset-0 opacity-40">
-          <div className="absolute -left-14 top-6 h-40 w-40 rounded-full bg-primary/30 blur-3xl" />
-          <div className="absolute right-0 top-0 h-52 w-52 rounded-full bg-amber-400/20 blur-3xl" />
-          <div className="absolute bottom-0 left-1/3 h-36 w-36 rounded-full bg-cyan-400/15 blur-3xl" />
+          <div className="absolute -left-14 top-6 size-40 rounded-full bg-primary/30 blur-3xl" />
+          <div className="absolute right-0 top-0 size-52 rounded-full bg-amber-400/20 blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 size-36 rounded-full bg-cyan-400/15 blur-3xl" />
         </div>
 
         <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
@@ -186,6 +192,53 @@ export default function CityOverviewPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
+        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm lg:col-span-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Strategic snapshot</p>
+          <h2 className="mt-1 text-lg font-black uppercase tracking-tight text-slate-950">Điểm nóng quyết định hôm nay</h2>
+          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+            {cityBrief.activeShare >= 70
+              ? "Pipeline đang có tỷ trọng mở tốt, có thể ưu tiên chốt các dự án lớn và giữ nhịp sự kiện đã lên lịch."
+              : cityBrief.activeShare >= 40
+                ? "Pipeline ở mức cân bằng, cần theo dõi stage chuyển đổi để tránh nghẽn giữa mở mới và chốt deal."
+                : "Pipeline đang mỏng, cần tăng tốc tạo cơ hội mới và kiểm soát các stage chậm chuyển đổi."}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button onClick={() => navigate("/reports/city")} className="rounded-xl bg-slate-950 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800">
+              Mở báo cáo
+            </button>
+            <button onClick={() => navigate("/approvals")} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 transition hover:bg-slate-50">
+              Xem phê duyệt
+            </button>
+          </div>
+        </div>
+
+        <InsightCard title="Tỉ trọng pipeline mở" value={`${cityBrief.activeShare}%`} detail="Phần giá trị còn đang mở so với tổng pipeline" />
+        <InsightCard
+          title="Stage cần chú ý"
+          value={formatDisplayLabel(cityBrief.bottleneckStage?.stageName, "Chưa xác định")}
+          detail={cityBrief.bottleneckStage ? `${cityBrief.bottleneckStage.projectCount} dự án, ${formatCurrency(cityBrief.bottleneckStage.totalValue)}` : "Chưa có stage đủ dữ liệu"}
+        />
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-3">
+        <InsightCard
+          title="Sự kiện gần nhất"
+          value={cityBrief.nextEvent ? formatDisplayLabel(cityBrief.nextEvent.title, "Sự kiện chưa đặt tên") : "Chưa có dữ liệu"}
+          detail={cityBrief.nextEvent ? `${formatDateTime(cityBrief.nextEvent.startAt)} · ${formatDisplayLabel(cityBrief.nextEvent.locationName, "Chưa gắn địa điểm")}` : "Không có sự kiện sắp tới"}
+        />
+        <InsightCard
+          title="Partner dẫn đầu"
+          value={cityBrief.topPartner ? formatDisplayLabel(cityBrief.topPartner.partnerName, "Chưa có partner") : "Chưa có dữ liệu"}
+          detail={cityBrief.topPartner ? `${cityBrief.topPartner.projectCount} dự án đang nối · score ${cityBrief.topPartner.score !== null ? cityBrief.topPartner.score.toFixed(2) : "N/A"}` : "Chưa có partner đủ dữ liệu"}
+        />
+        <InsightCard
+          title="Tác vụ cần ưu tiên"
+          value={taskItems.filter((task) => task.isOverdue || task.overdue || getPriorityLabel(task.priority) === "Urgent").length.toString()}
+          detail="Số task quá hạn hoặc cần xử lý gấp từ feed hiện tại"
+        />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
@@ -316,7 +369,7 @@ export default function CityOverviewPage() {
             ) : (
               topPartners.map((partner, index) => (
                 <div key={partner.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
                     {String(index + 1).padStart(2, "0")}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -350,7 +403,7 @@ function HeroStat({ title, value, note, icon }: { title: string; value: string; 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm">
       <div className="flex items-center gap-2 text-white/55">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-amber-300">{icon}</span>
+        <span className="flex size-7 items-center justify-center rounded-lg bg-white/10 text-amber-300">{icon}</span>
         <p className="text-[10px] font-black uppercase tracking-[0.24em]">{title}</p>
       </div>
       <p className="mt-3 text-2xl font-black tracking-tight text-white">{value}</p>
@@ -408,9 +461,19 @@ function EmptyState({ label }: { label: string }) {
   return <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-5 text-sm font-medium text-slate-500">{label}</div>;
 }
 
+function InsightCard({ title, value, detail }: { title: string; value: string; detail: string }) {
+  return (
+    <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{title}</p>
+      <p className="mt-2 text-lg font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{detail}</p>
+    </div>
+  );
+}
+
 function CityOverviewSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="animate-pulse space-y-6">
       <div className="h-[360px] rounded-[2rem] bg-slate-200/80" />
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="h-[420px] rounded-[1.75rem] bg-slate-100" />
@@ -484,38 +547,23 @@ function formatDisplayLabel(value: string | null | undefined, fallback: string):
   return normalized;
 }
 
-function getTaskStatusLabel(status: number): string {
-  if (status === 1) {
-    return "Đang xử lý";
-  }
-
-  if (status === 2) {
-    return "Hoàn thành";
-  }
-
+function getTaskStatusLabel(status: string | number | undefined): string {
+  const s = Number(status);
+  if (s === 1 || status === "In Progress") return "Đang xử lý";
+  if (s === 2 || status === "Completed") return "Hoàn thành";
   return "Chưa xử lý";
 }
 
-function getPriorityLabel(priority: number): string {
-  if (priority === 3) {
-    return "Urgent";
-  }
-
-  if (priority === 2) {
-    return "High";
-  }
-
+function getPriorityLabel(priority: string | number | undefined): string {
+  const p = Number(priority);
+  if (p === 3 || priority === "Urgent") return "Urgent";
+  if (p === 2 || priority === "High") return "High";
   return "Normal";
 }
 
-function getPriorityClasses(priority: number): string {
-  if (priority === 3) {
-    return "bg-rose-50 text-rose-600";
-  }
-
-  if (priority === 2) {
-    return "bg-amber-50 text-amber-600";
-  }
-
+function getPriorityClasses(priority: string | number | undefined): string {
+  const p = Number(priority);
+  if (p === 3 || priority === "Urgent") return "bg-rose-50 text-rose-600";
+  if (p === 2 || priority === "High") return "bg-amber-50 text-amber-600";
   return "bg-slate-100 text-slate-500";
 }

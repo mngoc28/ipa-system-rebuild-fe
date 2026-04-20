@@ -1,6 +1,6 @@
 import { t } from "i18next";
 
-export type DateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD" | "DD MMM YYYY" | "DD-MM-YYYY";
+export type DateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD" | "DD MMM YYYY" | "DD-MM-YYYY" | "YYYYMMDD";
 
 export const formatDate = (date: string | Date, format: DateFormat = "DD/MM/YYYY"): string => {
   const d = new Date(date);
@@ -25,6 +25,8 @@ export const formatDate = (date: string | Date, format: DateFormat = "DD/MM/YYYY
       return `${day}-${month}-${year}`;
     case "DD MMM YYYY":
       return `${day} ${monthNames[d.getMonth()]} ${year}`;
+    case "YYYYMMDD":
+      return `${year}${month}${day}`;
     default:
       return `${day}/${month}/${year}`;
   }

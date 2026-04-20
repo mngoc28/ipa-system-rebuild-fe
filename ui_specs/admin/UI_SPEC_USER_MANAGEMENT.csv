@@ -1,0 +1,21 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+User Management,page_title,label,Quản lý Người dùng,,none,header,,,font-title text-2xl font-black uppercase,Main module heading
+User Management,btn_add_user,button,THÊM NGƯỜI DÙNG,,click,header,,,bg-primary text-white font-black,Opens 'Thêm người dùng' dialog
+User Management,stat_total_users,card,Tổng nhân sự,,none,center,,,border-slate-200 bg-white,Global user count
+User Management,stat_active_users,card,Đang hoạt động,,none,center,,,border-emerald-100 bg-emerald-50,Count of non-locked active users
+User Management,stat_inactive_users,card,Chưa kích hoạt,,none,center,,,border-amber-100 bg-amber-50,Count of inactive or locked users
+User Management,search_users,input,,Tìm tên, email hoặc đơn vị...,type,center,false,,border-slate-200 bg-white,Real-time search across table
+User Management,filter_active_btn,button,LỌC DỮ LIỆU,,filter,center,,,border-primary text-primary,Toggles 'activeOnly' status filter
+User Management,user_table,table,,,[none],center,,,w-full text-left,Main data grid for users
+User Management,user_row_item,card,,,[click],center,,,hover:bg-slate-50/50,Interactive row with avatar and role badges
+User Management,btn_edit_user,button,,Chỉnh sửa người dùng,click,center,,,text-slate-400 hover:text-primary,Opens edit dialog for selected user
+User Management,btn_lock_user,button,,Khóa/Mở khóa người dùng,click,center,,,text-slate-400 hover:text-amber-600,Toggles user lock status
+User Management,btn_delete_user,button,,Xóa người dùng,click,center,,,text-slate-400 hover:text-rose-600,Opens deletion confirmation
+User Management,dialog_create_title,label,Thêm người dùng,,none,modal,,,font-bold,Creation dialog header
+User Management,input_username,input,,Username,type,modal,true,,border-slate-200,Unique account identifier
+User Management,input_full_name,input,,Họ và tên,type,modal,true,,border-slate-200,Member's full display name
+User Management,input_email,input,,Email,type,modal,true,,border-slate-200,System email for notifications
+User Management,select_unit,select,,Chọn đơn vị,type,modal,true,,border-slate-200,Organizational unit assignment
+User Management,select_roles,select,,Role IDs,type,modal,true,,border-slate-200,Comma separated role codes
+User Management,btn_dialog_save,button,Lưu thay đổi,,submit,modal,,,bg-primary text-white,Submits updated user payload
+User Management,dialog_delete_confirm,panel,Xác nhận xóa người dùng,,click,modal,,,bg-white shadow-xl,Danger zone confirmation overlay

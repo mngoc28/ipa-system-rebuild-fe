@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { delegationsApi } from "@/api/delegationsApi";
 import { SEARCH_DEBOUNCE_DELAY_MS } from "@/constant";
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function MinutesListPage() {
   const queryClient = useQueryClient();
@@ -67,7 +68,11 @@ export default function MinutesListPage() {
   });
 
   if (listQuery.isLoading || delegationsQuery.isLoading) {
-    return <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">Đang tải biên bản...</div>;
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-12 text-sm font-semibold text-slate-500">
+        <LoadingSpinner label="Đang tải biên bản..." />
+      </div>
+    );
   }
 
   if (listQuery.isError || delegationsQuery.isError) {
@@ -205,7 +210,7 @@ export default function MinutesListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Quản lý Biên bản</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Quản lý Biên bản</h1>
           <p className="mt-1 text-sm font-semibold text-slate-500">Lập biên bản làm việc, ký số và lưu trữ hồ sơ pháp lý của dự án.</p>
         </div>
 
@@ -231,7 +236,7 @@ export default function MinutesListPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {["BIÊN BẢN GHI NHỚ (MOU)", "BIÊN BẢN KHẢO SÁT", "BIÊN BẢN HỌP ĐOÀN"].map((tpl, i) => (
-              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black text-white/80 transition-all hover:bg-white hover:text-slate-950 uppercase tracking-widest">
+              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-slate-950">
                 {tpl}
               </button>
             ))}
@@ -257,7 +262,7 @@ export default function MinutesListPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
                 placeholder="Tìm tên biên bản, đối tác..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-10 text-[11px] font-bold outline-none transition-all focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-10 py-2.5 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -275,7 +280,7 @@ export default function MinutesListPage() {
                 </button>
               )}
             </div>
-            <button onClick={handleFilter} className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-slate-400 transition-all hover:text-primary hover:bg-white">
+            <button onClick={handleFilter} title="Bộ lọc biên bản" aria-label="Bộ lọc biên bản" className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-slate-400 transition-all hover:bg-white hover:text-primary">
               <Filter size={16} />
             </button>
           </div>
@@ -283,7 +288,9 @@ export default function MinutesListPage() {
 
         <div className="space-y-3">
           {listQuery.isFetching && !listQuery.data ? (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Đang cập nhật danh sách biên bản...</div>
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-12 text-sm font-semibold text-slate-500">
+              <LoadingSpinner label="Đang cập nhật danh sách biên bản..." />
+            </div>
           ) : visibleMinutes.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Không có biên bản phù hợp.</div>
           ) : visibleMinutes.map((item) => (
@@ -301,7 +308,7 @@ export default function MinutesListPage() {
                   <FileText size={20} />
                 </div>
                 <div className="space-y-0.5">
-                  <h4 className="text-sm font-black text-slate-900 transition-colors group-hover:text-primary uppercase tracking-tight">{item.title}</h4>
+                  <h4 className="text-sm font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.title}</h4>
                   <div className="flex items-center gap-4">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{item.type}</span>
                     <div className={cn("flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest", item.status === "Signed" ? "text-emerald-600" : "text-slate-400")}>
@@ -309,7 +316,7 @@ export default function MinutesListPage() {
                       {item.status === "Signed" ? "Đã ký số" : item.status === "Pending" ? "Chờ ký" : "Bản nháp"}
                     </div>
                   </div>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                  <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
                     Cập nhật: {item.date} &bull; {item.author}
                   </p>
                 </div>
@@ -322,12 +329,12 @@ export default function MinutesListPage() {
                 <button onClick={() => handleDownload(item.title)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-950 hover:text-white">
                   <Download size={14} /> Gốc
                 </button>
-                <button onClick={() => handleShare(item.title)} className="rounded border border-primary/20 bg-primary/5 p-2 text-primary transition-all hover:bg-primary hover:text-white shadow-sm">
+                <button onClick={() => handleShare(item.title)} title={`Chia sẻ nhanh ${item.title}`} aria-label={`Chia sẻ nhanh ${item.title}`} className="rounded border border-primary/20 bg-primary/5 p-2 text-primary shadow-sm transition-all hover:bg-primary hover:text-white">
                   <Share2 size={16} />
                 </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="p-2 text-slate-300 transition-all hover:text-slate-600">
+                    <button className="p-2 text-slate-300 transition-all hover:text-slate-600" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                       <MoreVertical size={16} />
                     </button>
                   </DropdownMenuTrigger>

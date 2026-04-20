@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Search, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ export default function SearchableSelect({
   triggerClassName,
   contentClassName,
 }: SearchableSelectProps) {
-  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,7 +34,11 @@ export default function SearchableSelect({
     if (!search.trim()) return options;
 
     const searchLower = search.toLowerCase();
-    return options.filter((option: any) => option.label?.toLowerCase().includes(searchLower) || option.value?.toString().toLowerCase().includes(searchLower) || option.name_en?.toLowerCase().includes(searchLower));
+    return options.filter((option) =>
+      option.label?.toLowerCase().includes(searchLower) ||
+      option.value?.toString().toLowerCase().includes(searchLower) ||
+      option.name_en?.toLowerCase().includes(searchLower)
+    );
   }, [search, options]);
 
   useEffect(() => {
@@ -81,26 +83,26 @@ export default function SearchableSelect({
           {showSearch && (
             <div className="border-b p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
                 <Input
                   ref={searchInputRef}
                   type="text"
                   placeholder={searchPlaceholder}
                   value={search}
-                  onChange={(e: any) => setSearch(e.target.value)}
-                  className="h-10 pl-9 pr-9"
-                  onClick={(e: any) => e.stopPropagation()}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                  className="h-10 px-9"
+                  onClick={(e: React.MouseEvent<HTMLInputElement>) => e.stopPropagation()}
                 />
                 {search && (
                   <button
                     type="button"
-                    onClick={(e: any) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       setSearch("");
                     }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="size-4" />
                   </button>
                 )}
               </div>
@@ -110,19 +112,19 @@ export default function SearchableSelect({
           <div className="max-h-64 overflow-y-auto py-1">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                <Loader2 className="size-5 animate-spin text-blue-500" />
               </div>
             ) : filteredOptions.length === 0 ? (
               <div className="py-6 text-center text-sm text-gray-500">{emptyMessage}</div>
             ) : (
               <div className="p-1">
-                {filteredOptions.map((option: any) => (
+                {filteredOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => {
                       const nextValue = value === option.value ? "" : option.value;
-                      (onValueChange as any)?.(nextValue);
+                      onValueChange(nextValue);
                       setOpen(false);
                       setSearch("");
                     }}

@@ -1,9 +1,10 @@
 import * as React from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { BarChart3, Download, FileText, Globe, RefreshCw, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
+import { BarChart3, Download, FileText, Globe, RefreshCw, ShieldCheck, Sparkles, Target, TrendingUp, AlertTriangle, Activity, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { reportsApi } from "@/api/reportsApi";
+import { SelectField } from "@/components/ui/SelectField";
 
 const currencyFormatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -55,8 +56,8 @@ export default function CityReportsPage() {
     }
   }, [realDefinitions, selectedCode]);
 
-  const isLoading = summaryQuery.isLoading || definitionsQuery.isLoading;
-  const isError = summaryQuery.isError || definitionsQuery.isError;
+  const isLoading = summaryQuery.isLoading;
+  const isError = summaryQuery.isError || !summary;
 
   const handleExportReport = () => {
     if (!selectedCode) {
@@ -75,7 +76,7 @@ export default function CityReportsPage() {
     return (
       <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
         <div className="max-w-md space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
             <Sparkles size={22} />
           </div>
           <div className="space-y-1">
@@ -98,23 +99,35 @@ export default function CityReportsPage() {
   }
 
   const reportList = recentRuns;
+  const successRate = summary.stats.runs > 0 ? Math.round((summary.stats.successfulRuns / summary.stats.runs) * 100) : 0;
+  const failedRuns = summary.stats.runs - summary.stats.successfulRuns;
+  const latestRun = reportList[0] ?? null;
+
+  const kpiNotes = {
+    newProjects: summary.kpis.newProjects === 0 ? "Chưa có dự án mới được ghi nhận trong chu kỳ hiện tại" : "Dữ liệu tổng hợp từ summary thành phố",
+    fdiTotal: summary.kpis.fdiTotal === 0 ? "Chưa có FDI đã chốt trong chu kỳ này" : "Tổng vốn FDI đã được chuẩn hóa từ backend",
+    domesticCapital: summary.kpis.domesticCapital === 0 ? "Chưa có vốn nội địa được chốt trong tháng này" : "Nguồn số liệu vốn nội địa theo summary",
+    pciIndex: summary.kpis.pciIndex === 0 ? "Chỉ số chưa có dữ liệu kỳ này" : "Chỉ số PCI được đồng bộ từ dashboard city",
+  } as const;
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-        <div className="space-y-1">
+          <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Báo cáo chiến lược thành phố</p>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Báo cáo Chiến lược Thành phố</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Báo cáo Chiến lược Thành phố</h1>
           <p className="text-sm font-medium text-slate-500">Các báo cáo định kỳ về tình hình xúc tiến đầu tư và kinh tế đối ngoại của Đà Nẵng.</p>
         </div>
         <div className="flex gap-2">
           <button
+            aria-label="Chỉnh sửa mẫu báo cáo"
             onClick={() => setShowTemplateEditor((prev) => !prev)}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
           >
             CHỈNH SỬA MẪU
           </button>
           <button
+            aria-label="Xuất báo cáo tổng hợp"
             onClick={handleExportReport}
             className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
           >
@@ -125,21 +138,22 @@ export default function CityReportsPage() {
 
       <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-[11px] font-semibold text-slate-600 shadow-sm">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
-          <select
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+          <SelectField
             value={selectedCode}
-            onChange={(event) => setSelectedCode(event.target.value)}
-          >
-            {realDefinitions.map((definition) => (
-              <option key={definition.report_code} value={definition.report_code}>
-                {definition.report_name}
-              </option>
-            ))}
-          </select>
+            onValueChange={setSelectedCode}
+            placeholder="Chọn mẫu báo cáo"
+            options={realDefinitions.map((definition) => ({ label: definition.report_name, value: definition.report_code }))}
+            triggerClassName="h-9 text-xs font-semibold"
+          />
           <p className="text-[10px] font-black uppercase tracking-widest text-primary">Số mẫu báo cáo khả dụng: {realDefinitions.length}</p>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Run thành công: {summary.stats.successfulRuns}</p>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Metric đang theo dõi: {summary.stats.metrics}</p>
         </div>
+        {definitionsQuery.isError && (
+          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-amber-700">
+            Không tải được danh sách mẫu báo cáo, nhưng KPI tổng hợp vẫn đang hiển thị.
+          </div>
+        )}
       </div>
 
       {showTemplateEditor && (
@@ -159,16 +173,51 @@ export default function CityReportsPage() {
       )}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-        <StatItem title="Số dự án mới" value={formatCompactNumber(summary.kpis.newProjects)} sub="QUÝ I/2026" icon={<Globe size={18} />} color="blue" />
-        <StatItem title="Tổng vốn FDI" value={formatCurrency(summary.kpis.fdiTotal)} sub="THEO KPI THÀNH PHỐ" icon={<TrendingUp size={18} />} color="emerald" />
-        <StatItem title="Vốn đăng ký nội" value={formatCurrency(summary.kpis.domesticCapital)} sub="THÁNG 04/2026" icon={<Target size={18} />} color="purple" />
-        <StatItem title="Tỉ lệ hài lòng" value={`${summary.kpis.pciIndex.toFixed(1)}/5`} sub="CHỈ SỐ PCI" icon={<ShieldCheck size={18} />} color="amber" />
+        <StatItem title="Số dự án mới" value={formatCompactNumber(summary.kpis.newProjects)} sub="QUÝ I/2026" note={kpiNotes.newProjects} icon={<Globe size={18} />} color="blue" />
+        <StatItem title="Tổng vốn FDI" value={formatCurrency(summary.kpis.fdiTotal)} sub="THEO KPI THÀNH PHỐ" note={kpiNotes.fdiTotal} icon={<TrendingUp size={18} />} color="emerald" />
+        <StatItem title="Vốn đăng ký nội" value={formatCurrency(summary.kpis.domesticCapital)} sub="THÁNG 04/2026" note={kpiNotes.domesticCapital} icon={<Target size={18} />} color="purple" />
+        <StatItem title="Tỉ lệ hài lòng" value={`${summary.kpis.pciIndex.toFixed(1)}/5`} sub="CHỈ SỐ PCI" note={kpiNotes.pciIndex} icon={<ShieldCheck size={18} />} color="amber" />
       </div>
+
+      <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="rounded-xl bg-slate-950 p-3 text-white">
+              <Activity size={18} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Bản đồ quyết định</p>
+              <h2 className="text-lg font-black uppercase tracking-tight text-slate-950">Tín hiệu báo cáo quan trọng</h2>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <StrategicNote title="Tỉ lệ run thành công" value={`${successRate}%`} detail={`Thành công: ${summary.stats.successfulRuns} · Thất bại: ${failedRuns}`} tone="emerald" />
+            <StrategicNote title="Mẫu báo cáo khả dụng" value={String(realDefinitions.length)} detail="Số mẫu thật đang có thể chạy ngay" tone="blue" />
+            <StrategicNote title="Run mới nhất" value={latestRun ? formatDisplayLabel(latestRun.outputFileName ?? latestRun.reportName, "Báo cáo chiến lược") : "Chưa có run"} detail={latestRun ? `${latestRun.reportCode} · ${formatRunStatus(latestRun.status)}` : "Chưa có run nào được ghi nhận"} tone="amber" />
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-slate-950 p-3 text-white">
+              <AlertTriangle size={18} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Giải thích số 0</p>
+              <h2 className="text-base font-black uppercase tracking-tight text-slate-950">Không phải lỗi hiển thị, mà là thiếu dữ liệu chu kỳ</h2>
+            </div>
+          </div>
+          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+            Khi một KPI đang bằng 0, báo cáo giờ hiển thị rõ đó là “chưa có dữ liệu kỳ này” thay vì để người dùng tự đoán. Điều này giúp Director phân biệt giữa số liệu thật và khoảng trống dữ liệu.
+          </p>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
+            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
               <BarChart3 size={20} className="text-primary" /> Tập tin báo cáo chiến lược
             </h2>
             <button onClick={handleExportReport} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
@@ -190,7 +239,7 @@ export default function CityReportsPage() {
                   className="group flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:bg-white hover:shadow-md"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition-all group-hover:border-primary/20 group-hover:text-primary shadow-sm">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 shadow-sm transition-all group-hover:border-primary/20 group-hover:text-primary">
                       <FileText size={18} />
                     </div>
                     <div className="min-w-0">
@@ -205,6 +254,8 @@ export default function CityReportsPage() {
                     </div>
                   </div>
                   <button
+                    aria-label={`Tải báo cáo ${run.outputFileName ?? run.reportName}`}
+                    title={`Tải báo cáo ${run.outputFileName ?? run.reportName}`}
                     onClick={() => toast.success(`Đang tải báo cáo: ${run.outputFileName ?? run.reportName}`)}
                     className="rounded-lg p-2.5 text-slate-300 transition-all hover:bg-primary/5 hover:text-primary active:scale-90"
                   >
@@ -216,18 +267,18 @@ export default function CityReportsPage() {
           </div>
         </div>
 
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20 shadow-inner">
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-inner shadow-xl shadow-slate-950/20">
           <div className="relative z-10 space-y-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-300 shadow-inner">
+            <div className="flex size-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-300 shadow-inner">
               <TrendingUp size={20} />
             </div>
             <div className="space-y-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">{summary.forecast.title}</p>
-              <h3 className="font-title text-xl font-black uppercase tracking-tight leading-tight">{summary.forecast.headline}</h3>
+              <h3 className="font-title text-xl font-black uppercase leading-tight tracking-tight">{summary.forecast.headline}</h3>
               <p className="text-sm font-medium leading-relaxed text-slate-400">{summary.forecast.detail}</p>
             </div>
           </div>
-          <div className="relative z-10 pt-8 mt-4 border-t border-white/5">
+          <div className="relative z-10 mt-4 border-t border-white/5 pt-8">
             <button
               onClick={() => setShowForecastDetail((prev) => !prev)}
               className="w-full rounded-lg bg-primary py-3.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.98]"
@@ -236,15 +287,15 @@ export default function CityReportsPage() {
             </button>
             {showForecastDetail && <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-white/70">{summary.forecast.detail}</p>}
           </div>
-          <div className="absolute top-[-20%] right-[-10%] h-48 w-48 rounded-full bg-primary/10 blur-[60px]" />
-          <div className="absolute bottom-[-10%] left-[-10%] h-48 w-48 rounded-full bg-primary/20 blur-[80px]" />
+          <div className="absolute right-[-10%] top-[-20%] size-48 rounded-full bg-primary/10 blur-[60px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] size-48 rounded-full bg-primary/20 blur-[80px]" />
         </div>
       </div>
     </div>
   );
 }
 
-function StatItem({ title, value, sub, icon, color }: { title: string; value: string; sub: string; icon: React.ReactNode; color: "blue" | "emerald" | "purple" | "amber" }) {
+function StatItem({ title, value, sub, note, icon, color }: { title: string; value: string; sub: string; note: string; icon: React.ReactNode; color: "blue" | "emerald" | "purple" | "amber" }) {
   const colors = {
     blue: "bg-blue-50 text-blue-600 border-blue-100",
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
@@ -257,9 +308,29 @@ function StatItem({ title, value, sub, icon, color }: { title: string; value: st
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg border shadow-sm", colors[color])}>{icon}</div>
       <div className="space-y-1">
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-        <p className="text-2xl font-black text-slate-950 tracking-tight leading-none">{value}</p>
-        <p className="text-[9px] font-black text-slate-500 uppercase tracking-tight">{sub}</p>
+        <p className="text-2xl font-black leading-none tracking-tight text-slate-950">{value}</p>
+        <p className="text-[9px] font-black uppercase tracking-tight text-slate-500">{sub}</p>
+        <p className="text-[10px] font-medium leading-5 text-slate-500">{note}</p>
       </div>
+    </div>
+  );
+}
+
+function StrategicNote({ title, value, detail, tone }: { title: string; value: string; detail: string; tone: "blue" | "emerald" | "amber" }) {
+  const toneClasses: Record<typeof tone, string> = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    amber: "bg-amber-50 text-amber-600 border-amber-100",
+  };
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl border", toneClasses[tone])}>
+        <CheckCircle2 size={16} />
+      </div>
+      <p className="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{title}</p>
+      <p className="mt-1 text-sm font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-1 text-[11px] font-medium leading-5 text-slate-500">{detail}</p>
     </div>
   );
 }
@@ -270,7 +341,7 @@ function EmptyState({ label }: { label: string }) {
 
 function CityReportsSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="animate-pulse space-y-6">
       <div className="flex items-center justify-between gap-6">
         <div className="h-14 w-2/3 rounded-2xl bg-slate-200" />
         <div className="h-10 w-56 rounded-2xl bg-slate-200" />

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getAccessToken, removeAccessToken, setAccessToken, clearAllDashboardDateRanges } from "../utils/storage";
+import { getAccessToken, removeAccessToken, removeRefreshToken, setAccessToken, clearAllDashboardDateRanges } from "../utils/storage";
 
 interface UserStore {
   userEmail: string;
@@ -27,6 +27,7 @@ export const useUserStore = create<UserStore, [["zustand/persist", unknown]]>(
       },
       logout() {
         removeAccessToken();
+        removeRefreshToken();
         clearAllDashboardDateRanges();
         set(() => ({
           userEmail: "",

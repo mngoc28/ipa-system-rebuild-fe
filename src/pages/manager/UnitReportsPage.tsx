@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Download, FileText, Filter, PieChart, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { reportsApi } from "@/api/reportsApi";
+import { SelectField } from "@/components/ui/SelectField";
 
 export default function UnitReportsPage() {
   const [showChartPanel, setShowChartPanel] = React.useState(false);
@@ -55,10 +56,11 @@ export default function UnitReportsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Báo cáo Đơn vị</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Báo cáo Đơn vị</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Tổng hợp báo cáo tuần, tháng và KPI của phòng ban.</p>
         </div>
         <button
+          aria-label="Tạo báo cáo đơn vị"
           onClick={() => {
             if (!selectedCode) {
               toast.error("Chưa có mẫu báo cáo khả dụng.");
@@ -92,7 +94,7 @@ export default function UnitReportsPage() {
         <div className="relative col-span-1 space-y-6 overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20 lg:col-span-2">
           <TrendingUp size={64} className="absolute right-4 top-4 text-white opacity-5" />
           <div className="space-y-1">
-            <p className="font-black uppercase tracking-widest text-slate-500 text-[10px]">Kết quả KPI tháng 04/2026</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Kết quả KPI tháng 04/2026</p>
             <h3 className="font-title text-2xl font-black uppercase tracking-tight">Hiệu suất Đạt 92.5%</h3>
           </div>
           <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-5 md:grid-cols-4">
@@ -104,21 +106,21 @@ export default function UnitReportsPage() {
             ].map((stat, i) => (
               <div key={i}>
                 <p className="text-xl font-black">{stat.value}</p>
-                <p className="text-[9px] font-black uppercase text-slate-500 tracking-wider font-sans">{stat.label}</p>
+                <p className="font-sans text-[9px] font-black uppercase tracking-wider text-slate-500">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
+          <div className="flex size-12 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600">
             <PieChart size={24} />
           </div>
           <div className="space-y-1">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 leading-none">Phân tích mảng việc</h4>
+            <h4 className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-900">Phân tích mảng việc</h4>
             <p className="text-[10px] font-medium text-slate-400">Tự động hóa báo cáo tháng</p>
           </div>
-          <button onClick={() => setShowChartPanel((prev) => !prev)} className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:border-primary/50 hover:text-primary active:scale-95">Xem biểu đồ</button>
+          <button aria-label="Xem biểu đồ KPI" onClick={() => setShowChartPanel((prev) => !prev)} className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:border-primary/50 hover:text-primary active:scale-95">Xem biểu đồ</button>
         </div>
       </div>
 
@@ -130,27 +132,23 @@ export default function UnitReportsPage() {
 
       <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:p-10">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <h2 className="flex items-center gap-3 font-title text-lg font-black text-slate-900 uppercase tracking-tight">
+          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
             <FileText size={20} className="text-primary" /> Lịch sử Báo cáo
           </h2>
-          <button onClick={() => setShowReportFilter((prev) => !prev)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary border border-slate-100">
+          <button aria-label="Mở bộ lọc báo cáo" title="Mở bộ lọc báo cáo" onClick={() => setShowReportFilter((prev) => !prev)} className="rounded-lg border border-slate-100 bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary">
             <Filter size={18} />
           </button>
         </div>
 
         {showReportFilter && (
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-            <select
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+            <SelectField
               value={selectedCode}
-              onChange={(e) => setSelectedCode(e.target.value)}
-            >
-              {definitions.map((def) => (
-                <option key={def.report_code} value={def.report_code}>
-                  {def.report_code}
-                </option>
-              ))}
-            </select>
+              onValueChange={setSelectedCode}
+              placeholder="Chọn mẫu báo cáo"
+              options={definitions.map((def) => ({ label: def.report_code, value: def.report_code }))}
+              triggerClassName="h-9 text-xs font-semibold"
+            />
             <p className="text-[10px] font-black uppercase tracking-widest text-primary">Đang lọc theo mẫu báo cáo đã chọn.</p>
           </div>
         )}
@@ -162,7 +160,7 @@ export default function UnitReportsPage() {
               className="group flex flex-col justify-between gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-4 transition-all hover:border-primary/20 hover:bg-white hover:shadow-md md:flex-row md:items-center"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-400 shadow-sm border border-slate-100 transition-all group-hover:text-primary group-hover:border-primary/20">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-primary/20 group-hover:text-primary">
                   <FileText size={18} />
                 </div>
                 <div>
@@ -174,6 +172,7 @@ export default function UnitReportsPage() {
                 </div>
               </div>
               <button
+                aria-label={`Tải báo cáo run ${report.run_id}`}
                 onClick={() => {
                   if (report.status.toLowerCase() !== "done") {
                     toast.error("Báo cáo chưa hoàn tất.");
@@ -181,7 +180,7 @@ export default function UnitReportsPage() {
                   }
                   toast.success(`Sẵn sàng tải báo cáo run ${report.run_id}`);
                 }}
-                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all group-hover:bg-primary group-hover:text-white group-hover:border-primary active:scale-95"
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider shadow-sm transition-all active:scale-95 group-hover:border-primary group-hover:bg-primary group-hover:text-white"
               >
                 Tải xuống <Download size={14} />
               </button>

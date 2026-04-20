@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { DndContext, DragOverlay, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragStartEvent, DragOverEvent, DragEndEvent, defaultDropAnimationSideEffects } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { DelegationItem, StatusTone } from "@/dataHelper/ui-system.data";
 import KanbanColumn from "./KanbanColumn.tsx";
 import KanbanCard from "./KanbanCard.tsx";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 interface KanbanBoardProps {
   delegations: DelegationItem[];
+  onUpdateStatus?: (id: string | number, status: string) => void;
+  onDelete?: (id: string | number) => void;
+  onViewList?: () => void;
 }
 
 const COLUMNS: { id: StatusTone; label: string; color: string }[] = [
@@ -21,27 +25,28 @@ const COLUMNS: { id: StatusTone; label: string; color: string }[] = [
 ];
 
 // Business rules for state transitions
-const VALID_TRANSITIONS: Record<StatusTone, StatusTone[]> = {
-  draft: ["pendingApproval", "cancelled", "pending"],
-  pending: ["approved", "needsRevision", "cancelled"],
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  draft: ["pendingApproval", "cancelled"],
   pendingApproval: ["approved", "needsRevision", "cancelled"],
-  needsRevision: ["pendingApproval", "cancelled", "pending"],
-  revision: ["pendingApproval", "cancelled", "pending"],
+  needsRevision: ["pendingApproval", "cancelled"],
   approved: ["inProgress", "cancelled"],
   inProgress: ["completed", "cancelled"],
   completed: [],
   cancelled: ["draft"],
-  todo: [],
-  done: [],
-  urgent: [],
-  high: [],
-  medium: [],
-  low: [],
 };
 
-export default function KanbanBoard({ delegations: initialDelegations }: KanbanBoardProps) {
+export default function KanbanBoard({ delegations: initialDelegations, onUpdateStatus, onDelete, onViewList }: KanbanBoardProps) {
   const [items, setItems] = useState(initialDelegations);
   const [activeItem, setActiveItem] = useState<DelegationItem | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    item: DelegationItem | null;
+    targetStatus: StatusTone | null;
+  }>({
+    isOpen: false,
+    item: null,
+    targetStatus: null,
+  });
 
   useEffect(() => {
     setItems(initialDelegations);
@@ -96,11 +101,13 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+    const { over } = event;
+    if (!over || !activeItem) {
+      setActiveItem(null);
+      return;
+    }
 
-    const activeItem = items.find((i) => i.id === active.id);
-    if (!activeItem) return;
+    const originalItem = activeItem; // Use the one recorded at drag start
 
     // Determine target status
     let targetStatus: StatusTone | undefined;
@@ -114,26 +121,66 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
       if (overItem) targetStatus = overItem.status;
     }
 
-    if (targetStatus && targetStatus !== activeItem.status) {
+    if (targetStatus && targetStatus !== originalItem.status) {
       // Validate transition
-      if (VALID_TRANSITIONS[activeItem.status].includes(targetStatus)) {
-        setItems((prev) => prev.map((item) => (item.id === activeItem.id ? { ...item, status: targetStatus! } : item)));
-        toast.success(`Đã cập nhật trạng thái đoàn sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
+      if (VALID_TRANSITIONS[originalItem.status] && VALID_TRANSITIONS[originalItem.status].includes(targetStatus)) {
+        setTimeout(() => {
+          setConfirmModal({
+            isOpen: true,
+            item: originalItem,
+            targetStatus: targetStatus,
+          });
+        }, 250); // Delay matches the dropAnimation duration
       } else {
-        toast.error(`Không thể chuyển trực tiếp từ ${COLUMNS.find((c) => c.id === activeItem.status)?.label} sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
+        toast.error(`Không thể chuyển trực tiếp từ ${COLUMNS.find((c) => c.id === originalItem.status)?.label} sang ${COLUMNS.find((c) => c.id === targetStatus)?.label}`);
+        // Reset items to initial because drag over might have changed it
+        setItems(initialDelegations);
       }
+    } else {
+      // If dropped in the same column, ensure UI respects the reorder visually
+      // In this case arrayMove from dragOver was enough to visually keep it there,
+      // but API persistence for ordering is not implemented yet.
     }
 
     setActiveItem(null);
+  };
+
+  const handleConfirmStatus = () => {
+    if (confirmModal.item && confirmModal.targetStatus) {
+      if (onUpdateStatus) {
+        onUpdateStatus(confirmModal.item.id, confirmModal.targetStatus);
+      } else {
+        setItems((prev) => prev.map((item) => (item.id === confirmModal.item!.id ? { ...item, status: confirmModal.targetStatus! } : item)));
+        toast.success(`Đã cập nhật trạng thái đoàn sang ${COLUMNS.find((c) => c.id === confirmModal.targetStatus)?.label}`);
+      }
+    }
+    setConfirmModal({ isOpen: false, item: null, targetStatus: null });
+  };
+
+  const handleCancelStatus = () => {
+    // Revert the visual update if cancelled
+    setItems(initialDelegations);
+    setConfirmModal({ isOpen: false, item: null, targetStatus: null });
   };
 
   return (
     <div className="scrollbar-hide overflow-x-auto pb-8">
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         <div className="flex min-w-max gap-4">
-          {COLUMNS.map((column) => (
-            <KanbanColumn key={column.id} id={column.id} label={column.label} color={column.color} items={items.filter((i) => i.status === column.id)} />
-          ))}
+          {COLUMNS.map((column) => {
+            const columnItems = items.filter((item) => item.status === column.id);
+            return (
+              <KanbanColumn 
+                key={column.id} 
+                id={column.id} 
+                label={column.label} 
+                color={column.color} 
+                items={columnItems} 
+                onDelete={onDelete}
+                onViewList={onViewList}
+              />
+            );
+          })}
         </div>
 
         <DragOverlay
@@ -149,9 +196,19 @@ export default function KanbanBoard({ delegations: initialDelegations }: KanbanB
             }),
           }}
         >
-          {activeItem ? <KanbanCard item={activeItem} isOverlay /> : null}
+          {activeItem ? <KanbanCard item={activeItem} isOverlay onDelete={onDelete} /> : null}
         </DragOverlay>
       </DndContext>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleCancelStatus}
+        onConfirm={handleConfirmStatus}
+        title="Xác nhận chuyển trạng thái"
+        description={<p>Bạn có chắc chắn muốn chuyển <strong className="text-slate-900">{confirmModal.item?.name}</strong> sang trạng thái <strong className="text-primary">{COLUMNS.find(c => c.id === confirmModal.targetStatus)?.label}</strong>?</p>}
+        confirmText="Xác nhận"
+        variant="primary"
+      />
     </div>
   );
 }

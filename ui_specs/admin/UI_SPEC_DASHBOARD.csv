@@ -1,0 +1,9 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+Admin Dashboard,page_title,label,SYSADMIN DASHBOARD,,none,header,,,font-title text-2xl font-black uppercase,System administration root
+Admin Dashboard,btn_clear_cache,button,XÓA CACHE RAM,,submit,header,,,border-slate-200 text-slate-700,Triggers /maintenance/cache-clear API
+Admin Dashboard,btn_backup_db,button,BACKUP DATABASE,,click,header,,,bg-slate-200 text-slate-500,Currently non-functional placeholder (toast info)
+Admin Dashboard,stat_accounts,card,Tài khoản (Tổng),,none,center,,,text-blue-500 bg-blue-50,Real-time total user count from backend
+Admin Dashboard,stat_cpu_load,card,Tải Server (CPU),,none,center,,,text-amber-500 bg-amber-50,Real-time server load indicator (5-15% avg)
+Admin Dashboard,stat_db_conn,card,Kết nối Database,,none,center,,,text-emerald-500 bg-emerald-50,Database availability status (Actual PDO check)
+Admin Dashboard,stat_security_alerts,card,Cảnh báo Bảo mật,,none,center,,,text-rose-500 bg-rose-50,Count of logged security incidents in last 24h
+Admin Dashboard,loading_skeleton,skeleton,,,none,center,,,animate-pulse bg-slate-100,Shows while useAdminOperationalStats is fetching

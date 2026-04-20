@@ -21,12 +21,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-yarn.lock
-
 # Environment variables
 .env
-
-package-lock.json
 
 tsconfig.app.tsbuildinfo
 tsconfig.node.tsbuildinfo

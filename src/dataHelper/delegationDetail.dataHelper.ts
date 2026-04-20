@@ -45,6 +45,12 @@ export interface CreateDelegationPayload {
   endDate: string;
   objective: string;
   description: string;
+  members?: string[];
+  schedule_items?: Array<{
+    date: string;
+    title: string;
+    note?: string;
+  }>;
 }
 
 export interface DelegationsQuery {

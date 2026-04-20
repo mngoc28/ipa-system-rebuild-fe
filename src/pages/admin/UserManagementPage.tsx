@@ -1,15 +1,27 @@
 import * as React from "react";
 import { toast } from "sonner";
-import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, Edit2, Trash2, Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, Edit2, Trash2, Lock, AlertTriangle, Camera, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SelectField } from "@/components/ui/SelectField";
+import { profileApi } from "@/api/profileApi";
+import { AvatarCropper } from "@/components/shared/AvatarCropper";
 import {
   useAdminUserQuery,
   useAdminUsersListQuery,
+  useDeleteAdminUserMutation,
   useCreateAdminUserMutation,
   useLockAdminUserMutation,
   usePatchAdminUserMutation,
 } from "@/hooks/useAdminUsersQuery";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +30,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+const USER_STATUS_OPTIONS = [
+  { label: "Hoạt động", value: "active" },
+  { label: "Không hoạt động", value: "inactive" },
+];
 
 interface DisplayUser {
   id: string;
@@ -69,7 +86,7 @@ const buildEditFormFromApi = (user: {
   fullName: string;
   email: string;
   phone?: string;
-  roles?: string[];
+  role_codes?: string[];
   unit: { id: string; unit_code?: string; unit_name?: string } | null;
   status: string;
   locked: boolean;
@@ -79,7 +96,7 @@ const buildEditFormFromApi = (user: {
   email: user.email,
   phone: user.phone || "",
   unitId: user.unit?.unit_code || user.unit?.unit_name || user.unit?.id || "UNIT-ROOT",
-  roleIds: user.roles?.join(",") || "staff",
+  roleIds: user.role_codes?.join(",") || "staff",
   status: user.status === "active" && !user.locked ? "active" : "inactive",
 });
 
@@ -91,9 +108,16 @@ export default function UserManagementPage() {
   const [createOpen, setCreateOpen] = React.useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
   const [lockOpen, setLockOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<DisplayUser | null>(null);
+  const [deleteTargetUser, setDeleteTargetUser] = React.useState<DisplayUser | null>(null);
   const [createForm, setCreateForm] = React.useState<UserFormState>(defaultCreateForm());
   const [editForm, setEditForm] = React.useState<UserFormState>(defaultCreateForm());
+  const [loadingTimedOut, setLoadingTimedOut] = React.useState(false);
+  const [autoRetriedEmpty, setAutoRetriedEmpty] = React.useState(false);
+  const [cropImage, setCropImage] = React.useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const pageSize = 5;
 
   const usersQuery = useAdminUsersListQuery({
@@ -106,12 +130,13 @@ export default function UserManagementPage() {
   const createMutation = useCreateAdminUserMutation();
   const patchMutation = usePatchAdminUserMutation();
   const lockMutation = useLockAdminUserMutation();
+  const deleteMutation = useDeleteAdminUserMutation();
   const adminUserQuery = useAdminUserQuery(editingUserId ?? undefined, editOpen);
 
   const users: DisplayUser[] = React.useMemo(() => {
     const rawUsers = usersQuery.data?.data?.items || [];
     return rawUsers.map((user) => {
-      const roleCode = (user.roles[0] || "admin").toLowerCase();
+      const roleCode = (user.role_codes?.[0] || "admin").toLowerCase();
       const role = roleCode.charAt(0).toUpperCase() + roleCode.slice(1);
       return {
         id: user.id,
@@ -121,6 +146,7 @@ export default function UserManagementPage() {
         unit: user.unit?.unit_code || user.unit?.unit_name || user.unit?.id || "UNIT-UNKNOWN",
         status: user.status === "active" && !user.locked ? "active" : "inactive",
         locked: user.locked,
+        avatar: user.avatar,
       };
     });
   }, [usersQuery.data]);
@@ -132,7 +158,33 @@ export default function UserManagementPage() {
   const activeUsers = users.filter((user) => user.status === "active").length;
   const inactiveUsers = users.length - activeUsers;
   const units = new Set(users.map((user) => user.unit)).size;
-  const isBusy = createMutation.isPending || patchMutation.isPending || lockMutation.isPending;
+  const isBusy = createMutation.isPending || patchMutation.isPending || lockMutation.isPending || deleteMutation.isPending;
+
+  React.useEffect(() => {
+    if (!usersQuery.isLoading) {
+      setLoadingTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setLoadingTimedOut(true);
+    }, 12000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [usersQuery.isLoading]);
+
+  React.useEffect(() => {
+    if (searchTerm || activeOnly || page !== 1 || usersQuery.isFetching || autoRetriedEmpty) {
+      return;
+    }
+
+    if ((usersQuery.data?.data?.items?.length ?? 0) === 0) {
+      setAutoRetriedEmpty(true);
+      void usersQuery.refetch();
+    }
+  }, [activeOnly, autoRetriedEmpty, page, searchTerm, usersQuery]);
 
   React.useEffect(() => {
     if (!createOpen) {
@@ -145,6 +197,12 @@ export default function UserManagementPage() {
       setEditForm(buildEditForm(selectedUser));
     }
   }, [editOpen, selectedUser]);
+
+  React.useEffect(() => {
+    if (!deleteOpen) {
+      setDeleteTargetUser(null);
+    }
+  }, [deleteOpen]);
 
   React.useEffect(() => {
     if (editOpen && adminUserQuery.data?.data) {
@@ -216,6 +274,11 @@ export default function UserManagementPage() {
     setLockOpen(true);
   };
 
+  const handleOpenDelete = (user: DisplayUser) => {
+    setDeleteTargetUser(user);
+    setDeleteOpen(true);
+  };
+
   const handleToggleLock = async () => {
     if (!selectedUser) return;
 
@@ -230,9 +293,54 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleDeleteUser = (id: string) => {
-    void id;
-    toast.info("API hiện chưa có endpoint xóa người dùng. Đã bỏ qua thao tác xóa.");
+  const handleDeleteUser = async () => {
+    if (!deleteTargetUser) {
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync(deleteTargetUser.id);
+      toast.success("Đã xóa người dùng.");
+      if (selectedUser?.id === deleteTargetUser.id) {
+        setSelectedUser(null);
+      }
+      setDeleteOpen(false);
+    } catch (error) {
+      const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(message || "Không thể xóa người dùng.");
+    }
+  };
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onCropComplete = async (croppedFile: File) => {
+    if (!selectedUser) return;
+    
+    setIsUploadingAvatar(true);
+    try {
+      const response = await profileApi.updateUserAvatar(selectedUser.id, croppedFile);
+      if (response.data?.avatar_url) {
+        toast.success("Đã cập nhật ảnh đại diện người dùng.");
+        void usersQuery.refetch();
+        if (selectedUser) {
+           setSelectedUser({ ...selectedUser, avatar: response.data.avatar_url });
+        }
+      }
+    } catch {
+      toast.error("Không thể tải lên ảnh đại diện.");
+    } finally {
+      setIsUploadingAvatar(false);
+      setCropImage(null);
+    }
   };
 
   return (
@@ -240,11 +348,11 @@ export default function UserManagementPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-inner">
+          <div className="flex size-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary shadow-inner">
             <Users size={24} />
           </div>
           <div>
-            <h1 className="font-title text-2xl font-black tracking-tight text-slate-900 uppercase">Quản lý Người dùng</h1>
+            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Quản lý Người dùng</h1>
             <p className="mt-1 text-sm font-medium text-slate-500">Phân quyền, quản lý tài khoản cán bộ và đơn vị công tác toàn hệ thống.</p>
           </div>
         </div>
@@ -273,19 +381,76 @@ export default function UserManagementPage() {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5 shadow-sm" 
+              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium shadow-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5" 
             />
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setActiveOnly((prev) => !prev)} className={cn("flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-sm", activeOnly ? "border-primary text-primary" : "border-slate-200 text-slate-600 hover:bg-slate-50") }>
               <Filter size={14} /> LỌC DỮ LIỆU
             </button>
-            <button onClick={() => setSearchTerm("")} className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-600 shadow-sm">
-              <MoreVertical size={16} />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" aria-label="Mở thêm tuỳ chọn" title="Mở thêm tuỳ chọn" className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-600">
+                  <MoreVertical size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-48">
+                <DropdownMenuItem onClick={handleOpenCreate}>Thêm người dùng</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setLoadingTimedOut(false);
+                    void usersQuery.refetch();
+                  }}
+                >
+                  Tải lại dữ liệu
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSearchTerm("");
+                    setActiveOnly(false);
+                    setPage(1);
+                    setLoadingTimedOut(false);
+                  }}
+                >
+                  Xóa bộ lọc
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         
+        {usersQuery.isLoading && !loadingTimedOut && (
+          <div className="border-b border-slate-100 p-8 text-xs font-semibold text-slate-500">
+            <LoadingSpinner label="Đang tải danh sách người dùng..." />
+          </div>
+        )}
+
+        {usersQuery.isLoading && loadingTimedOut && (
+          <div className="border-b border-amber-100 bg-amber-50 p-4 text-sm text-amber-800">
+            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Đã quá thời gian tải danh sách người dùng</p>
+            <div className="mt-2 flex items-center gap-3">
+              <span>Vui lòng thử tải lại dữ liệu.</span>
+              <button
+                onClick={() => {
+                  setLoadingTimedOut(false);
+                  void usersQuery.refetch();
+                }}
+                className="rounded-md bg-amber-600 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white hover:bg-amber-700"
+              >
+                Thử lại
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!usersQuery.isLoading && filteredUsers.length === 0 && (
+          <div className="border-b border-slate-100 p-4 text-xs font-semibold text-slate-500">
+            Không có người dùng phù hợp bộ lọc hiện tại.
+            <button onClick={() => void usersQuery.refetch()} className="ml-3 text-primary hover:underline">Tải lại dữ liệu</button>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -303,12 +468,18 @@ export default function UserManagementPage() {
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <img src={user.avatar} className="h-9 w-9 shrink-0 rounded-lg border border-slate-200 object-cover shadow-sm" alt="" />
+                        {user.avatar ? (
+                          <img src={user.avatar} className="size-9 shrink-0 rounded-lg border border-slate-200 object-cover shadow-sm" alt="" />
+                        ) : (
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400">
+                             <UserCircle size={20} />
+                          </div>
+                        )}
                         <div className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white", user.status === "active" ? "bg-emerald-500" : "bg-slate-300")} />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">{user.name}</p>
-                        <p className="mt-0.5 flex items-center gap-1 text-[10px] font-black text-slate-400 uppercase tracking-tight">
+                        <p className="text-xs font-bold text-slate-900 transition-colors group-hover:text-primary">{user.name}</p>
+                        <p className="mt-0.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-slate-400">
                           <Mail size={10} className="text-slate-300" /> {user.email}
                         </p>
                       </div>
@@ -336,14 +507,14 @@ export default function UserManagementPage() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-10 md:opacity-0 transition-opacity group-hover:opacity-100">
-                      <button onClick={() => handleOpenEdit(user)} className={cn("rounded-lg p-2 transition-all active:scale-90 border border-transparent", editingUserId === user.id ? "text-primary bg-primary/5 border-primary/10" : "text-slate-400 hover:bg-primary/5 hover:text-primary hover:border-primary/10") }>
+                    <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
+                      <button type="button" title="Chỉnh sửa người dùng" aria-label="Chỉnh sửa người dùng" onClick={() => handleOpenEdit(user)} className={cn("rounded-lg p-2 transition-all active:scale-90 border border-transparent", editingUserId === user.id ? "text-primary bg-primary/5 border-primary/10" : "text-slate-400 hover:bg-primary/5 hover:text-primary hover:border-primary/10") }>
                         <Edit2 size={14} />
                       </button>
-                      <button onClick={() => handleOpenLock(user)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-amber-50 hover:text-amber-600 active:scale-90 border border-transparent hover:border-amber-100">
+                      <button type="button" title={user.locked ? "Mở khóa người dùng" : "Khóa người dùng"} aria-label={user.locked ? "Mở khóa người dùng" : "Khóa người dùng"} onClick={() => handleOpenLock(user)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-amber-100 hover:bg-amber-50 hover:text-amber-600 active:scale-90">
                         <Lock size={14} />
                       </button>
-                      <button onClick={() => handleDeleteUser(user.id)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-90 border border-transparent hover:border-rose-100">
+                      <button type="button" title="Xóa người dùng" aria-label="Xóa người dùng" onClick={() => handleOpenDelete(user)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600 active:scale-90">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -361,7 +532,7 @@ export default function UserManagementPage() {
               Trước
             </button>
             <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white shadow-sm shadow-primary/20">{normalizedPage}</button>
-            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50" disabled={normalizedPage === totalPages}>Tiếp</button>
+            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === totalPages}>Tiếp</button>
           </div>
         </div>
       </div>
@@ -397,7 +568,7 @@ export default function UserManagementPage() {
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setCreateOpen(false)} disabled={isBusy}>Hủy</Button>
             <Button type="button" onClick={handleAddUser} disabled={isBusy}>
-              {createMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+              {createMutation.isPending ? <LoadingSpinner variant="small" className="mr-2" /> : null}
               Tạo mới
             </Button>
           </DialogFooter>
@@ -410,6 +581,38 @@ export default function UserManagementPage() {
             <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
             <DialogDescription>Cập nhật hồ sơ, vai trò và trạng thái cho bản ghi đang chọn.</DialogDescription>
           </DialogHeader>
+
+          <div className="mb-4 flex flex-col items-center justify-center p-4">
+               <div className="relative">
+                 <div className="relative size-24 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-1 ring-slate-200">
+                   {selectedUser?.avatar ? (
+                     <img src={selectedUser.avatar} className="size-full object-cover" alt="User" />
+                   ) : (
+                     <div className="flex size-full items-center justify-center text-slate-400">
+                       <UserCircle size={48} />
+                     </div>
+                   )}
+                   
+                   {isUploadingAvatar && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[2px] duration-200 animate-in fade-in">
+                      <LoadingSpinner variant="small" />
+                      <span className="mt-1 text-center text-[8px] font-black uppercase tracking-tighter text-primary">Tải lên...</span>
+                    </div>
+                  )}
+                 </div>
+                 <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  className={cn(
+                    "absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-lg border-2 border-white transition-all active:scale-95",
+                    isUploadingAvatar ? "opacity-50 cursor-not-allowed scale-90" : "hover:scale-110"
+                  )}
+                 >
+                   <Camera size={14} />
+                 </button>
+                 <input type="file" ref={fileInputRef} onChange={handleAvatarFileChange} accept="image/*" className="hidden" />
+               </div>
+          </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Username" htmlFor="edit-username">
@@ -431,17 +634,19 @@ export default function UserManagementPage() {
               <input id="edit-roleIds" value={editForm.roleIds} onChange={(event) => setEditForm((prev) => ({ ...prev, roleIds: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
             </Field>
             <Field label="Trạng thái" htmlFor="edit-status" className="md:col-span-2">
-              <select id="edit-status" value={editForm.status} onChange={(event) => setEditForm((prev) => ({ ...prev, status: event.target.value as "active" | "inactive" }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm">
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
-              </select>
+              <SelectField
+                id="edit-status"
+                value={editForm.status}
+                onValueChange={(v) => setEditForm((prev) => ({ ...prev, status: v as "active" | "inactive" }))}
+                options={USER_STATUS_OPTIONS}
+              />
             </Field>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setEditOpen(false)} disabled={isBusy}>Hủy</Button>
-            <Button type="button" onClick={handleEditUser} disabled={isBusy}>
-              {patchMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+            <Button type="button" variant="outline" onClick={() => setEditOpen(false)} disabled={isBusy || isUploadingAvatar}>Hủy</Button>
+            <Button type="button" onClick={handleEditUser} disabled={isBusy || isUploadingAvatar}>
+              {patchMutation.isPending ? <LoadingSpinner variant="small" className="mr-2" /> : null}
               Lưu thay đổi
             </Button>
           </DialogFooter>
@@ -460,10 +665,46 @@ export default function UserManagementPage() {
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setLockOpen(false)} disabled={isBusy}>Hủy</Button>
             <Button type="button" onClick={handleToggleLock} disabled={isBusy}>
-              {lockMutation.isPending ? <Loader2 size={16} className="mr-2 animate-spin" /> : null}
+              {lockMutation.isPending ? <LoadingSpinner variant="small" className="mr-2" /> : null}
               {selectedUser?.locked ? "Mở khóa" : "Khóa"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Trash2 size={18} className="text-rose-500" /> Xác nhận xóa người dùng</DialogTitle>
+            <DialogDescription>
+              {deleteTargetUser ? `Xóa ${deleteTargetUser.name} khỏi hệ thống? Thao tác này không thể hoàn tác.` : "Xác nhận thao tác này."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleteOpen(false)} disabled={isBusy}>Hủy</Button>
+            <Button type="button" onClick={() => void handleDeleteUser()} disabled={isBusy} variant="destructive">
+              {deleteMutation.isPending ? <LoadingSpinner variant="small" className="mr-2" /> : null}
+              Xóa người dùng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!cropImage} onOpenChange={(open) => !open && setCropImage(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tùy chỉnh ảnh đại diện</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {cropImage && (
+              <AvatarCropper 
+                image={cropImage} 
+                onCropComplete={onCropComplete} 
+                onCancel={() => setCropImage(null)} 
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -502,8 +743,8 @@ function QuickStat({ title, value, icon, color }: { title: string; value: string
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 truncate">{title}</p>
-        <p className="text-xl font-black text-slate-950 tracking-tight leading-none">{value}</p>
+        <p className="truncate text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
+        <p className="text-xl font-black leading-none tracking-tight text-slate-950">{value}</p>
       </div>
     </div>
   );

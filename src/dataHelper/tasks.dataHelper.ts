@@ -15,6 +15,9 @@ export interface TaskApiItem {
   createdBy: number;
   creatorName: string;
   createdAt: string;
+  assignees?: { id: number; name: string; avatar?: string }[];
+  commentsCount?: number;
+  attachmentsCount?: number;
 }
 
 export interface TaskCreatePayload {
@@ -26,6 +29,7 @@ export interface TaskCreatePayload {
   status?: number;
   priority?: number;
   due_at?: string;
+  assignee_ids?: number[];
 }
 
 export interface TaskPatchPayload {
@@ -34,6 +38,7 @@ export interface TaskPatchPayload {
   status?: number;
   priority?: number;
   due_at?: string;
+  assignee_ids?: number[];
 }
 
 export interface TaskUiItem {
@@ -45,6 +50,11 @@ export interface TaskUiItem {
   dueAt: string;
   isOverdue: boolean;
   creator: string;
+  assignees: { id: number; name: string; avatar?: string }[];
+  commentsCount: number;
+  attachmentsCount: number;
+  delegationId?: number | null;
+  eventId?: number | null;
 }
 
 export const mapTaskStatus = (status: number): TaskStatus => {
@@ -71,6 +81,11 @@ export const mapTaskToUi = (item: TaskApiItem): TaskUiItem => {
     dueAt: item.dueAt || "N/A",
     isOverdue: item.isOverdue,
     creator: item.creatorName || "Hệ thống",
+    assignees: item.assignees || [],
+    commentsCount: item.commentsCount || 0,
+    attachmentsCount: item.attachmentsCount || 0,
+    delegationId: item.delegationId,
+    eventId: item.eventId,
   };
 };
 

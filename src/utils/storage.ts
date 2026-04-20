@@ -12,6 +12,18 @@ export const removeAccessToken = () => {
   localStorage.removeItem(STORAGE_VAR.ACCESS_TOKEN);
 };
 
+export const getRefreshToken = () => {
+  return localStorage.getItem(STORAGE_VAR.REFRESH_TOKEN);
+};
+
+export const setRefreshToken = (token: string) => {
+  localStorage.setItem(STORAGE_VAR.REFRESH_TOKEN, token);
+};
+
+export const removeRefreshToken = () => {
+  localStorage.removeItem(STORAGE_VAR.REFRESH_TOKEN);
+};
+
 export const getUserEmail = () => {
   return localStorage.getItem(STORAGE_VAR.USER_EMAIL);
 };

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ChangeEvent, MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronDown } from "lucide-react";
 import { 
   PaginationContent, 
   PaginationEllipsis, 
@@ -90,7 +91,7 @@ const Pagination = ({
           {getVisiblePages(currentPage, totalPages, maxVisiblePages).map((page, idx) => {
             if (page === "start-ellipsis" || page === "end-ellipsis") {
               return (
-                <PaginationItem key={page + (idx as any)}>
+                <PaginationItem key={`${page}-${idx}`}>
                   <PaginationEllipsis className="text-slate-500 opacity-70" />
                 </PaginationItem>
               );
@@ -125,20 +126,21 @@ const Pagination = ({
 
       {onPerPageChange && perPage && (
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded bg-slate-100 px-3 py-1.5">
-            <select
-              className="bg-transparent text-sm text-slate-700 outline-none"
-              value={perPage}
-              onChange={handlePerPageChange}
-              aria-label={t("pagination.items_per_page")}
-            >
-              {perPageOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="relative flex items-center gap-2 rounded bg-slate-100 px-3 py-1.5">
+              <select
+                className="appearance-none bg-transparent pr-5 text-sm text-slate-700 outline-none"
+                value={perPage}
+                onChange={handlePerPageChange}
+                aria-label={t("pagination.items_per_page")}
+              >
+                {perPageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
+            </div>
           {totalItems !== undefined && (
             <span className="whitespace-nowrap text-sm text-slate-700">
               {totalItems} {resultsText || t("pagination.results")}

@@ -75,7 +75,7 @@ const DataTable = <T extends object>({
               data.map((item, rowIndex) => (
                 <TableRow
                   key={rowIndex}
-                  className="border-b border-blue-100 cursor-pointer hover:bg-slate-50"
+                  className="cursor-pointer border-b border-blue-100 hover:bg-slate-50"
                   onClick={() => onRowClick?.(item)}
                 >
                   {columns.map((column, colIndex) => (

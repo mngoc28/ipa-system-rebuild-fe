@@ -1,5 +1,6 @@
 import axiosClient from "@/api/axiosClient";
 import { ApiEnvelope } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export type TeamMemberStatus = "In Office" | "On Field" | "On Leave";
 
@@ -53,19 +54,28 @@ export interface TeamCreateMemberPayload {
 }
 
 export const teamsApi = {
-  getDashboard: async (query?: { unitId?: number; page?: number; pageSize?: number }) => {
-    const response = await axiosClient.get<ApiEnvelope<TeamDashboardData>>("/api/v1/teams", {
+  getDashboard: async (query?: { unitId?: number; page?: number; pageSize?: number; search?: string }) => {
+    const { user } = useAuthStore.getState();
+    const rolePrefix = user?.role?.toLowerCase() || 'staff';
+    
+    const response = await axiosClient.get<ApiEnvelope<TeamDashboardData>>(`/api/v1/${rolePrefix}/teams`, {
       params: query,
     });
 
     return response.data;
   },
   createMember: async (payload: TeamCreateMemberPayload) => {
-    const response = await axiosClient.post<ApiEnvelope<TeamMemberItem>>("/api/v1/teams/members", payload);
+    const { user } = useAuthStore.getState();
+    const rolePrefix = user?.role?.toLowerCase() || 'staff';
+
+    const response = await axiosClient.post<ApiEnvelope<TeamMemberItem>>(`/api/v1/${rolePrefix}/teams/members`, payload);
     return response.data;
   },
   listUnits: async () => {
-    const response = await axiosClient.get<ApiEnvelope<{ items: OrgUnitItem[] }>>("/api/v1/teams/units");
+    const { user } = useAuthStore.getState();
+    const rolePrefix = user?.role?.toLowerCase() || 'staff';
+
+    const response = await axiosClient.get<ApiEnvelope<{ items: OrgUnitItem[] }>>(`/api/v1/${rolePrefix}/teams/units`);
     return response.data;
   },
 };

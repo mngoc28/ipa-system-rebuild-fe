@@ -68,10 +68,11 @@ import AdminDocumentListPage from "./pages/admin/documents/DocumentListPage";
 
 // == ADMIN PORTAL IMPORTS ==
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
-import SystemSettingsPage from "./pages/admin/SystemSettingsPage";
+import AnnouncementsPage from "./pages/admin/AnnouncementsPage.tsx";
 import UserManagementPage from "./pages/admin/UserManagementPage";
 import MasterDataPage from "./pages/admin/MasterDataPage";
 import AuditLogPage from "./pages/admin/AuditLogPage";
+import AdminGuidePage from "./pages/admin/AdminGuidePage";
 import { AUTH_LOGIN_PATH, getDashboardPathForRole } from "./lib/routeHelpers";
 
 export default function Router() {
@@ -96,6 +97,7 @@ export default function Router() {
             <Route path="dashboard" element={<StaffDashboardPage />} />
             <Route path="delegations" element={<StaffDelegationListPage />} />
             <Route path="delegations/create" element={<StaffDelegationForm />} />
+            <Route path="delegations/:id/edit" element={<StaffDelegationForm />} />
             <Route path="delegations/:id" element={<StaffDelegationDetailPage />} />
             <Route path="schedule" element={<StaffSchedulePage />} />
             <Route path="minutes" element={<StaffMinutesListPage />} />
@@ -115,6 +117,7 @@ export default function Router() {
             <Route path="dashboard" element={<ManagerDashboardPage />} />
             <Route path="delegations" element={<ManagerDelegationListPage />} />
             <Route path="delegations/create" element={<ManagerDelegationForm />} />
+            <Route path="delegations/:id/edit" element={<ManagerDelegationForm />} />
             <Route path="delegations/:id" element={<ManagerDelegationDetailPage />} />
             <Route path="schedule" element={<ManagerSchedulePage />} />
             <Route path="minutes" element={<ManagerMinutesListPage />} />
@@ -137,6 +140,7 @@ export default function Router() {
             <Route path="dashboard" element={<DirectorDashboardPage />} />
             <Route path="delegations" element={<DirectorDelegationListPage />} />
             <Route path="delegations/create" element={<DirectorDelegationForm />} />
+            <Route path="delegations/:id/edit" element={<DirectorDelegationForm />} />
             <Route path="delegations/:id" element={<DirectorDelegationDetailPage />} />
             <Route path="schedule" element={<DirectorSchedulePage />} />
             <Route path="minutes" element={<DirectorMinutesListPage />} />
@@ -158,6 +162,7 @@ export default function Router() {
             <Route path="dashboard" element={<AdminAppDashboardPage />} />
             <Route path="delegations" element={<AdminDelegationListPage />} />
             <Route path="delegations/create" element={<AdminDelegationForm />} />
+            <Route path="delegations/:id/edit" element={<AdminDelegationForm />} />
             <Route path="delegations/:id" element={<AdminDelegationDetailPage />} />
             <Route path="schedule" element={<AdminSchedulePage />} />
             <Route path="minutes" element={<AdminMinutesListPage />} />
@@ -180,8 +185,9 @@ export default function Router() {
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="users" element={<UserManagementPage />} />
         <Route path="master-data" element={<MasterDataPage />} />
-        <Route path="system" element={<SystemSettingsPage />} />
+        <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="audit-log" element={<AuditLogPage />} />
+        <Route path="guide" element={<AdminGuidePage />} />
       </Route>
 
       <Route path="*" element={<Navigate to={isAuthenticated ? dashboardPath : "/"} replace />} />

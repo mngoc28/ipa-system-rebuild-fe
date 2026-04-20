@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 import { minutesAttachments, minutesTasks } from "@/dataHelper/minutesDetail.dataHelper";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function MinutesDetailPage() {
   const queryClient = useQueryClient();
@@ -71,7 +72,11 @@ export default function MinutesDetailPage() {
   });
 
   if (detailQuery.isLoading) {
-    return <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">Đang tải biên bản...</div>;
+    return (
+      <div className="rounded-3xl border border-slate-200 bg-white p-12 text-sm font-semibold text-slate-500">
+        <LoadingSpinner label="Đang tải chi tiết biên bản..." />
+      </div>
+    );
   }
 
   if (detailQuery.isError || !detailData) {
@@ -152,7 +157,7 @@ export default function MinutesDetailPage() {
       {/* Top Header */}
       <div className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm md:flex-row md:items-center">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-50">
+          <button onClick={() => navigate(-1)} title="Quay lại" aria-label="Quay lại" className="rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-50">
             <ChevronLeft size={20} />
           </button>
           <div className="space-y-1">
@@ -168,10 +173,10 @@ export default function MinutesDetailPage() {
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center rounded-xl border border-slate-100 bg-slate-50 p-1 lg:flex">
-            <button onClick={handlePrint} className="p-2 text-slate-400 transition-all hover:text-primary">
+            <button onClick={handlePrint} title="In biên bản" aria-label="In biên bản" className="p-2 text-slate-400 transition-all hover:text-primary">
               <Printer size={18} />
             </button>
-            <button onClick={handleDownload} className="p-2 text-slate-400 transition-all hover:text-primary">
+            <button onClick={handleDownload} title="Tải biên bản" aria-label="Tải biên bản" className="p-2 text-slate-400 transition-all hover:text-primary">
               <Download size={18} />
             </button>
           </div>
@@ -201,7 +206,7 @@ export default function MinutesDetailPage() {
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="rounded-xl p-2 text-slate-400 hover:bg-slate-50">
+              <button className="rounded-xl p-2 text-slate-400 hover:bg-slate-50" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                 <MoreVertical size={20} />
               </button>
             </DropdownMenuTrigger>
@@ -224,7 +229,7 @@ export default function MinutesDetailPage() {
               <FileText size={20} className="text-primary" />
               <h2 className="text-sm font-bold tracking-tight text-slate-900">Nội dung biên bản</h2>
             </div>
-            <button onClick={handleFullscreen} className="p-2 text-slate-300 transition-colors hover:text-primary">
+            <button onClick={handleFullscreen} title="Mở toàn màn hình" aria-label="Mở toàn màn hình" className="p-2 text-slate-300 transition-colors hover:text-primary">
               <Maximize2 size={16} />
             </button>
           </div>
@@ -303,7 +308,7 @@ export default function MinutesDetailPage() {
             <div className="flex shrink-0 items-center justify-between border-b border-slate-50 p-6">
               <h3 className="text-sm font-black text-slate-900">{activeRightTab === "tasks" ? "Đầu việc phát sinh" : activeRightTab === "comments" ? "Phản hồi & Thảo luận" : "Phiên bản tài liệu"}</h3>
               {activeRightTab === "tasks" && (
-                <button onClick={handleAddTask} className="rounded-lg bg-primary p-1.5 text-white">
+                <button onClick={handleAddTask} title="Thêm đầu việc" aria-label="Thêm đầu việc" className="rounded-lg bg-primary p-1.5 text-white">
                   <Plus size={16} />
                 </button>
               )}
@@ -337,7 +342,7 @@ export default function MinutesDetailPage() {
                   {comments.length === 0 ? <p className="text-xs font-semibold text-slate-500">Chưa có phản hồi nào.</p> : null}
                   {comments.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-slate-900">Người dùng</span>
@@ -390,7 +395,7 @@ export default function MinutesDetailPage() {
               <div className="border-t border-slate-100 bg-slate-50 p-4">
                 <div className="group relative">
                   <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Viết phản hồi..." className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-4 pr-12 text-xs outline-none transition-all focus:border-primary" />
-                  <button onClick={handleSendComment} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-primary p-2 text-white shadow-md">
+                  <button onClick={handleSendComment} title="Gửi phản hồi" aria-label="Gửi phản hồi" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-primary p-2 text-white shadow-md">
                     <ArrowRight size={16} />
                   </button>
                 </div>
@@ -411,7 +416,7 @@ export default function MinutesDetailPage() {
                     {index % 2 === 0 ? <FileText size={16} className="text-red-500" /> : <History size={16} className="text-blue-500" />}
                     <span className="max-w-[200px] truncate text-[11px] font-bold text-slate-700">{file}</span>
                   </div>
-                  <button onClick={() => handleAttachmentDownload(file)} className="options-btn p-1 opacity-0 group-hover:opacity-100">
+                  <button onClick={() => handleAttachmentDownload(file)} title={`Tải xuống ${file}`} aria-label={`Tải xuống ${file}`} className="options-btn p-1 opacity-0 group-hover:opacity-100">
                     <Download size={14} />
                   </button>
                 </div>

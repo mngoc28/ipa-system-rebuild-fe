@@ -1,0 +1,14 @@
+screen_name,component_id,component_type,text,placeholder,action,position,required,validation,style,notes
+System Settings,page_title,label,Hệ thống & Tích hợp,,none,header,,,font-title text-2xl font-black uppercase,Central configuration module (Entry point disabled from user profile)
+System Settings,btn_reset_auto,button,RESET VỀ TỰ ĐỘNG,,click,header,,,border-slate-200 text-slate-700,Restores initial settings state
+System Settings,btn_save_changes,button,LƯU THAY ĐỔI,,submit,header,,,bg-emerald-600 text-white font-black,Persists current form state to backend
+System Settings,saved_timestamp,label,Đã lưu lúc [time],,none,header,,,text-[10px] font-black text-emerald-600,Shows last successful persistence time
+System Settings,section_smtp,panel,Mail Server (SMTP),,none,center,,,border-slate-200 bg-white shadow-sm,Group for email server settings
+System Settings,input_smtp_host,input,,smtp.ipa.danang.gov.vn,type,center,true,,border-slate-200 bg-slate-50,Domain for outgoing mail server
+System Settings,input_smtp_port,input,,587,type,center,true,,border-slate-200 bg-slate-50,Communication port for server
+System Settings,select_smtp_security,select,,TLS,type,center,true,,border-slate-200 bg-slate-50,Encryption protocol (TLS/SSL/None)
+System Settings,section_zalo,panel,Kết nối Zalo ZNS,,none,center,,,border-slate-200 bg-white shadow-sm,Group for Zalo notification settings
+System Settings,input_zalo_app_id,input,,Zalo App ID,type,center,true,,border-slate-200 bg-slate-50,Zalo Developer application ID
+System Settings,input_zalo_secret,input,,Để trống nếu không thay đổi,type,center,false,,border-slate-200 bg-slate-50,Encrypted secret key
+System Settings,btn_test_api,button,KIỂM TRA KẾT NỐI API,,submit,center,,,border-slate-200 bg-slate-100 font-black,Validates Zalo credentials against API
+System Settings,api_status_indicator,label,,,[none],center,,,text-[10px] font-black uppercase,Success: green; Error: red indicator

@@ -20,12 +20,12 @@ export default function LandingLayout() {
       )}>
         <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-3">
-             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-[11px] font-black tracking-widest text-white shadow-lg">IPA</div>
+             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-[11px] font-black tracking-widest text-white shadow-lg">IPA</div>
              <span className={cn("font-title text-base font-black tracking-[0.2em]", isScrolled ? "text-slate-900" : "text-white")}>ĐÀ NẴNG</span>
           </div>
           
           <nav className="hidden lg:block">
-            <ul className="flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-[11px]">
+            <ul className="flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest">
               <li className={cn("cursor-pointer transition-colors hover:text-blue-500", !isScrolled && "text-slate-200")}>Giới thiệu</li>
               <li className={cn("cursor-pointer transition-colors hover:text-blue-500", !isScrolled && "text-slate-200")}>Dự án</li>
               <li className={cn("cursor-pointer transition-colors hover:text-blue-500", !isScrolled && "text-slate-200")}>Thủ tục</li>

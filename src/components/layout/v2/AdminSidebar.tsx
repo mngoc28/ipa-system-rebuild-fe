@@ -29,11 +29,11 @@ interface MenuItem {
  * Navigation configuration for the administrative sidebar.
  */
 const adminMenuItems: MenuItem[] = [
-  { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Identity & Permissions", path: "/admin/users", icon: Users },
-  { title: "Master Data", path: "/admin/master-data", icon: Server },
-  { title: "Announcements & Ops", path: "/admin/announcements", icon: Settings },
-  { title: "Audit Log", path: "/admin/audit-log", icon: ShieldCheck },
+  { title: "Bảng điều khiển", path: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Định danh & Quyền hạn", path: "/admin/users", icon: Users },
+  { title: "Dữ liệu danh mục", path: "/admin/master-data", icon: Server },
+  { title: "Thông báo & Vận hành", path: "/admin/announcements", icon: Settings },
+  { title: "Nhật ký hệ thống", path: "/admin/audit-log", icon: ShieldCheck },
 ];
 
 /**
@@ -73,7 +73,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
       {/* Navigation */}
       <nav className="scrollbar-hide flex-1 overflow-y-auto px-3 py-6">
         <div className="mb-4 px-2">
-           {!isCollapsed && <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Administration Console</p>}
+           {!isCollapsed && <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bộ điều khiển quản trị</p>}
         </div>
         <ul className="space-y-1.5">
           {adminMenuItems.map((item) => (
@@ -111,7 +111,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
               )}
             >
               <ArrowLeft size={18} className={cn("shrink-0 transition-transform group-hover:-translate-x-1")} />
-              {!isCollapsed && <span className="ml-3 truncate text-xs font-black uppercase tracking-wider">EXIT ADMIN</span>}
+              {!isCollapsed && <span className="ml-3 truncate text-xs font-black uppercase tracking-wider">THOÁT QUẢN TRỊ</span>}
               {isCollapsed && (
                   <div className="invisible absolute left-14 z-50 whitespace-nowrap rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 transition-all group-hover:visible group-hover:opacity-100">
                     Exit Admin
@@ -130,7 +130,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
           {!isCollapsed && (
             <div className="ml-3 overflow-hidden">
               <p className="truncate text-xs font-black text-emerald-50">{user?.fullName || "System Admin"}</p>
-              <p className="text-[10px] uppercase tracking-widest text-emerald-500/80">Root Administrator</p>
+              <p className="text-[10px] uppercase tracking-widest text-emerald-500/80">Quản trị viên hệ thống</p>
             </div>
           )}
         </div>
@@ -142,7 +142,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
             ) : (
               <>
                 <ChevronLeft size={20} />
-                <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Collapse</span>
+                <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Thu gọn</span>
               </>
             )}
           </button>
@@ -157,7 +157,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
             className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white"
           >
             <LogOut size={20} />
-            {!isCollapsed && <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Logout</span>}
+            {!isCollapsed && <span className="ml-3 text-[10px] font-black uppercase tracking-widest">Đăng xuất</span>}
           </button>
         </div>
       </div>

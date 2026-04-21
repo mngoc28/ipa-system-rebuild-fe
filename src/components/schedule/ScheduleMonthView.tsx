@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UiEvent } from "./ScheduleHub";
 
@@ -10,10 +11,17 @@ interface ScheduleMonthViewProps {
     label: string;
   };
   selectedDay: number | null;
-  setSelectedDay: (day: number) => void;
+  setSelectedDay: (day: number | null) => void;
+  onEventClick?: (event: UiEvent) => void;
 }
 
-export default function ScheduleMonthView({ events, currentMonth, selectedDay, setSelectedDay }: ScheduleMonthViewProps) {
+export default function ScheduleMonthView({ 
+  events, 
+  currentMonth, 
+  selectedDay, 
+  setSelectedDay,
+  onEventClick
+}: ScheduleMonthViewProps) {
   const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.year, currentMonth.month, 1).getDay();
 
@@ -97,20 +105,24 @@ export default function ScheduleMonthView({ events, currentMonth, selectedDay, s
               <div className="space-y-1.5">
                 {dayEvents.slice(0, 3).map((event) => (
                   <div 
-                    key={event.id}
+                    key={event.id} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEventClick?.(event);
+                    }}
                     className={cn(
-                        "group relative truncate rounded border px-2 py-1 text-[9px] font-bold uppercase transition-all hover:scale-[1.02] active:scale-95 animate-in fade-in zoom-in-95 duration-300",
-                        event.type === "MEETING" 
-                            ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100" 
-                            : event.type === "GALA" || event.type === "CEREMONY"
-                            ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
-                            : "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100"
+                      "group/event relative flex cursor-pointer flex-col gap-0.5 rounded-md border border-slate-100 bg-white p-2 transition-all hover:border-primary/30 hover:shadow-lg active:scale-95",
+                      event.type === "MEETING" ? "border-l-4 border-l-blue-500" : "border-l-4 border-l-primary"
                     )}
-                    title={`${event.title} (${event.time})`}
                   >
-                    <div className="flex items-center gap-1">
-                       <span className="text-[7.5px] font-black tracking-tighter opacity-60">{event.time.split(" - ")[0]}</span>
-                       <span className="truncate">{event.title}</span>
+                    <div className="flex items-center justify-between gap-1 overflow-hidden">
+                      <span className="truncate text-[10px] font-black uppercase tracking-tight text-slate-800">
+                        {event.title}
+                      </span>
+                      <div className={cn("size-1.5 shrink-0 rounded-full", event.status === "DONE" ? "bg-emerald-500" : "bg-blue-500")} />
+                    </div>
+                    <div className="flex items-center gap-1 text-[8px] font-bold uppercase text-slate-400">
+                      <Clock size={8} /> {event.time}
                     </div>
                   </div>
                 ))}

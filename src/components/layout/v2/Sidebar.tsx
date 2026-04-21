@@ -49,52 +49,52 @@ interface MenuGroup {
 
 const menuGroups: MenuGroup[] = [
   {
-    group: "GENERAL",
+    group: "TỔNG QUAN",
     items: [
-      { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Delegations", path: "/delegations", icon: Briefcase, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Bảng điều khiển", path: "/dashboard", icon: LayoutDashboard, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Đoàn công tác", path: "/delegations", icon: Briefcase, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
-    group: "UNIT MANAGEMENT",
+    group: "QUẢN LÝ ĐƠN VỊ",
     roles: ["Manager"],
     items: [
-      { title: "Pending Approvals", path: "/approvals", icon: ClipboardList, roles: ["Manager"] },
-      { title: "Unit Reports", path: "/reports/unit", icon: BarChart3, roles: ["Manager"] },
-      { title: "Teams & HR", path: "/teams", icon: Users, roles: ["Manager"] },
+      { title: "Chờ phê duyệt", path: "/approvals", icon: ClipboardList, roles: ["Manager"] },
+      { title: "Báo cáo đơn vị", path: "/reports/unit", icon: BarChart3, roles: ["Manager"] },
+      { title: "Đội nhóm & Nhân sự", path: "/teams", icon: Users, roles: ["Manager"] },
     ]
   },
   {
-    group: "CITY LEADERSHIP",
+    group: "LÃNH ĐẠO THÀNH PHỐ",
     roles: ["Director"],
     items: [
-      { title: "City Overview", path: "/city-overview", icon: Building2, roles: ["Director"] },
-      { title: "City Reports", path: "/reports/city", icon: BarChart3, roles: ["Director"] },
+      { title: "Tổng quan thành phố", path: "/city-overview", icon: Building2, roles: ["Director"] },
+      { title: "Báo cáo thành phố", path: "/reports/city", icon: BarChart3, roles: ["Director"] },
     ]
   },
   {
-    group: "SYSTEM",
+    group: "HỆ THỐNG",
     roles: ["Admin"],
     items: [
-      { title: "Admin Portal", path: "/admin/dashboard", icon: ShieldCheck, roles: ["Admin"] },
-      { title: "Master Data", path: "/admin/master-data", icon: Database, roles: ["Admin"] },
-      { title: "Audit Logs", path: "/admin/audit-logs", icon: Activity, roles: ["Admin"] },
-      { title: "Announcements & Ops", path: "/admin/announcements", icon: Settings, roles: ["Admin"] },
+      { title: "Quản trị hệ thống", path: "/admin/dashboard", icon: ShieldCheck, roles: ["Admin"] },
+      { title: "Dữ liệu danh mục", path: "/admin/master-data", icon: Database, roles: ["Admin"] },
+      { title: "Nhật ký hệ thống", path: "/admin/audit-logs", icon: Activity, roles: ["Admin"] },
+      { title: "Thông báo & Vận hành", path: "/admin/announcements", icon: Settings, roles: ["Admin"] },
     ]
   },
   {
-    group: "OPERATIONS",
+    group: "NGHIỆP VỤ",
     items: [
-      { title: "Project Pipeline", path: "/pipeline", icon: PieChart, roles: ["Staff", "Manager", "Director"] },
-      { title: "Work Schedule", path: "/schedule", icon: Calendar, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Task Manager", path: "/tasks", icon: CheckSquare, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Tuyến dự án", path: "/pipeline", icon: PieChart, roles: ["Staff", "Manager", "Director"] },
+      { title: "Lịch làm việc", path: "/schedule", icon: Calendar, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Quản lý nhiệm vụ", path: "/tasks", icon: CheckSquare, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
-    group: "OFFICE",
+    group: "VĂN PHÒNG",
     items: [
-      { title: "Minutes", path: "/minutes", icon: FileText, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Notifications", path: "/notifications", icon: Bell, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Biên bản", path: "/minutes", icon: FileText, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "Thông báo", path: "/notifications", icon: Bell, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   },
   {
@@ -229,7 +229,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
             ) : (
               <>
                 <ChevronLeft size={20} />
-                <span className="ml-3 text-xs">Collapse</span>
+                <span className="ml-3 text-xs">Thu gọn</span>
               </>
             )}
           </button>
@@ -244,7 +244,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
             className="flex h-10 w-full items-center rounded-md px-3 text-slate-400 shadow-sm transition-all hover:bg-destructive hover:text-white"
           >
             <LogOut size={20} />
-            {!isCollapsed && <span className="ml-3 text-xs">Logout</span>}
+            {!isCollapsed && <span className="ml-3 text-xs">Đăng xuất</span>}
           </button>
         </div>
       </div>

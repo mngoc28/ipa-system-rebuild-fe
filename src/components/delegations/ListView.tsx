@@ -19,13 +19,13 @@ interface ListViewProps {
  * Theme and localized labels for delegation statuses.
  */
 const statusColors: Record<string, { bg: string; text: string; label: string }> = {
-  draft: { bg: "bg-slate-100", text: "text-slate-600", label: "Draft" },
-  pendingApproval: { bg: "bg-amber-100", text: "text-amber-700", label: "Pending Approval" },
-  needsRevision: { bg: "bg-orange-100", text: "text-orange-700", label: "Needs Revision" },
-  approved: { bg: "bg-blue-100", text: "text-blue-700", label: "Approved" },
-  inProgress: { bg: "bg-emerald-100", text: "text-emerald-700", label: "In Progress" },
-  completed: { bg: "bg-teal-100", text: "text-teal-800", label: "Completed" },
-  cancelled: { bg: "bg-rose-100", text: "text-rose-700", label: "Cancelled" },
+  draft: { bg: "bg-slate-100", text: "text-slate-600", label: "Nháp" },
+  pendingApproval: { bg: "bg-amber-100", text: "text-amber-700", label: "Chờ phê duyệt" },
+  needsRevision: { bg: "bg-orange-100", text: "text-orange-700", label: "Cần bổ sung" },
+  approved: { bg: "bg-blue-100", text: "text-blue-700", label: "Đã phê duyệt" },
+  inProgress: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Đang thực hiện" },
+  completed: { bg: "bg-teal-100", text: "text-teal-800", label: "Hoàn thành" },
+  cancelled: { bg: "bg-rose-100", text: "text-rose-700", label: "Đã hủy" },
 };
 
 /**
@@ -104,7 +104,7 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 onClick={() => handleSort("code")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Code <ArrowUpDown size={10} className={cn(sortConfig.key === "code" && "text-primary")} />
+                  Mã <ArrowUpDown size={10} className={cn(sortConfig.key === "code" && "text-primary")} />
                 </div>
               </th>
               <th 
@@ -112,21 +112,21 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 onClick={() => handleSort("name")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Event / Delegation <ArrowUpDown size={10} className={cn(sortConfig.key === "name" && "text-primary")} />
+                  Sự kiện / Đoàn công tác <ArrowUpDown size={10} className={cn(sortConfig.key === "name" && "text-primary")} />
                 </div>
               </th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Country</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</th>
               <th 
                 className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400"
                 onClick={() => handleSort("startDate")}
               >
                 <div className="flex cursor-pointer items-center gap-1 transition-colors hover:text-slate-900">
-                  Timeline <ArrowUpDown size={10} className={cn(sortConfig.key === "startDate" && "text-primary")} />
+                  Thời gian <ArrowUpDown size={10} className={cn(sortConfig.key === "startDate" && "text-primary")} />
                 </div>
               </th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
-              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Staff</th>
-              <th className="px-6 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</th>
+              <th className="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Cán bộ</th>
+              <th className="px-6 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -187,11 +187,11 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
       {/* Pagination Footer */}
       <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-4">
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-          SHOWING{" "}
+          HIỂN THỊ{" "}
           <span className="text-slate-900">
             {sortedDelegations.length === 0 ? "0 - 0" : `${(normalizedPage - 1) * itemsPerPage + 1} - ${Math.min(normalizedPage * itemsPerPage, sortedDelegations.length)}`}
           </span>{" "}
-          OF <span className="text-slate-900">{sortedDelegations.length}</span> RESULTS
+          TRÊN <span className="text-slate-900">{sortedDelegations.length}</span> KẾT QUẢ
         </p>
 
         <div className="flex items-center gap-1">

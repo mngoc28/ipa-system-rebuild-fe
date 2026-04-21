@@ -85,31 +85,31 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {isAdmin ? (
           <>
-            <StatCard title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Từ API summary" icon={<Users size={20} />} color="blue" />
-            <StatCard title="System Uptime" value={String(summary?.stats.tasks ?? 0)} note="Task records" icon={<ShieldCheck size={20} />} color="emerald" />
-            <StatCard title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Event records" icon={<TrendingUp size={20} />} color="purple" />
-            <StatCard title="Log Storage" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue tasks" icon={<Clock size={20} />} color="amber" />
+            <StatCard title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Số lượng tài khoản" icon={<Users size={20} />} color="blue" />
+            <StatCard title="Thời gian vận hành" value={String(summary?.stats.tasks ?? 0)} note="Hệ thống ổn định" icon={<ShieldCheck size={20} />} color="emerald" />
+            <StatCard title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Lượt truy cập" icon={<TrendingUp size={20} />} color="purple" />
+            <StatCard title="Lưu trữ nhật ký" value={String(summary?.overdueTasks.length ?? 0)} note="Bản ghi hệ thống" icon={<Clock size={20} />} color="amber" />
           </>
         ) : isDirector ? (
           <>
-            <StatCard title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<TrendingUp size={20} />} color="emerald" />
-            <StatCard title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<Briefcase size={20} />} color="blue" />
-            <StatCard title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Events" icon={<PieChart size={20} />} color="purple" />
-            <StatCard title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Users size={20} />} color="amber" />
+            <StatCard title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<TrendingUp size={20} />} color="emerald" />
+            <StatCard title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<Briefcase size={20} />} color="blue" />
+            <StatCard title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<PieChart size={20} />} color="purple" />
+            <StatCard title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Users size={20} />} color="amber" />
           </>
         ) : isManager ? (
           <>
-            <StatCard title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<ClipboardList size={20} />} color="rose" />
-            <StatCard title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="blue" />
-            <StatCard title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<PieChart size={20} />} color="emerald" />
+            <StatCard title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<ClipboardList size={20} />} color="rose" />
+            <StatCard title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="blue" />
+            <StatCard title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
+            <StatCard title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<PieChart size={20} />} color="emerald" />
           </>
         ) : (
           <>
-            <StatCard title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<Users size={20} />} color="blue" />
-            <StatCard title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="rose" />
-            <StatCard title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Zap size={20} />} color="emerald" />
+            <StatCard title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<Users size={20} />} color="blue" />
+            <StatCard title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="rose" />
+            <StatCard title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
+            <StatCard title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Zap size={20} />} color="emerald" />
           </>
         )}
       </div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             <div className="space-y-4">
               {taskFeed.length === 0 && (
                 <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-xs font-semibold text-slate-500">
-                  Chua co dau viec tu API.
+                  Chưa có đầu việc từ API.
                 </div>
               )}
               {taskFeed.map((item) => (
@@ -157,7 +157,7 @@ export default function DashboardPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.delegation || item.user || "GENERAL"}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.delegation || item.user || "CHUNG"}</p>
                     <div className="mt-3 flex items-center gap-4">
                       <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
                         <Calendar size={12} className="text-slate-300" /> {item.deadline || item.time || "N/A"}
@@ -173,8 +173,8 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {isAdmin ? (
               <>
-                <HighlightCard title="Audit Console" detail="Tracking sessions & security events" action="OPEN CONSOLE" color="dark" icon={<ShieldCheck size={32} />} onClick={() => navigate("/admin/audit-log")} />
-                <HighlightCard title="System Config" detail="Environment & global parameters" action="CONFIGURE" color="primary" icon={<Settings size={32} />} onClick={() => navigate("/admin/system")} />
+                <HighlightCard title="Nhật ký hệ thống" detail="Theo dõi phiên đăng nhập & sự kiện bảo mật" action="MỞ NHẬT KÝ" color="dark" icon={<ShieldCheck size={32} />} onClick={() => navigate("/admin/audit-log")} />
+                <HighlightCard title="Cấu hình hệ thống" detail="Cài đặt môi trường & tham số hệ thống" action="CẤU HÌNH" color="primary" icon={<Settings size={32} />} onClick={() => navigate("/admin/system")} />
               </>
             ) : isDirector ? (
               <>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
         <div className="space-y-8">
           <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-50 pb-5">
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{isAdmin ? "USERS ONLINE" : "SỰ KIỆN TRONG NGÀY"}</h2>
+              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{isAdmin ? "NGƯỜI DÙNG TRỰC TUYẾN" : "SỰ KIỆN TRONG NGÀY"}</h2>
               <Calendar size={16} className="text-primary" />
             </div>
             <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-slate-100">

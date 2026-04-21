@@ -353,7 +353,7 @@ export default function ScheduleForm({
       <Button type="button" variant="outline" onClick={onCancel} className="px-8 text-[10px] font-black uppercase tracking-widest">
         Hủy bỏ
       </Button>
-      <Button type="submit" disabled={isLoading} className="border-none bg-slate-900 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800">
+      <Button type="submit" disabled={isLoading} className="border-none bg-brand-dark-900 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800">
         {isLoading ? "Đang xử lý..." : "Lưu lịch trình"}
       </Button>
     </div>

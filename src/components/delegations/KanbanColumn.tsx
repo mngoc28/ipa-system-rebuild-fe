@@ -67,14 +67,14 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
       {/* Column Header */}
       <div className="mb-2 flex items-center justify-between rounded-t-2xl p-3" style={{ backgroundColor: `${color}15`, borderTop: `4px solid ${color}` }}>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-slate-900">{label}</span>
+          <span className="text-sm font-bold text-brand-text-dark">{label}</span>
           <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1.5 text-[10px] font-black shadow-sm" style={{ color: color }}>
             {items.length}
           </span>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button title={`${label} column options`} aria-label={`${label} column options`} className="text-slate-400 transition-colors hover:text-slate-600">
+            <button title={`${label} column options`} aria-label={`${label} column options`} className="text-brand-text-dark/40 transition-colors hover:text-brand-text-dark/60">
               <MoreHorizontal size={18} />
             </button>
           </DropdownMenuTrigger>
@@ -107,7 +107,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
             <KanbanCard key={item.id} item={item} onDelete={onDelete} color={color} />
           ))}
 
-          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-300">Drop here</div>}
+          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-brand-dark/10 bg-brand-dark/[0.02] text-xs font-medium text-brand-text-dark/20">Drop here</div>}
         </SortableContext>
       </div>
     </div>

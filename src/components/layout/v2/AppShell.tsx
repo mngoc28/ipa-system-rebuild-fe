@@ -78,7 +78,7 @@ export default function AppShell() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-brand-dark/[0.02] font-sans text-brand-text-dark">
       {/* Sidebar */}
       <Sidebar
         isCollapsed={isSidebarCollapsed}
@@ -100,7 +100,7 @@ export default function AppShell() {
       </div>
 
       {/* Mobile Drawer Overlay */}
-      {isMobileMenuOpen && <div data-testid="mobile-drawer-overlay" className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
+      {isMobileMenuOpen && <div data-testid="mobile-drawer-overlay" className="fixed inset-0 z-40 bg-brand-dark-900/50 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
 
       {/* Sonner Toasts */}
       <Toaster richColors position="top-right" />

@@ -101,7 +101,7 @@ export default function ScheduleRescheduleForm({ event, onSubmit, onCancel, isLo
         <Button type="button" variant="outline" onClick={onCancel} className="px-8 text-[10px] font-black uppercase tracking-widest">
           Hủy bỏ
         </Button>
-        <Button type="submit" disabled={isLoading} className="gap-2 border-none bg-slate-900 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800">
+        <Button type="submit" disabled={isLoading} className="gap-2 border-none bg-brand-dark-900 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800">
           {isLoading ? "Đang gửi..." : "GỬI ĐỀ XUẤT"}
           <ArrowRight size={14} />
         </Button>

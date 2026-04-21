@@ -1,0 +1,18 @@
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.js diff=javascript
+*.jsx diff=javascript
+*.json diff=json
+*.md diff=markdown
+*.php diff=php
+*.ts diff=typescript
+*.tsx diff=typescript
+*.yml diff=yaml
+*.yaml diff=yaml
+
+/.github export-ignore
+CHANGELOG.md export-ignore
+.styleci.yml export-ignore

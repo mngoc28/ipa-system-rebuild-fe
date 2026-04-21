@@ -140,8 +140,8 @@ export default function SystemSettingsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Hệ thống & Tích hợp</h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">Cấu hình SMTP, cổng kết nối API và branding hệ thống.</p>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Hệ thống & Tích hợp</h1>
+          <p className="mt-1 text-sm font-medium text-brand-text-dark/60">Cấu hình SMTP, cổng kết nối API và branding hệ thống.</p>
           {settingsQuery.isLoading && (
             <div className="mt-2">
               <LoadingSpinner size={16} variant="small" label="Đang tải cấu hình..." />
@@ -153,7 +153,7 @@ export default function SystemSettingsPage() {
           <button
             onClick={handleReset}
             disabled={isBusy}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/80 shadow-sm transition-all hover:bg-brand-dark/[0.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <RefreshCcw size={14} /> RESET VỀ TỰ ĐỘNG
           </button>
@@ -168,72 +168,72 @@ export default function SystemSettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Mail Server (SMTP)</h3>
+        <div className="space-y-5 rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+          <h3 className="border-b border-brand-dark/5 pb-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">Mail Server (SMTP)</h3>
           <div className="space-y-4">
             <div>
-              <label htmlFor="smtp-host" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Host</label>
+              <label htmlFor="smtp-host" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">SMTP Host</label>
               <input
                 id="smtp-host"
                 type="text"
                 value={form.smtpHost}
                 onChange={(e) => handleFieldChange("smtpHost", e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
               />
             </div>
             <div className="flex gap-4">
               <div className="w-2/3">
-                <label htmlFor="smtp-port" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">SMTP Port</label>
+                <label htmlFor="smtp-port" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">SMTP Port</label>
                 <input
                   id="smtp-port"
                   type="text"
                   value={form.smtpPort}
                   onChange={(e) => handleFieldChange("smtpPort", e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
+                  className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
                 />
               </div>
               <div className="w-1/3">
-                <label htmlFor="smtp-security" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Bảo mật</label>
+                <label htmlFor="smtp-security" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">Bảo mật</label>
                 <SelectField
                   id="smtp-security"
                   value={form.smtpSecurity}
                   onValueChange={(v) => handleFieldChange("smtpSecurity", v as SystemSettingsForm["smtpSecurity"])}
                   options={SMTP_SECURITY_OPTIONS}
-                  triggerClassName="focus:border-emerald-500"
+                  triggerClassName="focus:border-emerald-500 border-brand-dark/10 bg-brand-dark/[0.02]"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Kết nối Zalo ZNS</h3>
+        <div className="space-y-5 rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+          <h3 className="border-b border-brand-dark/5 pb-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">Kết nối Zalo ZNS</h3>
           <div className="space-y-4">
             <div>
-              <label htmlFor="zalo-appid" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Zalo App ID</label>
+              <label htmlFor="zalo-appid" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">Zalo App ID</label>
               <input
                 id="zalo-appid"
                 type="text"
                 value={form.zaloAppId}
                 onChange={(e) => handleFieldChange("zaloAppId", e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
               />
             </div>
             <div>
-              <label htmlFor="zalo-secret" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-500">Secret Key</label>
+              <label htmlFor="zalo-secret" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">Secret Key</label>
               <input
                 id="zalo-secret"
                 type="password"
                 value={form.zaloSecret}
                 placeholder="Để trống nếu không thay đổi"
                 onChange={(e) => handleFieldChange("zaloSecret", e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-sm font-medium outline-none transition-colors focus:border-emerald-500 focus:bg-white"
               />
             </div>
             <button
               onClick={() => void handleTestConnection()}
               disabled={isBusy}
-              className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-100 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 transition-all hover:bg-brand-dark/[0.05] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {testMutation.isPending ? <LoadingSpinner variant="small" label="Đang kiểm tra..." /> : "KIỂM TRA KẾT NỐI API"}
             </button>

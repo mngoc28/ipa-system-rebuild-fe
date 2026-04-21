@@ -118,7 +118,7 @@ export default function AnnouncementsPage() {
             <Settings size={24} />
           </div>
           <div>
-            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Thông báo & Vận hành</h1>
+            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Thông báo & Vận hành</h1>
             <p className="mt-1 text-sm font-medium text-slate-500">Quản lý nội dung truyền thông nội bộ và giám sát trạng thái hệ thống.</p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function AnnouncementsPage() {
                         <tr key={item.id} className="group transition-all duration-300 animate-in slide-in-from-bottom-2 hover:bg-slate-50/50">
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="line-clamp-1 text-xs font-bold text-slate-900 transition-colors group-hover:text-primary">{item.title}</span>
+                              <span className="line-clamp-1 text-xs font-bold text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</span>
                               <span className="mt-0.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter text-slate-400">
                                 ID: #{item.id} • {format(new Date(item.created_at), "HH:mm dd/MM/yyyy")}
                               </span>
@@ -264,7 +264,7 @@ export default function AnnouncementsPage() {
         {/* Right Column: Operational Stats & Quick Actions */}
         <div className="space-y-6">
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3 text-[11px] font-black uppercase tracking-wider text-slate-900">
+            <h3 className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3 text-[11px] font-black uppercase tracking-wider text-brand-text-dark">
               <Activity size={14} className="text-primary" /> Thống kê vận hành
             </h3>
             <div className="space-y-4">
@@ -304,7 +304,7 @@ export default function AnnouncementsPage() {
               <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 {editingAnnouncement ? <Edit2 size={20} /> : <Plus size={20} />}
               </div>
-              <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-900">
+              <DialogTitle className="text-lg font-black uppercase tracking-tight text-brand-text-dark">
                 {editingAnnouncement ? "Chỉnh sửa thông báo" : "Tạo thông báo mới"}
               </DialogTitle>
             </div>
@@ -346,7 +346,7 @@ function QuickStat({ title, value, icon, color, loading }: { title: string; valu
           {loading ? (
              <Skeleton className="mt-1 h-5 w-12" />
           ) : (
-            <p className="mt-0.5 text-lg font-black leading-none text-slate-900">{value}</p>
+            <p className="mt-0.5 text-lg font-black leading-none text-brand-text-dark">{value}</p>
           )}
         </div>
       </div>
@@ -427,7 +427,7 @@ function StatItem({ label, value, icon, color, loading }: { label: string; value
         <div className={cn("shrink-0", iconColors[color])}>{icon}</div>
         <span className="text-[10px] font-bold">{label}</span>
       </div>
-      <div className="text-[11px] font-black text-slate-900">
+      <div className="text-[11px] font-black text-brand-text-dark">
         {loading ? (
           <Skeleton className="h-3 w-10" />
         ) : (

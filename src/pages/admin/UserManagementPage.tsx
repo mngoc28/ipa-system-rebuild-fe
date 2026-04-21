@@ -352,8 +352,8 @@ export default function UserManagementPage() {
             <Users size={24} />
           </div>
           <div>
-            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Quản lý Người dùng</h1>
-            <p className="mt-1 text-sm font-medium text-slate-500">Phân quyền, quản lý tài khoản cán bộ và đơn vị công tác toàn hệ thống.</p>
+            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Quản lý Người dùng</h1>
+            <p className="mt-1 text-sm font-medium text-brand-text-dark/60">Phân quyền, quản lý tài khoản cán bộ và đơn vị công tác toàn hệ thống.</p>
           </div>
         </div>
         <button onClick={handleOpenCreate} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95">
@@ -366,12 +366,12 @@ export default function UserManagementPage() {
         <QuickStat title="Tổng nhân sự" value={String(users.length)} icon={<UserCheck size={18} />} color="blue" />
         <QuickStat title="Đang hoạt động" value={String(activeUsers)} icon={<ShieldCheck size={18} />} color="emerald" />
         <QuickStat title="Chưa kích hoạt" value={String(inactiveUsers)} icon={<Lock size={18} />} color="amber" />
-        <QuickStat title="Phòng ban" value={String(units)} icon={<Building size={18} />} color="slate" />
+        <QuickStat title="Phòng ban" value={String(units)} icon={<Building size={18} />} color="dark" />
       </div>
 
       {/* Table Section */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50 p-4 md:flex-row">
+      <div className="overflow-hidden rounded-xl border border-brand-dark/10 bg-white shadow-sm">
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-brand-dark/5 bg-brand-dark/[0.01] p-4 md:flex-row">
           <div className="relative w-full md:w-[350px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
@@ -385,12 +385,12 @@ export default function UserManagementPage() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setActiveOnly((prev) => !prev)} className={cn("flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-sm", activeOnly ? "border-primary text-primary" : "border-slate-200 text-slate-600 hover:bg-slate-50") }>
+            <button onClick={() => setActiveOnly((prev) => !prev)} className={cn("flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-sm", activeOnly ? "border-primary text-primary" : "border-brand-dark/10 text-brand-text-dark/60 hover:bg-brand-dark/[0.02]") }>
               <Filter size={14} /> LỌC DỮ LIỆU
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button type="button" aria-label="Mở thêm tuỳ chọn" title="Mở thêm tuỳ chọn" className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-600">
+                <button type="button" aria-label="Mở thêm tuỳ chọn" title="Mở thêm tuỳ chọn" className="rounded-lg border border-brand-dark/10 bg-white p-2 text-brand-text-dark/40 shadow-sm transition-all hover:bg-brand-dark/[0.02] hover:text-brand-text-dark/70">
                   <MoreVertical size={16} />
                 </button>
               </DropdownMenuTrigger>
@@ -421,7 +421,7 @@ export default function UserManagementPage() {
         </div>
         
         {usersQuery.isLoading && !loadingTimedOut && (
-          <div className="border-b border-slate-100 p-8 text-xs font-semibold text-slate-500">
+          <div className="border-b border-brand-dark/5 p-8 text-xs font-semibold text-brand-text-dark/40">
             <LoadingSpinner label="Đang tải danh sách người dùng..." />
           </div>
         )}
@@ -445,7 +445,7 @@ export default function UserManagementPage() {
         )}
 
         {!usersQuery.isLoading && filteredUsers.length === 0 && (
-          <div className="border-b border-slate-100 p-4 text-xs font-semibold text-slate-500">
+          <div className="border-b border-brand-dark/5 p-4 text-xs font-semibold text-brand-text-dark/40">
             Không có người dùng phù hợp bộ lọc hiện tại.
             <button onClick={() => void usersQuery.refetch()} className="ml-3 text-primary hover:underline">Tải lại dữ liệu</button>
           </div>
@@ -469,31 +469,31 @@ export default function UserManagementPage() {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         {user.avatar ? (
-                          <img src={user.avatar} className="size-9 shrink-0 rounded-lg border border-slate-200 object-cover shadow-sm" alt="" />
+                          <img src={user.avatar} className="size-9 shrink-0 rounded-lg border border-brand-dark/10 object-cover shadow-sm" alt="" />
                         ) : (
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400">
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] text-brand-text-dark/40">
                              <UserCircle size={20} />
                           </div>
                         )}
-                        <div className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white", user.status === "active" ? "bg-emerald-500" : "bg-slate-300")} />
+                        <div className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white", user.status === "active" ? "bg-emerald-500" : "bg-brand-dark/20")} />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 transition-colors group-hover:text-primary">{user.name}</p>
-                        <p className="mt-0.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-slate-400">
-                          <Mail size={10} className="text-slate-300" /> {user.email}
+                        <p className="text-xs font-bold text-brand-text-dark transition-colors group-hover:text-primary">{user.name}</p>
+                        <p className="mt-0.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-brand-text-dark/40">
+                          <Mail size={10} className="text-brand-text-dark/20" /> {user.email}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
-                      <Building size={12} className="text-slate-300" /> {user.unit}
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-brand-text-dark/60">
+                      <Building size={12} className="text-brand-text-dark/20" /> {user.unit}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={cn(
                       "inline-block rounded border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider", 
-                      user.role === "Admin" ? "bg-primary/5 text-primary border-primary/10" : "bg-slate-50 text-slate-500 border-slate-200"
+                      user.role === "Admin" ? "bg-primary/5 text-primary border-primary/10" : "bg-brand-dark/[0.02] text-brand-text-dark/40 border-brand-dark/10"
                     )}>
                       {user.role}
                     </span>
@@ -501,7 +501,7 @@ export default function UserManagementPage() {
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={cn(
                       "text-[10px] font-black uppercase tracking-widest", 
-                      user.status === "active" ? "text-emerald-600" : "text-slate-400"
+                      user.status === "active" ? "text-emerald-600" : "text-brand-text-dark/40"
                     )}>
                       {user.status === "active" ? "Hoạt động" : "Bị khóa"}
                     </span>
@@ -525,14 +525,14 @@ export default function UserManagementPage() {
           </table>
         </div>
         
-        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hiển thị {pagedUsers.length} trên {filteredUsers.length} thành viên</p>
+        <div className="flex items-center justify-between border-t border-brand-dark/5 bg-brand-dark/[0.01] px-6 py-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Hiển thị {pagedUsers.length} trên {filteredUsers.length} thành viên</p>
           <div className="flex gap-1">
-            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-400 disabled:opacity-50" disabled={normalizedPage === 1}>
+            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/40 disabled:opacity-50" disabled={normalizedPage === 1}>
               Trước
             </button>
             <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white shadow-sm shadow-primary/20">{normalizedPage}</button>
-            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === totalPages}>Tiếp</button>
+            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/60 transition-colors hover:bg-brand-dark/[0.02] disabled:opacity-50" disabled={normalizedPage === totalPages}>Tiếp</button>
           </div>
         </div>
       </div>
@@ -724,18 +724,18 @@ function Field({
 }) {
   return (
     <label className={cn("space-y-1.5", className)} htmlFor={htmlFor}>
-      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+      <span className="block text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{label}</span>
       {children}
     </label>
   );
 }
 
-function QuickStat({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: "blue" | "emerald" | "amber" | "slate" }) {
-  const colors: Record<"blue" | "emerald" | "amber" | "slate", string> = {
+function QuickStat({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: "blue" | "emerald" | "amber" | "dark" }) {
+  const colors: Record<"blue" | "emerald" | "amber" | "dark", string> = {
     blue: "bg-blue-50 text-blue-600 border-blue-100 shadow-blue-100/20", 
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-100/20", 
     amber: "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-100/20", 
-    slate: "bg-slate-50 text-slate-600 border-slate-200 shadow-slate-100/20" 
+    dark: "bg-slate-50 text-slate-600 border-slate-200 shadow-slate-100/20" 
   };
   return (
     <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-slate-300">
@@ -744,7 +744,7 @@ function QuickStat({ title, value, icon, color }: { title: string; value: string
       </div>
       <div className="min-w-0">
         <p className="truncate text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-        <p className="text-xl font-black leading-none tracking-tight text-slate-950">{value}</p>
+        <p className="text-xl font-black leading-none tracking-tight text-brand-dark">{value}</p>
       </div>
     </div>
   );

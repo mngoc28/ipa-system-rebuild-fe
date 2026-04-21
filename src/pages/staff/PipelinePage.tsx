@@ -61,35 +61,35 @@ export default function StaffPipelinePage() {
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-6 border-b border-slate-100 pb-6 md:flex-row md:items-center">
+      <div className="flex flex-col justify-between gap-6 border-b border-brand-dark/5 pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">
             Xúc tiến Đầu tư
           </h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">
+          <p className="mt-1 text-sm font-medium text-brand-text-dark/60">
             Dành cho Chuyên viên: Theo dõi và cập nhật tiến độ các dự án đang phụ trách.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95"
+            className="flex items-center gap-2 rounded-lg bg-brand-dark px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-brand-dark/20 transition-all hover:opacity-90 active:scale-95"
           >
             <Plus size={14} /> TẠO DỰ ÁN
           </button>
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
-            <Target size={20} className="text-indigo-600" /> Dự án Pipeline
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-col gap-4 border-b border-brand-dark/5 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
+            <Target size={20} className="text-primary" /> Dự án Pipeline
           </h2>
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={14} />
             <Input 
               placeholder="Tìm theo tên hoặc mã..." 
-              className="h-9 border-slate-200 pl-9 text-xs"
+              className="h-9 border-brand-dark/10 pl-9 text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -128,7 +128,7 @@ export default function StaffPipelinePage() {
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black uppercase tracking-tight text-indigo-600">
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-brand-dark">
               Chi tiết dự án
             </DialogTitle>
           </DialogHeader>

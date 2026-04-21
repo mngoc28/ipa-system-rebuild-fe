@@ -67,13 +67,13 @@ const SyllabusCard = ({
               />
             </svg>
           )}
-          <h3 className="text-xl font-bold text-slate-900">{title}</h3>
+          <h3 className="text-xl font-bold text-brand-text-dark">{title}</h3>
         </div>
         <div className="flex items-center gap-8">
           <button
             className={cn(
               "flex items-center gap-1 text-base",
-              isPinned ? "text-blue-500" : "text-slate-900 hover:text-blue-500"
+              isPinned ? "text-blue-500" : "text-brand-text-dark hover:text-blue-500"
             )}
             onClick={handleTogglePin}
             aria-label={isPinned ? "Unpin" : "Pin to top"}

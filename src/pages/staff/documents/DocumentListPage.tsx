@@ -157,12 +157,12 @@ export default function DocumentListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Thư viện Tài liệu</h1>
-          <p className="mt-1 text-sm font-semibold text-slate-500">Lưu trữ, quản lý và chia sẻ tài liệu nghiệp vụ tập trung.</p>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Thư viện Tài liệu</h1>
+          <p className="mt-1 text-sm font-semibold text-brand-text-dark/60">Lưu trữ, quản lý và chia sẻ tài liệu nghiệp vụ tập trung.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleCreateFolder} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:bg-slate-50">
+          <button onClick={handleCreateFolder} className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/70 shadow-sm transition-all hover:bg-brand-dark/[0.03]">
             <FolderPlus size={16} />
             Tạo thư mục
           </button>
@@ -178,16 +178,16 @@ export default function DocumentListPage() {
           <div
             key={folder.id}
             onClick={() => handleOpenFolder(folder.id)}
-            className="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
+            className="group flex cursor-pointer items-center gap-4 rounded-xl border border-brand-dark/10 bg-white p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
           >
-            <div className="flex size-12 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
+            <div className="flex size-12 items-center justify-center rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] text-brand-text-dark/40 transition-all group-hover:bg-brand-dark-900 group-hover:text-white">
               <Folder size={24} fill="currentColor" className="opacity-20 group-hover:opacity-40" />
             </div>
             <div>
-              <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900">{folder.folderName}</h4>
-              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
+              <h4 className="text-[11px] font-black uppercase tracking-widest text-brand-text-dark">{folder.folderName}</h4>
+              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-brand-text-dark/40">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
             </div>
-            <ChevronRight className="ml-auto text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
+            <ChevronRight className="ml-auto text-brand-text-dark/20 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
           </div>
         ))}
       </div>
@@ -198,28 +198,28 @@ export default function DocumentListPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="group relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={16} />
             <input
               placeholder="Tìm tài liệu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:shadow-sm"
+              className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:shadow-sm"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex rounded-lg bg-slate-100 p-1">
-              <button onClick={() => setViewMode("grid")} title="Chế độ lưới" aria-label="Chế độ lưới" className={cn("rounded-md p-1.5 transition-all", viewMode === "grid" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600")}>
+            <div className="flex rounded-lg bg-brand-dark/5 p-1">
+              <button onClick={() => setViewMode("grid")} title="Chế độ lưới" aria-label="Chế độ lưới" className={cn("rounded-md p-1.5 transition-all", viewMode === "grid" ? "bg-white text-primary shadow-sm" : "text-brand-text-dark/40 hover:text-brand-text-dark/70")}>
                 <Grid size={16} />
               </button>
-              <button onClick={() => setViewMode("list")} title="Chế độ danh sách" aria-label="Chế độ danh sách" className={cn("rounded-md p-1.5 transition-all", viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600")}>
+              <button onClick={() => setViewMode("list")} title="Chế độ danh sách" aria-label="Chế độ danh sách" className={cn("rounded-md p-1.5 transition-all", viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-brand-text-dark/40 hover:text-brand-text-dark/70")}>
                 <List size={16} />
               </button>
             </div>
-            <button onClick={handleFilter} title="Bộ lọc tài liệu" aria-label="Bộ lọc tài liệu" className="rounded-lg border border-slate-200 bg-slate-50 p-2 text-slate-400 transition-all hover:bg-white hover:text-primary">
+            <button onClick={handleFilter} title="Bộ lọc tài liệu" aria-label="Bộ lọc tài liệu" className="rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] p-2 text-brand-text-dark/40 transition-all hover:bg-white hover:text-primary">
               <Filter size={16} />
             </button>
           </div>
@@ -230,12 +230,12 @@ export default function DocumentListPage() {
             {visibleDocuments.map((doc) => (
               <div
                 key={doc.id}
-                className="group relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/20 p-4 text-center transition-all hover:border-primary/20 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 active:scale-95"
+                className="group relative overflow-hidden rounded-xl border border-brand-dark/5 bg-brand-dark/[0.01] p-4 text-center transition-all hover:border-primary/20 hover:bg-white hover:shadow-xl hover:shadow-brand-dark/5 active:scale-95"
               >
                 <div className="absolute right-1 top-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg p-1.5 text-slate-300 opacity-0 transition-opacity hover:bg-slate-50 hover:text-slate-600 group-hover:opacity-100" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
+                      <button className="rounded-lg p-1.5 text-brand-text-dark/20 opacity-0 transition-opacity hover:bg-brand-dark/[0.02] hover:text-brand-text-dark/70 group-hover:opacity-100" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                         <MoreVertical size={14} />
                       </button>
                     </DropdownMenuTrigger>
@@ -249,21 +249,21 @@ export default function DocumentListPage() {
                 </div>
 
                 <div className="mb-4 flex flex-col items-center">
-                  <div className="mb-4 flex size-14 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-slate-950 group-hover:bg-slate-950 group-hover:text-white">
+                  <div className="mb-4 flex size-14 items-center justify-center rounded-xl border border-brand-dark/5 bg-white text-brand-text-dark/40 shadow-sm transition-all group-hover:border-brand-dark group-hover:bg-brand-dark group-hover:text-white">
                     {doc.type === "image" ? <FileImage size={24} /> : <FileText size={24} />}
                   </div>
-                  <h4 className="mb-2 line-clamp-2 min-h-10 px-1 text-[11px] font-black uppercase leading-relaxed tracking-tight text-slate-800 transition-colors group-hover:text-primary">{doc.name}</h4>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.size}</p>
+                  <h4 className="mb-2 line-clamp-2 min-h-10 px-1 text-[11px] font-black uppercase leading-relaxed tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{doc.name}</h4>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">{doc.size}</p>
                 </div>
 
-                <div className="flex items-center justify-center gap-1 border-t border-slate-100 pt-4">
-                  <button onClick={() => handleDownload(doc)} title={`Tải xuống ${doc.name}`} aria-label={`Tải xuống ${doc.name}`} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-950 hover:text-white active:scale-90">
+                <div className="flex items-center justify-center gap-1 border-t border-brand-dark/5 pt-4">
+                  <button onClick={() => handleDownload(doc)} title={`Tải xuống ${doc.name}`} aria-label={`Tải xuống ${doc.name}`} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark hover:text-white active:scale-90">
                     <Download size={14} />
                   </button>
-                  <button onClick={() => handleShare(doc)} title={`Chia sẻ ${doc.name}`} aria-label={`Chia sẻ ${doc.name}`} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-950 hover:text-white active:scale-90">
+                  <button onClick={() => handleShare(doc)} title={`Chia sẻ ${doc.name}`} aria-label={`Chia sẻ ${doc.name}`} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark hover:text-white active:scale-90">
                     <Share2 size={14} />
                   </button>
-                  <button onClick={() => handleDelete(doc.name)} title={`Xóa ${doc.name}`} aria-label={`Xóa ${doc.name}`} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-600 hover:text-white active:scale-90">
+                  <button onClick={() => handleDelete(doc.name)} title={`Xóa ${doc.name}`} aria-label={`Xóa ${doc.name}`} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-destructive hover:text-white active:scale-90">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -271,21 +271,21 @@ export default function DocumentListPage() {
             ))}
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+          <div className="divide-y divide-brand-dark/5 overflow-hidden rounded-xl border border-brand-dark/10 shadow-sm">
             {visibleDocuments.map((doc) => (
-              <div key={doc.id} className="group flex items-center justify-between bg-white px-5 py-4 transition-all hover:bg-slate-50/80 active:bg-slate-100">
+              <div key={doc.id} className="group flex items-center justify-between bg-white px-5 py-4 transition-all hover:bg-brand-dark/[0.02] active:bg-brand-dark/5">
                 <div className="flex items-center gap-4">
-                  <div className="flex size-8 items-center justify-center rounded border border-slate-100 bg-slate-50 text-slate-400 transition-colors group-hover:text-primary">
+                  <div className="flex size-8 items-center justify-center rounded border border-brand-dark/5 bg-brand-dark/[0.02] text-brand-text-dark/40 transition-colors group-hover:text-primary">
                     <FileText size={16} />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-tight text-slate-700">{doc.name}</span>
+                  <span className="text-[11px] font-black uppercase tracking-tight text-brand-text-dark/80">{doc.name}</span>
                 </div>
                 <div className="flex items-center gap-8">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.updated}</span>
-                  <span className="w-24 text-right text-[9px] font-black uppercase tracking-widest text-slate-400">{doc.owner}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">{doc.updated}</span>
+                  <span className="w-24 text-right text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">{doc.owner}</span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg p-2 text-slate-300 shadow-sm transition-all hover:bg-white hover:text-slate-600 active:scale-90" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
+                      <button className="rounded-lg p-2 text-brand-text-dark/20 shadow-sm transition-all hover:bg-white hover:text-brand-text-dark/70 active:scale-90" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                         <MoreVertical size={16} />
                       </button>
                     </DropdownMenuTrigger>
@@ -302,12 +302,12 @@ export default function DocumentListPage() {
           </div>
         )}
 
-        <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+        <div className="mt-6 flex items-center justify-between border-t border-brand-dark/5 pt-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-dark/40">
           <p>
             Dung lượng: {toSizeLabel(rawFiles.reduce((sum, item) => sum + item.sizeBytes, 0))} / 100GB
           </p>
           <p className="flex items-center gap-2">
-            <span className="size-1.5 animate-pulse rounded-full bg-slate-300" />
+            <span className="size-1.5 animate-pulse rounded-full bg-brand-dark/10" />
             {visibleDocuments.length} tài liệu hiển thị
           </p>
         </div>

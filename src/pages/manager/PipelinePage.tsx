@@ -77,7 +77,7 @@ export default function ManagerPipelinePage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 border-b border-slate-100 pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase italic tracking-tight text-slate-900">
+          <h1 className="font-title text-2xl font-black uppercase italic tracking-tight text-brand-text-dark">
             Quản lý Pipeline
           </h1>
           <p className="mt-1 text-sm font-medium text-slate-500">
@@ -99,7 +99,7 @@ export default function ManagerPipelinePage() {
 
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
+          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
             <Target size={20} className="text-emerald-600" /> Danh sách dự án
           </h2>
           <div className="relative w-full sm:w-64">

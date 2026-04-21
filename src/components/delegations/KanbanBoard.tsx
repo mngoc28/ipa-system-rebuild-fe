@@ -221,7 +221,7 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
         onClose={handleCancelStatus}
         onConfirm={handleConfirmStatus}
         title="Xác nhận chuyển trạng thái"
-        description={<p>Bạn có chắc chắn muốn chuyển <strong className="text-slate-900">{confirmModal.item?.name}</strong> sang trạng thái <strong className="text-primary">{COLUMNS.find(c => c.id === confirmModal.targetStatus)?.label}</strong> không?</p>}
+        description={<p>Bạn có chắc chắn muốn chuyển <strong className="text-brand-text-dark">{confirmModal.item?.name}</strong> sang trạng thái <strong className="text-primary">{COLUMNS.find(c => c.id === confirmModal.targetStatus)?.label}</strong> không?</p>}
         confirmText="Xác nhận"
         variant="primary"
       />

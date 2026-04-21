@@ -80,7 +80,7 @@ const Pagination = ({
           <PaginationItem>
             <PaginationPrevious
               href="#"
-              className="size-8 min-w-8 rounded bg-slate-100 p-0"
+              className="size-8 min-w-8 rounded bg-brand-dark/[0.04] p-0 text-brand-text-dark/60 hover:bg-brand-dark/[0.08]"
               onClick={(e: MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 if (currentPage > 1) onPageChange(currentPage - 1);
@@ -92,7 +92,7 @@ const Pagination = ({
             if (page === "start-ellipsis" || page === "end-ellipsis") {
               return (
                 <PaginationItem key={`${page}-${idx}`}>
-                  <PaginationEllipsis className="text-slate-500 opacity-70" />
+                  <PaginationEllipsis className="text-brand-text-dark/40" />
                 </PaginationItem>
               );
             }
@@ -101,7 +101,11 @@ const Pagination = ({
               <PaginationItem key={pageNumber}>
                 <PaginationLink
                   href="#"
-                  className={`size-8 min-w-8 rounded ${pageNumber === currentPage ? "bg-slate-100 font-bold" : "p-0 text-slate-500 opacity-70"}`}
+                  className={`size-8 min-w-8 rounded transition-all ${
+                    pageNumber === currentPage 
+                      ? "bg-brand-dark font-bold text-white" 
+                      : "p-0 text-brand-text-dark/60 hover:bg-brand-dark/[0.04]"
+                  }`}
                   isActive={pageNumber === currentPage}
                   onClick={(e: MouseEvent<HTMLAnchorElement>) => handlePageClick(e, pageNumber)}
                 >
@@ -114,7 +118,7 @@ const Pagination = ({
           <PaginationItem>
             <PaginationNext
               href="#"
-              className="size-8 min-w-8 rounded bg-slate-100 p-0"
+              className="size-8 min-w-8 rounded bg-brand-dark/[0.04] p-0 text-brand-text-dark/60 hover:bg-brand-dark/[0.08]"
               onClick={(e: MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 if (currentPage < totalPages) onPageChange(currentPage + 1);
@@ -126,9 +130,9 @@ const Pagination = ({
 
       {onPerPageChange && perPage && (
         <div className="flex items-center gap-2">
-          <div className="relative flex items-center gap-2 rounded bg-slate-100 px-3 py-1.5">
+          <div className="relative flex items-center gap-2 rounded bg-brand-dark/[0.04] px-3 py-1.5 transition-all focus-within:ring-2 focus-within:ring-primary/20">
               <select
-                className="appearance-none bg-transparent pr-5 text-sm text-slate-700 outline-none"
+                className="appearance-none bg-transparent pr-5 text-sm font-medium text-brand-text-dark/80 outline-none"
                 value={perPage}
                 onChange={handlePerPageChange}
                 aria-label={t("pagination.items_per_page")}
@@ -139,10 +143,10 @@ const Pagination = ({
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
+              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={12} />
             </div>
           {totalItems !== undefined && (
-            <span className="whitespace-nowrap text-sm text-slate-700">
+            <span className="whitespace-nowrap text-sm text-brand-text-dark/60">
               {totalItems} {resultsText || t("pagination.results")}
             </span>
           )}

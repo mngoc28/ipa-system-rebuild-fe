@@ -94,58 +94,58 @@ export default function AuditLogPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="flex items-center gap-4">
-          <div className="flex size-12 items-center justify-center rounded-xl border border-slate-800 bg-slate-950 text-primary shadow-xl shadow-slate-950/20">
+          <div className="flex size-12 items-center justify-center rounded-xl border border-slate-800 bg-brand-dark text-primary shadow-xl shadow-brand-dark/20">
             <History size={24} />
           </div>
           <div>
-            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Audit Log</h1>
-            <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi và truy vết hoạt động vận hành trên toàn bộ hệ thống IPA.</p>
+            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Audit Log</h1>
+            <p className="mt-1 text-sm font-medium text-brand-text-dark/60">Theo dõi và truy vết hoạt động vận hành trên toàn bộ hệ thống IPA.</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={handleResetFilters} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95" aria-label="Xóa bộ lọc">
+          <button onClick={handleResetFilters} className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02] active:scale-95" aria-label="Xóa bộ lọc">
             <RefreshCw size={14} /> XÓA BỘ LỌC
           </button>
-          <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95" aria-label="Xuất nhật ký">
+          <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02] active:scale-95" aria-label="Xuất nhật ký">
             <Download size={14} /> XUẤT NHẬT KÝ (CSV)
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Tổng tải</p>
-          <p className="mt-2 text-2xl font-black text-slate-900">{latestMeta?.total ?? visibleLogs.length}</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-500">Bản ghi khớp bộ lọc hiện tại</p>
+        <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Tổng tải</p>
+          <p className="mt-2 text-2xl font-black text-brand-text-dark">{latestMeta?.total ?? visibleLogs.length}</p>
+          <p className="mt-1 text-[10px] font-semibold text-brand-text-dark/40">Bản ghi khớp bộ lọc hiện tại</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Success</p>
+        <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+          <p className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">Success</p>
           <p className="mt-2 text-2xl font-black text-emerald-600">{summaryCounts.success}</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-500">Hành động tạo / duyệt / cập nhật</p>
+          <p className="mt-1 text-[10px] font-semibold text-brand-text-dark/40">Hành động tạo / duyệt / cập nhật</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Warning</p>
+        <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+          <p className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">Warning</p>
           <p className="mt-2 text-2xl font-black text-amber-600">{summaryCounts.warning}</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-500">Cảnh báo hoặc rủi ro</p>
+          <p className="mt-1 text-[10px] font-semibold text-brand-text-dark/40">Cảnh báo hoặc rủi ro</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">System</p>
-          <p className="mt-2 text-2xl font-black text-slate-900">{summaryCounts.system}</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-500">Xóa, đồng bộ, thao tác hệ thống</p>
+        <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+          <p className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">System</p>
+          <p className="mt-2 text-2xl font-black text-brand-text-dark">{summaryCounts.system}</p>
+          <p className="mt-1 text-[10px] font-semibold text-brand-text-dark/40">Xóa, đồng bộ, thao tác hệ thống</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left Column: Timeline style logs */}
         <div className="space-y-4 lg:col-span-2">
-          <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="space-y-3 rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={14} />
               <input 
                 placeholder="Tìm kiếm hành động, người dùng hoặc sự kiện..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-transparent py-2 pl-11 pr-4 text-xs font-medium outline-none placeholder:text-slate-400" 
+                className="w-full bg-transparent py-2 pl-11 pr-4 text-xs font-medium text-brand-text-dark outline-none placeholder:text-brand-text-dark/40" 
               />
             </div>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
@@ -154,11 +154,11 @@ export default function AuditLogPage() {
                 onValueChange={(v) => setSelectedType((v || "all") as AuditLogType | "all")}
                 placeholder="Tất cả loại"
                 options={AUDIT_LOG_TYPE_OPTIONS}
-                triggerClassName="h-9 text-xs font-semibold"
+                triggerClassName="h-9 text-xs font-semibold border-brand-dark/10 bg-brand-dark/[0.02]"
               />
-              <input value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none" placeholder="Lọc theo action" />
-              <input value={resourceTypeFilter} onChange={(e) => setResourceTypeFilter(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none" placeholder="Lọc theo resource type" />
-              <input value={actorUserId} onChange={(e) => setActorUserId(e.target.value)} inputMode="numeric" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none" placeholder="Actor user ID" />
+              <input value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} className="rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-xs font-semibold text-brand-text-dark/60 outline-none" placeholder="Lọc theo action" />
+              <input value={resourceTypeFilter} onChange={(e) => setResourceTypeFilter(e.target.value)} className="rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-xs font-semibold text-brand-text-dark/60 outline-none" placeholder="Lọc theo resource type" />
+              <input value={actorUserId} onChange={(e) => setActorUserId(e.target.value)} inputMode="numeric" className="rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-3 py-2 text-xs font-semibold text-brand-text-dark/60 outline-none" placeholder="Actor user ID" />
             </div>
           </div>
 
@@ -167,23 +167,23 @@ export default function AuditLogPage() {
             <div className="absolute inset-y-0 left-[23px] hidden w-px bg-slate-100 md:block" />
             
             {auditLogsQuery.isLoading ? (
-              <div className="relative rounded-xl border border-slate-200 bg-white p-12 shadow-sm md:ml-12">
+              <div className="relative rounded-xl border border-brand-dark/10 bg-white p-12 shadow-sm md:ml-12">
                 <LoadingSpinner label="Đang tải nhật ký hệ thống..." />
               </div>
             ) : isEmpty ? (
-              <div className="relative overflow-hidden rounded-xl border border-dashed border-slate-200 bg-white/80 p-8 text-center shadow-sm md:ml-12">
-                <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-slate-950 text-primary shadow-lg shadow-slate-950/20">
+              <div className="relative overflow-hidden rounded-xl border border-dashed border-brand-dark/10 bg-white/80 p-8 text-center shadow-sm md:ml-12">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-brand-dark text-primary shadow-lg shadow-brand-dark/20">
                   <ShieldAlert size={20} />
                 </div>
-                <h3 className="mt-4 text-sm font-black uppercase tracking-widest text-slate-900">Không có nhật ký phù hợp</h3>
-                <p className="mx-auto mt-2 max-w-md text-xs font-medium leading-relaxed text-slate-500">
+                <h3 className="mt-4 text-sm font-black uppercase tracking-widest text-brand-text-dark">Không có nhật ký phù hợp</h3>
+                <p className="mx-auto mt-2 max-w-md text-xs font-medium leading-relaxed text-brand-text-dark/40">
                   {filtersActive ? "Bộ lọc hiện tại không trả về bản ghi nào. Hãy thử bỏ bớt điều kiện hoặc xóa bộ lọc." : "Chưa có nhật ký để hiển thị."}
                 </p>
                 {filtersActive && (
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-colors hover:bg-slate-50"
+                    className="mt-4 rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 transition-colors hover:bg-brand-dark/[0.02]"
                   >
                     Xóa bộ lọc
                   </button>
@@ -191,12 +191,12 @@ export default function AuditLogPage() {
               </div>
             ) : (
               visibleLogs.map((log) => (
-                <div key={log.id} className="group relative overflow-hidden rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:ml-12">
+                <div key={log.id} className="group relative overflow-hidden rounded-xl border border-brand-dark/5 bg-white p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:ml-12">
                   {/* Log node indicator */}
                   <div
                     className={cn(
                       "absolute left-[-47px] top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border-2 border-white shadow-sm md:flex",
-                      log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : log.type === "info" ? "bg-blue-500" : "bg-slate-950",
+                      log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : log.type === "info" ? "bg-blue-500" : "bg-brand-dark",
                     )}
                   >
                     <Activity size={12} className="text-white" />
@@ -205,27 +205,27 @@ export default function AuditLogPage() {
                   <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
-                          <Clock size={10} className="text-slate-300" /> {log.time}
+                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">
+                          <Clock size={10} className="text-brand-text-dark/20" /> {log.time}
                         </span>
-                        <span className="h-0.5 w-3 rounded-full bg-slate-100" />
+                        <span className="h-0.5 w-3 rounded-full bg-brand-dark/5" />
                         <span className="rounded border border-primary/10 bg-primary/5 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-primary">{log.action}</span>
                       </div>
-                      <h3 className="text-xs font-bold leading-tight text-slate-900 transition-colors group-hover:text-primary">{log.detail}</h3>
+                      <h3 className="text-xs font-bold leading-tight text-brand-text-dark transition-colors group-hover:text-primary">{log.detail}</h3>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2.5 rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-1.5">
-                      <div className="flex size-5 items-center justify-center rounded border border-slate-200 bg-white shadow-sm">
-                        <User size={10} className="text-slate-500" />
+                    <div className="flex shrink-0 items-center gap-2.5 rounded-lg border border-brand-dark/5 bg-brand-dark/[0.01] px-3 py-1.5">
+                      <div className="flex size-5 items-center justify-center rounded border border-brand-dark/10 bg-white shadow-sm">
+                        <User size={10} className="text-brand-text-dark/40" />
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-tight text-slate-700">{log.user}</span>
+                      <span className="text-[10px] font-black uppercase tracking-tight text-brand-text-dark/60">{log.user}</span>
                     </div>
                   </div>
                   {/* Accent border */}
                   <div
                     className={cn(
                       "absolute left-0 top-0 h-full w-1",
-                      log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : log.type === "info" ? "bg-blue-500" : "bg-slate-950",
+                      log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : log.type === "info" ? "bg-blue-500" : "bg-brand-dark",
                     )}
                   />
                 </div>
@@ -236,7 +236,7 @@ export default function AuditLogPage() {
           <button
             onClick={() => void auditLogsQuery.fetchNextPage()}
             disabled={!hasMore || auditLogsQuery.isFetchingNextPage}
-            className="flex w-full items-center justify-center gap-2 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all hover:text-primary active:scale-95"
+            className="flex w-full items-center justify-center gap-2 py-6 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40 transition-all hover:text-primary active:scale-95"
           >
             {auditLogsQuery.isFetchingNextPage ? <LoadingSpinner variant="small" label="ĐANG TẢI..." /> : hasMore ? "TẢI THÊM NHẬT KÝ" : "ĐÃ TẢI HẾT NHẬT KÝ"} <ArrowRight size={14} />
           </button>
@@ -244,14 +244,14 @@ export default function AuditLogPage() {
 
         {/* Right Column: Summaries & Stats */}
         <div className="space-y-6">
-          <div className="relative space-y-6 overflow-hidden rounded-xl border border-slate-900 bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/30">
+          <div className="relative space-y-6 overflow-hidden rounded-xl border border-brand-dark-900 bg-brand-dark p-6 text-white shadow-xl shadow-brand-dark/30">
             <div className="relative z-10 space-y-5">
               <div className="flex size-10 items-center justify-center rounded-lg border border-primary/20 bg-primary shadow-lg">
                 <ShieldAlert size={20} />
               </div>
               <div className="space-y-1">
                 <h3 className="text-lg font-black uppercase tracking-tight">Giám sát Bảo mật AI</h3>
-                <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-slate-500">
+                <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-brand-text-dark/40">
                   Hệ thống đang chủ động giám sát <span className="font-bold text-white">24/7</span> các hành vi bất thường.
                 </p>
               </div>
@@ -277,8 +277,8 @@ export default function AuditLogPage() {
             <div className="absolute right-[-10%] top-[-20%] size-48 rounded-full bg-primary/10 blur-[60px]" />
           </div>
 
-          <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Trạng thái Hạ tầng</h3>
+          <div className="space-y-5 rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+            <h3 className="border-b border-brand-dark/5 pb-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">Trạng thái Hạ tầng</h3>
             <div className="space-y-5">
               <div className="flex items-center gap-4">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400">
@@ -303,17 +303,17 @@ export default function AuditLogPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] text-brand-text-dark/40">
                   <Cpu size={14} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="mb-1.5 flex justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-tight text-slate-500">Compute Load</span>
+                    <span className="text-[10px] font-black uppercase tracking-tight text-brand-text-dark/40">Compute Load</span>
                     <span className="text-[9px] font-black uppercase tracking-widest text-amber-500">
                       {stats?.cpu_load ?? 0}%
                     </span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
+                  <div className="h-1.5 overflow-hidden rounded-full border border-brand-dark/5 bg-brand-dark/[0.01]">
                     <div 
                       className="h-full rounded-full bg-amber-500 transition-all duration-1000" 
                       style={{ width: `${stats?.cpu_load ?? 0}%` }}

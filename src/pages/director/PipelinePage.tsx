@@ -109,7 +109,7 @@ export default function DirectorPipelinePage() {
             <TrendingUp size={22} />
           </div>
           <div className="space-y-1">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-slate-950">Không tải được Pipeline</h1>
+            <h1 className="text-2xl font-black uppercase tracking-tight text-brand-dark">Không tải được Pipeline</h1>
             <p className="text-sm font-medium text-slate-500">Kiểm tra lại backend pipeline API rồi thử tải lại dữ liệu.</p>
           </div>
           <button
@@ -117,7 +117,7 @@ export default function DirectorPipelinePage() {
               void summaryQuery.refetch();
               void projectsQuery.refetch();
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
           >
             <TrendingUp size={14} />
             Tải lại
@@ -139,7 +139,7 @@ export default function DirectorPipelinePage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Director Pipeline</p>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Pipeline Xúc tiến Đầu tư</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Pipeline Xúc tiến Đầu tư</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi và quản lý phễu dòng vốn đầu tư chiến lược bằng dữ liệu thật từ backend.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export default function DirectorPipelinePage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
+            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
               <Target size={20} className="text-primary" /> Dự án trọng điểm
             </h2>
             <div className="relative w-full sm:w-64">
@@ -186,7 +186,7 @@ export default function DirectorPipelinePage() {
                 onClick={() => setStageFilter(item.value)}
                 className={cn(
                   "whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-all",
-                  stageFilter === item.value ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200",
+                  stageFilter === item.value ? "bg-brand-dark-900 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200",
                 )}
               >
                 {item.label}
@@ -217,13 +217,13 @@ export default function DirectorPipelinePage() {
               </div>
             </div>
 
-            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-900 active:scale-[0.98]">
+            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-dark py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-brand-dark-900 active:scale-[0.98]">
               Xem phân tích tài chính sâu
             </button>
           </div>
 
           <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Phân bổ quốc gia</h3>
+            <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">Phân bổ quốc gia</h3>
             <div className="space-y-4">
               {countryBreakdown.length === 0 ? (
                 <EmptyState label="Chưa có dữ liệu quốc gia." />
@@ -236,7 +236,7 @@ export default function DirectorPipelinePage() {
           </div>
 
           <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-900">Phân bổ lĩnh vực</h3>
+            <h3 className="border-b border-slate-50 pb-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">Phân bổ lĩnh vực</h3>
             <div className="space-y-4">
               {sectorBreakdown.length === 0 ? (
                 <EmptyState label="Chưa có dữ liệu lĩnh vực." />
@@ -300,7 +300,7 @@ function StatCard({ title, value, note, icon, color }: { title: string; value: s
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}>{icon}</div>
         <div>
           <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-          <p className="text-3xl font-black tracking-tighter text-slate-950">{value}</p>
+          <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <TrendingUp size={14} className="animate-pulse" /> {note}
@@ -324,7 +324,7 @@ function BreakdownItem({ label, value, percent, color }: { label: string; value:
     <div className="space-y-1.5">
       <div className="flex justify-between text-[10px] font-bold">
         <span className="uppercase tracking-tight text-slate-500">{label}</span>
-        <span className="text-slate-900">{value}</span>
+        <span className="text-brand-text-dark">{value}</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
         <div className={cn("h-full rounded-full transition-all duration-1000", color)} style={{ width: `${percent}%` }} />

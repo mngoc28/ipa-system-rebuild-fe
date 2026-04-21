@@ -12,14 +12,18 @@
     --card-foreground: 217 19% 27%;
     --popover: 0 0% 100%;
     --popover-foreground: 217 19% 27%;
-    --primary: 217 91% 21%; /* Deep Navy Blue #031F4F */
+    --primary: 200 100% 27.5%; /* Da Nang Maritime Blue #005D8C */
     --primary-foreground: 0 0% 100%;
+    --brand-dark: 200 100% 10%; /* Deep Maritime Blue for backgrounds */
+    --brand-dark-900: 200 100% 15%; /* Secondary dark blue */
+    --brand-text-dark: 200 80% 15%; /* High-contrast dark blue for typography */
+    --brand-dark-foreground: 0 0% 100%;
     --secondary: 215 25% 40%; /* Professional Slate/Gray-Blue */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 20% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 217 91% 96%;
-    --accent-foreground: 217 91% 21%;
+    --accent: 43 100% 50%; /* Da Nang Gold #FFB800 */
+    --accent-foreground: 0 0% 0%; /* Black text on Gold for better contrast */
     --destructive: 0 84% 63%; /* #F05252 */
     --destructive-foreground: 0 0% 100%;
     --border: 214 32% 91%;
@@ -238,7 +242,7 @@
 }
 
 .scrollbar-thin:hover {
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: hsl(var(--brand-dark) / 0.3) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -256,15 +260,15 @@
 }
 
 .scrollbar-thin:hover::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: hsl(var(--brand-dark) / 0.3);
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  background-color: hsl(var(--brand-dark) / 0.5);
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  background-color: hsl(var(--brand-dark) / 0.5);
 }
 
 .custom-checkbox {
@@ -272,7 +276,7 @@
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #cacaca;
+  border: 2px solid hsl(var(--brand-dark) / 0.2);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -281,7 +285,7 @@
 }
 
 .custom-checkbox:checked {
-  border-color: #005d8c;
+  border-color: hsl(var(--primary));
 }
 
 .custom-checkbox:checked::before {
@@ -290,7 +294,7 @@
   top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #005d8c;
+  color: hsl(var(--primary));
   font-size: 15px;
   font-weight: bold;
 }
@@ -310,7 +314,7 @@
 /* Custom Swiper */
 .swiper-button-next::after,
 .swiper-button-prev::after {
-  color: #5FA5F5;
+  color: hsl(var(--primary));
   font-size: 32px;
   font-weight: 800;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);

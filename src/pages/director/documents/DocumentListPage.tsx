@@ -157,7 +157,7 @@ export default function DocumentListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Thư viện Tài liệu</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Thư viện Tài liệu</h1>
           <p className="mt-1 text-sm font-semibold text-slate-500">Lưu trữ, quản lý và chia sẻ tài liệu nghiệp vụ tập trung.</p>
         </div>
 
@@ -180,11 +180,11 @@ export default function DocumentListPage() {
             onClick={() => handleOpenFolder(folder.id)}
             className="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
           >
-            <div className="flex size-12 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
+            <div className="flex size-12 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-slate-400 transition-all group-hover:bg-brand-dark-900 group-hover:text-white">
               <Folder size={24} fill="currentColor" className="opacity-20 group-hover:opacity-40" />
             </div>
             <div>
-              <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900">{folder.folderName}</h4>
+              <h4 className="text-[11px] font-black uppercase tracking-widest text-brand-text-dark">{folder.folderName}</h4>
               <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
             </div>
             <ChevronRight className="ml-auto text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
@@ -249,7 +249,7 @@ export default function DocumentListPage() {
                 </div>
 
                 <div className="mb-4 flex flex-col items-center">
-                  <div className="mb-4 flex size-14 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-slate-950 group-hover:bg-slate-950 group-hover:text-white">
+                  <div className="mb-4 flex size-14 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition-all group-hover:border-brand-dark group-hover:bg-brand-dark group-hover:text-white">
                     {doc.type === "image" ? <FileImage size={24} /> : <FileText size={24} />}
                   </div>
                   <h4 className="mb-2 line-clamp-2 min-h-10 px-1 text-[11px] font-black uppercase leading-relaxed tracking-tight text-slate-800 transition-colors group-hover:text-primary">{doc.name}</h4>
@@ -257,10 +257,10 @@ export default function DocumentListPage() {
                 </div>
 
                 <div className="flex items-center justify-center gap-1 border-t border-slate-100 pt-4">
-                  <button onClick={() => handleDownload(doc)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-950 hover:text-white active:scale-90">
+                  <button onClick={() => handleDownload(doc)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-brand-dark hover:text-white active:scale-90">
                     <Download size={14} />
                   </button>
-                  <button onClick={() => handleShare(doc)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-slate-950 hover:text-white active:scale-90">
+                  <button onClick={() => handleShare(doc)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-brand-dark hover:text-white active:scale-90">
                     <Share2 size={14} />
                   </button>
                   <button onClick={() => handleDelete(doc.name)} className="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-600 hover:text-white active:scale-90">

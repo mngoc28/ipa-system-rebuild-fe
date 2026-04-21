@@ -65,16 +65,15 @@ export default function SearchableSelect({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex min-h-12 w-full items-center justify-between gap-2", 
-            "rounded-md border border-slate-300 bg-white px-3 py-2 text-sm", 
+            "flex min-h-12 w-full items-center justify-between gap-2 rounded-md border border-brand-dark/10 bg-white px-3 py-2 text-sm text-brand-text-dark placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20", 
             triggerClassName, 
             className
           )}
           disabled={disabled}
         >
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            {icon && <span className="text-gray-400">{icon}</span>}
-            <span className={cn("flex-1 truncate text-left", selectedOption ? "font-medium text-black" : "font-normal text-gray-500")}>
+            {icon && <span className="text-brand-text-dark/40">{icon}</span>}
+            <span className={cn("flex-1 truncate text-left", selectedOption ? "font-medium text-brand-text-dark" : "font-normal text-brand-text-dark/50")}>
               {selectedOption ? selectedOption.label || selectedOption.name : placeholder}
             </span>
           </div>
@@ -83,14 +82,14 @@ export default function SearchableSelect({
       </PopoverTrigger>
 
       <PopoverContent 
-        className={cn("p-0 shadow-2xl border-slate-200", contentClassName)} 
+        className={cn("p-0 shadow-2xl border-brand-dark/10", contentClassName)} 
         align="start"
         style={{ width: "var(--radix-popover-trigger-width)" }}
       >
         {showSearch && (
           <div className="border-b p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-brand-text-dark/40" />
               <Input
                 ref={searchInputRef}
                 type="text"
@@ -103,7 +102,7 @@ export default function SearchableSelect({
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-text-dark/40"
                 >
                   <X className="size-4" />
                 </button>
@@ -115,10 +114,10 @@ export default function SearchableSelect({
         <div className="max-h-64 overflow-y-auto py-1">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="size-5 animate-spin text-blue-500" />
+              <Loader2 className="size-5 animate-spin text-primary" />
             </div>
           ) : filteredOptions.length === 0 ? (
-            <div className="py-6 text-center text-sm text-gray-500">{emptyMessage}</div>
+            <div className="py-6 text-center text-sm text-brand-text-dark/40">{emptyMessage}</div>
           ) : (
             <div className="p-1">
               {filteredOptions.map((option) => (
@@ -132,8 +131,8 @@ export default function SearchableSelect({
                     setSearch("");
                   }}
                   className={cn(
-                    "flex w-full items-center rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100", 
-                    value === option.value && "bg-slate-100 text-primary font-bold"
+                    "flex w-full items-center rounded-md px-3 py-2 text-left text-sm hover:bg-brand-dark/5", 
+                    value === option.value && "bg-brand-dark/5 text-primary font-bold"
                   )}
                 >
                   <Check className={cn("mr-2 h-4 w-4", value === option.value ? "opacity-100" : "opacity-0")} />

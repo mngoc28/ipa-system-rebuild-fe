@@ -122,7 +122,7 @@ export function AnnouncementForm({ initialData, onSubmit, onCancel, loading }: A
                   checked={field.value} 
                   onCheckedChange={field.onChange}
                 />
-                <Label htmlFor="is_active" className="cursor-pointer text-[11px] font-black uppercase tracking-wider text-slate-900">Activate immediately</Label>
+                <Label htmlFor="is_active" className="cursor-pointer text-[11px] font-black uppercase tracking-wider text-brand-text-dark">Activate immediately</Label>
               </div>
             )}
           />

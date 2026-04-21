@@ -54,7 +54,7 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({ countryName, className
   const code = getCountryCode(countryName);
 
   if (!code) {
-    return <Globe size={14} className={`text-slate-400 ${className}`} />;
+    return <Globe size={14} className={`text-brand-text-dark/40 ${className}`} />;
   }
 
   return (

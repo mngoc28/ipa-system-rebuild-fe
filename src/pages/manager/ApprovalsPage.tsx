@@ -154,7 +154,7 @@ export default function ApprovalsPage() {
     <div className="space-y-8 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase leading-none tracking-tight text-slate-900">Hàng đợi Phê duyệt</h1>
+          <h1 className="font-title text-2xl font-black uppercase leading-none tracking-tight text-brand-text-dark">Hàng đợi Phê duyệt</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Phê duyệt lịch trình, kế hoạch và các yêu cầu từ cán bộ chuyên viên.</p>
         </div>
         <div className="flex shrink-0 rounded-xl bg-slate-100 p-1">
@@ -202,7 +202,7 @@ export default function ApprovalsPage() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.type}</p>
-                  <h3 className="text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-primary">{item.title}</h3>
+                  <h3 className="text-sm font-bold leading-snug text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h3>
                 </div>
               </div>
               <button type="button" aria-label={`Xem chi tiết yêu cầu ${item.title}`} title={`Xem chi tiết yêu cầu ${item.title}`} onClick={() => handleRowOptions(item.id)} className="p-1.5 text-slate-300 transition-all hover:text-slate-600">
@@ -280,7 +280,7 @@ export default function ApprovalsPage() {
       >
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-900">
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-brand-text-dark">
               {selectedApprovalDetail?.request.title || selectedApproval?.title || "Chi tiết phê duyệt"}
             </DialogTitle>
             <DialogDescription className="text-xs font-semibold text-slate-500">
@@ -303,26 +303,26 @@ export default function ApprovalsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Người yêu cầu</p>
-                  <p className="mt-1 text-sm font-bold text-slate-900">{selectedApprovalDetail?.request.requesterId || selectedApproval?.requester || "N/A"}</p>
+                  <p className="mt-1 text-sm font-bold text-brand-text-dark">{selectedApprovalDetail?.request.requesterId || selectedApproval?.requester || "N/A"}</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
-                  <p className="mt-1 text-sm font-bold text-slate-900">{selectedApprovalDetail?.request.status || selectedApproval?.status || "pending"}</p>
+                  <p className="mt-1 text-sm font-bold text-brand-text-dark">{selectedApprovalDetail?.request.status || selectedApproval?.status || "pending"}</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hạn xử lý</p>
-                  <p className="mt-1 text-sm font-bold text-slate-900">{selectedApproval?.deadline || "Trong ngày"}</p>
+                  <p className="mt-1 text-sm font-bold text-brand-text-dark">{selectedApproval?.deadline || "Trong ngày"}</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loại yêu cầu</p>
-                  <p className="mt-1 text-sm font-bold text-slate-900">{selectedApproval?.type || selectedApprovalDetail?.request.type || "APPROVAL"}</p>
+                  <p className="mt-1 text-sm font-bold text-brand-text-dark">{selectedApproval?.type || selectedApprovalDetail?.request.type || "APPROVAL"}</p>
                 </div>
               </div>
 
               <div className="grid gap-5 lg:grid-cols-2">
                 <div className="space-y-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">Các bước xử lý</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight text-brand-text-dark">Các bước xử lý</h3>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{selectedApprovalDetail?.steps.length ?? 0} bước</span>
                   </div>
                   {selectedApprovalDetail?.steps?.length ? (
@@ -330,7 +330,7 @@ export default function ApprovalsPage() {
                       {selectedApprovalDetail.steps.map((step, index) => (
                         <div key={step.id || index} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="text-xs font-bold text-slate-900">Bước {step.stepOrder ?? index + 1}</p>
+                            <p className="text-xs font-bold text-brand-text-dark">Bước {step.stepOrder ?? index + 1}</p>
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{step.status || "pending"}</span>
                           </div>
                           <p className="mt-1 text-[11px] font-medium text-slate-500">Người duyệt: {step.approverId || "Chưa gán"}</p>
@@ -345,7 +345,7 @@ export default function ApprovalsPage() {
 
                 <div className="space-y-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">Lịch sử quyết định</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight text-brand-text-dark">Lịch sử quyết định</h3>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{selectedApprovalDetail?.history.length ?? 0} mục</span>
                   </div>
                   {selectedApprovalDetail?.history?.length ? (
@@ -353,7 +353,7 @@ export default function ApprovalsPage() {
                       {selectedApprovalDetail.history.map((record, index) => (
                         <div key={`${record.decidedAt || index}-${index}`} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="text-xs font-bold text-slate-900">{record.decision || "decision"}</p>
+                            <p className="text-xs font-bold text-brand-text-dark">{record.decision || "decision"}</p>
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{record.decidedAt ? new Date(record.decidedAt).toLocaleString("vi-VN") : "Chưa có thời gian"}</span>
                           </div>
                           <p className="mt-1 text-[11px] font-medium text-slate-500">Trạng thái: {record.oldStatus || "?"} → {record.newStatus || "?"}</p>
@@ -370,7 +370,7 @@ export default function ApprovalsPage() {
               {activeTab === "pending" && (
                 <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">Xử lý ngay</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight text-brand-text-dark">Xử lý ngay</h3>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hành động nhanh</span>
                   </div>
                   <textarea

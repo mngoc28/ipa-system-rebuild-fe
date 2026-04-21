@@ -131,7 +131,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                   ID: #{task.id}
                 </span>
               </div>
-              <DrawerTitle className="mt-2 text-xl font-black uppercase tracking-tight text-slate-900">
+              <DrawerTitle className="mt-2 text-xl font-black uppercase tracking-tight text-brand-text-dark">
                 {task.title}
               </DrawerTitle>
             </div>
@@ -221,7 +221,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                         <FileIcon size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-bold text-slate-900">{file.file_name}</p>
+                        <p className="truncate text-xs font-bold text-brand-text-dark">{file.file_name}</p>
                         <p className="text-[9px] font-medium text-slate-400">{Math.round(file.file_size / 1024)} KB</p>
                       </div>
                       <button 
@@ -252,7 +252,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                       </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-black uppercase tracking-tight text-slate-900">{comment.commenter?.full_name}</span>
+                          <span className="text-[11px] font-black uppercase tracking-tight text-brand-text-dark">{comment.commenter?.full_name}</span>
                           <span className="text-[9px] font-medium text-slate-400">
                             {format(new Date(comment.created_at), "HH:mm, dd/MM", { locale: vi })}
                           </span>

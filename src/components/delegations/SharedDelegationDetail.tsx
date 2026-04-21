@@ -399,14 +399,14 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   }
 
   if (!d) {
-    return <div className="p-8 text-center text-slate-500">Đoàn công tác không tồn tại.</div>;
+    return <div className="p-8 text-center text-brand-text-dark/60">Đoàn công tác không tồn tại.</div>;
   }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 pb-10 duration-500 animate-in fade-in">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} title="Go back" aria-label="Go back" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
+          <button onClick={() => navigate(-1)} title="Go back" aria-label="Go back" className="rounded-lg border border-brand-dark/10 bg-white p-3 text-brand-text-dark/40 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -414,17 +414,17 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
                 {d.code}
               </span>
-              <span className="text-xs font-bold text-slate-400">
+              <span className="text-xs font-bold text-brand-text-dark/40">
                 {formatDate(d.start_date)} - {formatDate(d.end_date)}
               </span>
             </div>
-            <h1 className="mt-2 font-title text-3xl font-black text-slate-900">{d.name}</h1>
+            <h1 className="mt-2 font-title text-3xl font-black text-brand-text-dark">{d.name}</h1>
           </div>
         </div>
 
         <button 
           onClick={() => navigate(`/delegations/${id}/edit`)}
-          className="flex items-center gap-2 rounded-lg bg-slate-900 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-slate-800"
+          className="flex items-center gap-2 rounded-lg bg-brand-dark px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-brand-dark/90"
         >
           <Edit size={16} />
           CHỈNH SỬA HỒ SƠ
@@ -433,7 +433,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
       <ApprovalActionBar role={role} delegation={d} onUpdate={() => navigate(0)} />
 
-      <div ref={tabRef} className="flex gap-4 border-b border-slate-200">
+      <div ref={tabRef} className="flex gap-4 border-b border-brand-dark/10">
         <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")} label="TỔNG QUAN" icon={<Info size={14} />} />
         <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} label="THÀNH VIÊN" icon={<Users size={14} />} />
         <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} label="LỊCH TRÌNH" icon={<Calendar size={14} />} />
@@ -446,49 +446,49 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <div className="space-y-8 md:col-span-2">
             {activeTab === "overview" && (
               <div className="space-y-8">
-                <div className="rounded-xl border border-slate-200 bg-white p-8">
-                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Mục tiêu & Nội dung</h3>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+                <div className="rounded-xl border border-brand-dark/10 bg-white p-8">
+                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-brand-text-dark">Mục tiêu & Nội dung</h3>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-text-dark/60">
                     {d.description || "Chưa có mô tả chi tiết."}
                   </p>
                   
                   <div className="mt-8">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lĩnh vực</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Lĩnh vực</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {d.sectors?.length ? d.sectors.map((s) => (
-                        <span key={s.id} className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                        <span key={s.id} className="rounded-md bg-brand-dark/[0.04] px-2 py-1 text-xs font-semibold text-brand-text-dark/60">
                           {s.name || s.name_vi}
                         </span>
-                      )) : <span className="text-xs italic text-slate-400">Chưa xác định lĩnh vực</span>}
+                      )) : <span className="text-xs italic text-brand-text-dark/40">Chưa xác định lĩnh vực</span>}
                     </div>
                   </div>
 
-                  <div className="mt-10 grid grid-cols-2 gap-8 border-t border-slate-100 pt-8 sm:grid-cols-3">
+                  <div className="mt-10 grid grid-cols-2 gap-8 border-t border-brand-dark/5 pt-8 sm:grid-cols-3">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
-                      <p className="mt-1 text-sm font-bold text-slate-900">{mapDelegationStatus(d.status)}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Trạng thái</p>
+                      <p className="mt-1 text-sm font-bold text-brand-text-dark">{mapDelegationStatus(d.status)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</p>
-                      <p className="mt-1 inline-flex w-fit items-center gap-2 rounded-md border border-slate-100 bg-slate-50 px-2 py-1 text-sm font-bold text-slate-900">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Quốc gia</p>
+                      <p className="mt-1 inline-flex w-fit items-center gap-2 rounded-md border border-brand-dark/5 bg-brand-dark/[0.02] px-2 py-1 text-sm font-bold text-brand-text-dark">
                         <CountryFlag countryName={d.country?.name_vi || ""} />
                         {d.country?.name_en || d.country?.name_vi || "N/A"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Đơn vị chủ trì</p>
-                      <p className="mt-1 text-sm font-bold text-slate-900">{d.host_unit?.unit_name || d.host_unit_id || "N/A"}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Đơn vị chủ trì</p>
+                      <p className="mt-1 text-sm font-bold text-brand-text-dark">{d.host_unit?.unit_name || d.host_unit_id || "N/A"}</p>
                     </div>
                     <div>
-                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Đối tác</p>
-                       <p className="mt-1 text-sm font-bold text-slate-900">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Đối tác</p>
+                       <p className="mt-1 text-sm font-bold text-brand-text-dark">
                          {d.partners && d.partners.length > 0 
                            ? d.partners.map((p) => p.partner_name || p.name).join(", ") 
                            : (d.objective || "N/A")}
                        </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiềm năng đầu tư</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Tiềm năng đầu tư</p>
                       <p className="mt-1 text-sm font-bold text-emerald-600">
                         {d.investment_potential ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.investment_potential) : "N/A"}
                       </p>
@@ -497,27 +497,27 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                 </div>
 
                 {/* Contact Information Section */}
-                <div className="rounded-xl border border-slate-200 bg-white p-8">
-                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Thông tin liên hệ</h3>
+                <div className="rounded-xl border border-brand-dark/10 bg-white p-8">
+                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-brand-text-dark">Thông tin liên hệ</h3>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {d.contacts?.length ? d.contacts.map((c, idx: number) => (
-                      <div key={idx} className="space-y-3 rounded-lg border border-slate-50 bg-slate-50/50 p-4">
+                      <div key={idx} className="space-y-3 rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] p-4">
                         <div>
-                          <p className="text-sm font-bold text-slate-900">{c.name}</p>
-                          <p className="text-xs text-slate-500">{c.role_name || "N/A"}</p>
+                          <p className="text-sm font-bold text-brand-text-dark">{c.name}</p>
+                          <p className="text-xs text-brand-text-dark/60">{c.role_name || "N/A"}</p>
                         </div>
-                        <div className="flex flex-col gap-1 border-t border-slate-200/50 pt-2 text-xs">
-                          <p className="flex items-center gap-2 text-slate-600">
+                        <div className="flex flex-col gap-1 border-t border-brand-dark/5 pt-2 text-xs">
+                          <p className="flex items-center gap-2 text-brand-text-dark/60">
                             <span className="font-bold opacity-50">Phone:</span> {c.phone || "N/A"}
                           </p>
-                          <p className="flex items-center gap-2 text-slate-600">
+                          <p className="flex items-center gap-2 text-brand-text-dark/60">
                             <span className="font-bold opacity-50">Email:</span> {c.email || "N/A"}
                           </p>
                         </div>
                       </div>
                     )) : (
                       <div className="col-span-full py-4 text-center">
-                        <p className="text-xs italic text-slate-400">No contact information available.</p>
+                        <p className="text-xs italic text-brand-text-dark/40">No contact information available.</p>
                       </div>
                     )}
                   </div>
@@ -538,15 +538,15 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                    {d.members?.map((m, i: number) => (
-                     <div key={i} className="group relative flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-primary/30 hover:shadow-md">
+                     <div key={i} className="group relative flex flex-col gap-4 rounded-xl border border-brand-dark/10 bg-white p-6 transition-all hover:border-primary/30 hover:shadow-md">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="flex size-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-400">
+                            <div className="flex size-10 items-center justify-center rounded-full bg-brand-dark/[0.04] font-bold text-brand-text-dark/40">
                               {m.full_name?.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-slate-900">{m.full_name}</p>
-                              <p className="text-xs text-slate-500">{m.title || "Chưa xác định chức vụ"}</p>
+                              <p className="text-sm font-bold text-brand-text-dark">{m.full_name}</p>
+                              <p className="text-xs text-brand-text-dark/60">{m.title || "Chưa xác định chức vụ"}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -564,7 +564,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                 identityNumber: m.identity_number,
                                 isVip: !!m.is_vip
                               }, i)}
-                              className="rounded-lg p-2 text-slate-300 transition-all hover:bg-slate-100 hover:text-primary"
+                              className="rounded-lg p-2 text-brand-text-dark/20 transition-all hover:bg-brand-dark/[0.04] hover:text-primary"
                             >
                               <Edit2 size={14} />
                             </button>
@@ -573,30 +573,30 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                 setDeleteTarget({ type: "member", index: i });
                                 setIsConfirmDeleteOpen(true);
                               }}
-                              className="rounded-lg p-2 text-slate-300 transition-all hover:bg-rose-50 hover:text-rose-500"
+                              className="rounded-lg p-2 text-brand-text-dark/20 transition-all hover:bg-rose-50 hover:text-rose-500"
                             >
                               <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
 
-                        <div className="space-y-2 border-t border-slate-50 pt-3">
-                          <p className="text-xs text-slate-600">
-                            <span className="font-semibold text-slate-400 opacity-70">Cơ quan:</span> {m.organization_name || "N/A"}
+                        <div className="space-y-2 border-t border-brand-dark/5 pt-3">
+                          <p className="text-xs text-brand-text-dark/60">
+                            <span className="font-semibold text-brand-text-dark/40 opacity-70">Cơ quan:</span> {m.organization_name || "N/A"}
                           </p>
-                          <div className="flex items-center gap-4 text-xs text-slate-500">
+                          <div className="flex items-center gap-4 text-xs text-brand-text-dark/60">
                              <p>
-                               <span className="font-semibold text-slate-400 opacity-70">Giới tính:</span> {m.gender || "N/A"}
+                               <span className="font-semibold text-brand-text-dark/40 opacity-70">Giới tính:</span> {m.gender || "N/A"}
                              </p>
                              {m.identity_number && (
                                <p>
-                                 <span className="font-semibold text-slate-400 opacity-70">CCCD/Hộ chiếu:</span> {m.identity_number}
+                                 <span className="font-semibold text-brand-text-dark/40 opacity-70">CCCD/Hộ chiếu:</span> {m.identity_number}
                                </p>
                              )}
                           </div>
                         </div>
                      </div>
-                   )) || <p className="text-center text-slate-400">No members found.</p>}
+                   )) || <p className="text-center text-brand-text-dark/40">No members found.</p>}
                 </div>
               </div>
            )}
@@ -625,7 +625,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                               {formatDate(event.start_at)}
                             </span>
                           </div>
-                          <p className="text-sm font-bold text-slate-900">{event.title || "No Title"}</p>
+                          <p className="text-sm font-bold text-brand-text-dark">{event.title || "No Title"}</p>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                             {event.location ? <span>📍 {event.location.name_vi || event.location.name}</span> : event.location_id ? <span>📍 Địa điểm #{event.location_id}</span> : null}
                             {event.staff ? <span>👤 {event.staff.name}</span> : event.staff_id ? <span>👤 Cán bộ #{event.staff_id}</span> : null}
@@ -673,7 +673,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <div className="space-y-6">
                 <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Checklist</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-brand-text-dark">Checklist</h3>
                     <button 
                       onClick={() => handleOpenAddModal("add-checklist")}
                       className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 transition-all hover:bg-emerald-100"
@@ -688,7 +688,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                         <div key={item.id ?? index} className="group rounded-lg border border-slate-100 bg-slate-50 p-4 transition-all hover:bg-slate-100/50">
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
-                               <p className="text-sm font-bold text-slate-900">{item.item_name || item.name || "Không có tiêu đề"}</p>
+                               <p className="text-sm font-bold text-brand-text-dark">{item.item_name || item.name || "Không có tiêu đề"}</p>
                                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                   <button 
                                     onClick={() => handleOpenEditModal("edit-checklist", {
@@ -736,7 +736,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <div className="space-y-6">
                 <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Kết quả & Giám sát</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-brand-text-dark">Kết quả & Giám sát</h3>
                     <button 
                       onClick={() => {
                         const outcome = d.outcomes?.[0] || {};
@@ -778,14 +778,14 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                               {summary && (
                                 <div className="space-y-2">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Kết quả đạt được</p>
-                                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{summary}</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Kết quả đạt được</p>
+                                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-text-dark/80">{summary}</p>
                                 </div>
                               )}
                               {nextSteps && (
                                 <div className="space-y-2">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nhiệm vụ tiếp theo</p>
-                                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-500">{nextSteps}</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Nhiệm vụ tiếp theo</p>
+                                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-text-dark/60">{nextSteps}</p>
                                 </div>
                               )}
                             </div>
@@ -794,12 +794,11 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">Chưa có thông tin giám sát được ghi nhận.</p>
+                    <p className="text-sm text-brand-text-dark/40">Chưa có thông tin giám sát được ghi nhận.</p>
                   )}
                 </section>
               </div>
            )}
-
            {activeTab === "discussion" && (
              <div className="flex max-h-[600px] flex-col">
                <DelegationDiscussion delegationId={d.id} />
@@ -808,8 +807,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         </div>
 
         <div className="space-y-6">
-           <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-              <h4 className="mb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Person in Charge</h4>
+           <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-6">
+              <h4 className="mb-4 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60">Person in Charge</h4>
               <div className="flex items-center gap-3">
                  {ownerUser?.avatar || d.owner?.avatar_url ? (
                    <img 
@@ -823,8 +822,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                    </div>
                  )}
                  <div>
-                    <p className="text-sm font-bold text-slate-900">{ownerUser?.fullName || d.owner?.full_name || "System Admin"}</p>
-                    <p className="text-[10px] font-medium text-slate-500">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Investment Department"}</p>
+                    <p className="text-sm font-bold text-brand-text-dark">{ownerUser?.fullName || d.owner?.full_name || "System Admin"}</p>
+                    <p className="text-[10px] font-medium text-brand-text-dark/60">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Investment Department"}</p>
                  </div>
               </div>
            </div>
@@ -1105,7 +1104,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 /** Simple component to display a message when a list is empty. */
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-100 text-slate-400">
+    <div className="flex h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-brand-dark/5 text-brand-text-dark/40">
       <CheckSquare size={32} className="mb-2 opacity-20" />
       <p>{message}</p>
     </div>
@@ -1119,7 +1118,7 @@ function TabButton({ active, onClick, label, icon }: { active: boolean; onClick:
       onClick={onClick}
       className={cn(
         "flex items-center gap-2 border-b-2 pb-4 pt-2 text-[10px] font-black uppercase tracking-widest transition-all",
-        active ? "border-primary text-primary" : "border-transparent text-slate-400 hover:text-slate-600",
+        active ? "border-primary text-primary" : "border-transparent text-brand-text-dark/40 hover:text-brand-text-dark/60",
       )}
     >
       {icon}
@@ -1175,7 +1174,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
           </div>
           <div>
             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Approve Portfolio</h4>
-            <p className="text-sm font-bold text-slate-900">Please review the portfolio and make a decision.</p>
+            <p className="text-sm font-bold text-brand-text-dark">Please review the portfolio and make a decision.</p>
           </div>
         </div>
 
@@ -1183,7 +1182,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
           <button
             onClick={() => handleAction(3)}
             disabled={updateMutation.isPending}
-            className="group flex items-center gap-3 rounded-xl bg-emerald-600 px-6 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-emerald-700"
+            className="group flex items-center gap-3 rounded-xl bg-accent px-6 py-3 text-[11px] font-black uppercase tracking-widest text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 hover:bg-accent/90"
           >
             <Check size={16} />
             APPROVE
@@ -1220,19 +1219,19 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
               placeholder="Enter specific reasons for the rejection or edit request..."
-              className="min-h-[100px] w-full rounded-xl border border-slate-200 bg-white p-4 text-sm ring-primary/20 transition-all focus:border-primary focus:outline-none focus:ring-4"
+              className="min-h-[100px] w-full rounded-xl border border-brand-dark/10 bg-white p-4 text-sm ring-primary/20 transition-all focus:border-primary focus:outline-none focus:ring-4"
             />
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setIsExpanding(false)}
-                className="rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600"
+                className="rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40 hover:text-brand-text-dark/60"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleAction(pendingStatus!)}
                 disabled={updateMutation.isPending || !remark.trim()}
-                className="flex items-center gap-3 rounded-lg bg-primary px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl transition-all hover:bg-primary/90 disabled:opacity-50"
+                className="flex items-center gap-3 rounded-lg bg-accent px-8 py-3 text-[10px] font-black uppercase tracking-widest text-accent-foreground shadow-xl shadow-accent/20 transition-all hover:bg-accent/90 disabled:opacity-50"
               >
                 <Send size={14} />
                 CONFIRM SUBMIT

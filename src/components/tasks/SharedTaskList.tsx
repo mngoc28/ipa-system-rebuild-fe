@@ -145,7 +145,7 @@ export default function SharedTaskList() {
       {/* Header & Main Actions */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Nhiệm vụ hệ thống</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Nhiệm vụ hệ thống</h1>
           <p className="mt-1 text-sm font-semibold text-slate-500">Quản lý và theo dõi tiến độ công việc tập trung.</p>
         </div>
 
@@ -269,7 +269,7 @@ export default function SharedTaskList() {
                     {task.status === "Done" && <CheckCircle2 size={12} />}
                   </button>
                   <div>
-                    <h4 className={cn("text-sm font-bold text-slate-900 uppercase tracking-tight", task.status === "Done" && "line-through opacity-50")}>{task.title}</h4>
+                    <h4 className={cn("text-sm font-bold text-brand-text-dark uppercase tracking-tight", task.status === "Done" && "line-through opacity-50")}>{task.title}</h4>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Giao bởi: {task.creator}</p>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export default function SharedTaskList() {
                   <span className={cn("rounded px-2 py-0.5 text-[9px] font-black uppercase border tracking-widest", task.priority === "Urgent" ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-slate-50 text-slate-500 border-slate-200")}>
                     {task.priority}
                   </span>
-                  <button aria-label={`Xem chi tiết nhiệm vụ ${task.title}`} className="rounded border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-900 hover:text-white">Chi tiết</button>
+                  <button aria-label={`Xem chi tiết nhiệm vụ ${task.title}`} className="rounded border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-brand-dark-900 hover:text-white">Chi tiết</button>
                 </div>
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function SharedTaskList() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-h-[95vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto border-none p-0 shadow-2xl sm:rounded-2xl">
           <DialogHeader className="border-b border-slate-100 bg-slate-50 px-6 py-5 text-left">
-            <DialogTitle className="text-sm font-black uppercase tracking-widest text-slate-900">
+            <DialogTitle className="text-sm font-black uppercase tracking-widest text-brand-text-dark">
               Thêm nhiệm vụ mới
             </DialogTitle>
           </DialogHeader>
@@ -415,7 +415,7 @@ function BoardColumn({ title, count, color, children, onAdd }: { title: string; 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between px-2">
-        <h3 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-900">
+        <h3 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark">
           <div className={cn("h-1.5 w-1.5 rounded-full", title.includes("hoàn thành") ? "bg-emerald-500" : "bg-primary")} />
           {title}
         </h3>
@@ -460,7 +460,7 @@ function TaskCard({ task, onClick, onStatusToggle, onDelete }: { task: TaskUiIte
           </DropdownMenu>
         </div>
 
-        <h4 className={cn("text-xs font-black leading-snug text-slate-900 transition-colors group-hover:text-primary uppercase tracking-tight", task.status === "Done" && "line-through opacity-40 text-slate-400")}>
+        <h4 className={cn("text-xs font-black leading-snug text-brand-text-dark transition-colors group-hover:text-primary uppercase tracking-tight", task.status === "Done" && "line-through opacity-40 text-slate-400")}>
           {task.title}
         </h4>
 
@@ -498,7 +498,7 @@ function TaskCard({ task, onClick, onStatusToggle, onDelete }: { task: TaskUiIte
 
 function StatsBox({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: "navy" | "rose" | "amber" | "emerald" }) {
   const colors: Record<"navy" | "rose" | "amber" | "emerald", string> = {
-    navy: "text-slate-900 bg-white border-slate-200 shadow-sm",
+    navy: "text-brand-text-dark bg-white border-slate-200 shadow-sm",
     rose: "text-rose-600 bg-rose-50 border-rose-100",
     amber: "text-amber-600 bg-amber-50 border-amber-100",
     emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",

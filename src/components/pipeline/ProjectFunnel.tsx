@@ -11,7 +11,7 @@ export const ProjectFunnel: React.FC<ProjectFunnelProps> = ({ projects }) => {
   const funnelStages = projectDataHelper.calculateFunnelStats(projects);
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-slate-900 bg-slate-950 p-6 shadow-xl shadow-slate-950/20 lg:p-10">
+    <div className="relative overflow-hidden rounded-xl border border-brand-dark-900 bg-brand-dark p-6 shadow-xl shadow-brand-dark/20 lg:p-10">
       <div className="relative z-10 grid grid-cols-1 gap-3 lg:grid-cols-4">
         {funnelStages.map((stage, i) => (
           <div key={i} className="flex flex-col items-center">
@@ -28,13 +28,13 @@ export const ProjectFunnel: React.FC<ProjectFunnelProps> = ({ projects }) => {
               </div>
               {/* Connection arrow */}
               {i < funnelStages.length - 1 && (
-                <div className="absolute -right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/10 bg-slate-950 p-0.5 lg:block">
+                <div className="absolute -right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-white/10 bg-brand-dark p-0.5 lg:block">
                   <ChevronRight size={12} className="text-white/40" />
                 </div>
               )}
             </div>
             <div className="text-center">
-              <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-500">Giá trị ước tính</p>
+              <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-white/40">Giá trị ước tính</p>
               <p className="text-lg font-black leading-none tracking-tight text-white">{stage.value}</p>
             </div>
           </div>

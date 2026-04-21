@@ -72,7 +72,7 @@ export function MultiSelectField({
             name={name}
             disabled={disabled}
             className={cn(
-              "flex min-h-[48px] w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50",
+              "flex min-h-[48px] w-full items-center justify-between rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-4 py-2 text-sm transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50",
               triggerClassName
             )}
           >
@@ -96,17 +96,17 @@ export function MultiSelectField({
                   </Badge>
                 ))
               ) : (
-                <span className="font-medium text-slate-400">{placeholder}</span>
+                <span className="font-medium text-brand-text-dark/40">{placeholder}</span>
               )}
             </div>
-            <ChevronDown className="size-4 shrink-0 text-slate-400" />
+            <ChevronDown className="size-4 shrink-0 text-brand-text-dark/40" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="max-h-80 w-[--radix-dropdown-menu-trigger-width] overflow-y-auto p-2" align="start">
           <div className="mb-2 px-1">
             <input
               type="text"
-              className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+              className="h-9 w-full rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -115,7 +115,7 @@ export function MultiSelectField({
           </div>
           <div className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-500">No results found</div>
+              <div className="p-4 text-center text-xs text-brand-text-dark/40">No results found</div>
             ) : (
               filteredOptions.map((option) => (
                 <DropdownMenuCheckboxItem

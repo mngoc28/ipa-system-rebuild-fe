@@ -57,7 +57,7 @@ function SortableSessionCard({ session }: { session: SessionItem }) {
         <div className="flex-1 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-black text-slate-900">{session.time}</span>
+              <span className="text-xs font-black text-brand-text-dark">{session.time}</span>
               <span className={cn("rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-tight", config.color)}>{config.label}</span>
             </div>
             <button className="text-slate-300 transition-colors hover:text-slate-600">
@@ -66,7 +66,7 @@ function SortableSessionCard({ session }: { session: SessionItem }) {
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-sm font-bold text-slate-900">{session.title}</h4>
+            <h4 className="text-sm font-bold text-brand-text-dark">{session.title}</h4>
             {session.description && <p className="line-clamp-1 text-xs font-medium text-slate-500">{session.description}</p>}
           </div>
 
@@ -123,7 +123,7 @@ export default function ItineraryTimeline({ sessions: initialSessions }: Itinera
         {Object.entries(grouped).map(([date, daySessions]) => (
           <div key={date} className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="rounded-xl bg-slate-900 px-4 py-1.5 text-xs font-black text-white shadow-lg">
+              <div className="rounded-xl bg-brand-dark-900 px-4 py-1.5 text-xs font-black text-white shadow-lg">
                 {daySessions[0].day}, {date}/2026
               </div>
               <div className="h-px flex-1 bg-slate-100" />

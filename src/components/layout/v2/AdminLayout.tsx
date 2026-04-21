@@ -42,7 +42,7 @@ export default function AdminLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-brand-dark/[0.02] font-sans text-brand-text-dark">
       {/* Sidebar */}
       <AdminSidebar
         isCollapsed={isSidebarCollapsed}
@@ -64,7 +64,7 @@ export default function AdminLayout() {
       </div>
 
       {/* Mobile Drawer Overlay */}
-      {isMobileMenuOpen && <div className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
+      {isMobileMenuOpen && <div className="fixed inset-0 z-40 bg-brand-dark-900/50 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
 
       {/* Sonner Toasts */}
       <Toaster richColors position="top-right" />

@@ -53,13 +53,13 @@ export function SelectField({
           id={id}
           name={name}
           className={cn(
-            "h-auto w-full rounded-lg border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
+            "h-auto w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-5 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
             triggerClassName
           )}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+        <SelectContent className="rounded-xl border-brand-dark/10 shadow-xl">
           {options.map((option) => (
             <SelectItem 
               key={option.value} 

@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running frontend pre-commit checks..."
+
+# 1. Accessibility Lint
+echo "♿ Checking Accessibility (A11y)..."
+npm run lint:a11y:ci
+
+# 2. ESLint
+echo "🧹 Running ESLint..."
+npm run lint:ci
+
+# 3. Build Check
+echo "🏗️  Checking Build..."
+npm run build
+
+echo "✅ All frontend checks passed!"

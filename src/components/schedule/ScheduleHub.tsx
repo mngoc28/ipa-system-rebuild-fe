@@ -1,18 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, ComponentProps } from "react";
 import { ChevronLeft, ChevronRight, Plus, Zap, Filter, Search, ChevronDown, Video, Map, BookOpen, Award, Clock, CheckCircle2, CalendarRange } from "lucide-react";
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { eventsApi } from "@/api/eventsApi";
 import { adminUsersApi } from "@/api/adminUsersApi";
+import { masterDataApi } from "@/api/masterDataApi";
 import { useAuthStore } from "@/store/useAuthStore";
 import ScheduleWeekView from "./ScheduleWeekView";
 import ScheduleMonthView from "./ScheduleMonthView";
 import ScheduleForm from "./ScheduleForm";
+import ScheduleDetailView from "./ScheduleDetailView";
+import ScheduleRescheduleForm from "./ScheduleRescheduleForm";
 import type { EventItem } from "@/api/eventsApi";
 import type { AdminUser } from "@/api/adminUsersApi";
+import { 
+  startOfWeek, 
+  endOfWeek, 
+  addWeeks, 
+  subWeeks, 
+  addMonths,
+  subMonths,
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+} from "date-fns";
+import { vi } from "date-fns/locale";
 
 interface ScheduleHubProps {
   role?: string;
@@ -25,17 +41,12 @@ type ScheduleEventListResponse = {
   meta?: { total_pages?: number; totalPages?: number; total?: number };
 };
 
-export interface UiEvent {
-  id: string;
+export interface UiEvent extends EventItem {
   time: string;
-  title: string;
   location: string;
   type: string;
-  startAt: string;
-  endAt?: string;
   isJoined: boolean;
-  status: string;
-  organizerUserId: string;
+  participantStatus?: "PENDING" | "JOINED" | "DECLINED";
   organizerName?: string;
 }
 
@@ -51,20 +62,18 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const monthOptions = [
-    { label: "Tháng 03, 2026", month: 2, year: 2026 },
-    { label: "Tháng 04, 2026", month: 3, year: 2026 },
-    { label: "Tháng 05, 2026", month: 4, year: 2026 },
-  ];
-
-  const [monthIndex, setMonthIndex] = useState(1);
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
   const [showOnlyJoined, setShowOnlyJoined] = useState(false);
   const [outlookConnected, setOutlookConnected] = useState(false);
+  // Modal & Selected Item States
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  
-  // New States: Pagination & Filtering
+  const [selectedEvent, setSelectedEvent] = useState<UiEvent | null>(null);
+  const [dialogMode, setDialogMode] = useState<"detail" | "edit" | "reschedule" | "delete" | null>(null);
+  const [isManagementOpen, setIsManagementOpen] = useState(false); 
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  // Pagination & Filtering (Restored)
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [eventTypeFilter, setEventTypeFilter] = useState("ALL");
@@ -72,10 +81,19 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Management States
+  // Management States (Restored)
   const isManagement = role?.toLowerCase() === "manager" || role?.toLowerCase() === "director" || role?.toLowerCase() === "admin";
   const [managementView, setManagementView] = useState<"PERSONAL" | "TEAM">(isManagement ? "TEAM" : "PERSONAL");
   const [selectedStaffId, setSelectedStaffId] = useState<string>("ALL");
+
+  // Date Range Management
+  const [referenceDate, setReferenceDate] = useState(new Date());
+  const currentWeekStart = useMemo(() => startOfWeek(referenceDate, { weekStartsOn: 1 }), [referenceDate]);
+  const currentWeekEnd = useMemo(() => endOfWeek(referenceDate, { weekStartsOn: 1 }), [referenceDate]);
+  const currentMonthStart = useMemo(() => startOfMonth(referenceDate), [referenceDate]);
+  const currentMonthEnd = useMemo(() => endOfMonth(referenceDate), [referenceDate]);
+  const currentMonthLabel = useMemo(() => format(referenceDate, "'Tháng' MM, yyyy", { locale: vi }), [referenceDate]);
+
 
   // Debounce search
   useEffect(() => {
@@ -86,12 +104,13 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Filter logic: if staff, show own events. If higher roles, show all or filtered.
-  const effectiveOrganizerId = managementView === "PERSONAL" ? user?.id : (selectedStaffId === "ALL" ? undefined : selectedStaffId);
-  const effectiveUnitId = (managementView === "TEAM" && selectedStaffId === "ALL") ? user?.unit : undefined;
+  // Filter logic: if staff, show own events (organizer or participant). If higher roles, show all or filtered.
+  const isStaff = role?.toLowerCase() === "staff";
+  const effectiveOrganizerId = isStaff ? undefined : (managementView === "PERSONAL" ? user?.id : (selectedStaffId === "ALL" ? undefined : selectedStaffId));
+  const effectiveUnitId = (managementView === "TEAM" && selectedStaffId === "ALL" && !isStaff) ? user?.unit : undefined;
 
   const eventsQuery = useQuery({
-    queryKey: ["events", effectiveOrganizerId, effectiveUnitId, eventTypeFilter, statusFilter, debouncedSearch, currentPage],
+    queryKey: ["events", effectiveOrganizerId, effectiveUnitId, eventTypeFilter, statusFilter, debouncedSearch, currentPage, viewMode, referenceDate],
     queryFn: () =>
       eventsApi.list({
         organizerId: effectiveOrganizerId,
@@ -99,8 +118,10 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
         eventType: eventTypeFilter === "ALL" ? undefined : eventTypeFilter,
         status: statusFilter === "ALL" ? undefined : statusFilter,
         search: debouncedSearch || undefined,
-        page: currentPage,
-        pageSize: itemsPerPage,
+        page: viewMode === "week" ? undefined : currentPage,
+        pageSize: viewMode === "week" ? 100 : itemsPerPage,
+        from: viewMode === "week" ? currentWeekStart.toISOString() : currentMonthStart.toISOString(),
+        to: viewMode === "week" ? currentWeekEnd.toISOString() : currentMonthEnd.toISOString(),
       }),
     placeholderData: keepPreviousData,
   });
@@ -109,10 +130,49 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   const membersQuery = useQuery({
     queryKey: ["unit-members", user?.unit],
     queryFn: () => adminUsersApi.list({ unitId: user?.unit, pageSize: 100 }),
-    enabled: isManagement,
   });
 
   const members = useMemo(() => membersQuery.data?.data?.items || [], [membersQuery.data]);
+  
+  // Global active users for name resolution
+  const allUsersQuery = useQuery({
+    queryKey: ["active-users"],
+    queryFn: () => adminUsersApi.list({ status: "active", pageSize: 100 }),
+  });
+  const allUsers = useMemo(() => allUsersQuery.data?.data?.items || [], [allUsersQuery.data]);
+
+  const locationsQuery = useQuery({
+    queryKey: ["master-data-locations"],
+    queryFn: () => masterDataApi.list("location"),
+  });
+
+  const locationsData = locationsQuery.data;
+
+  const locationOptions = useMemo(() => {
+    const items = locationsData?.data?.items || [];
+    const options = items.map((item) => ({
+      value: String(item.id),
+      label: item.name_vi || item.name_en || item.code,
+    }));
+
+    if (!options.some((item) => item.value === "IPA_DA_NANG")) {
+      options.unshift({ value: "IPA_DA_NANG", label: "Trung tâm Hành chính Đà Nẵng" });
+    }
+
+    return options;
+  }, [locationsData]);
+
+  const locationLabelMap = useMemo(() => {
+    return locationOptions.reduce<Record<string, string>>((accumulator, option) => {
+      accumulator[option.value] = option.label;
+      return accumulator;
+    }, {});
+  }, [locationOptions]);
+
+  const normalizeLocationId = (locationId?: string | null) => {
+    if (!locationId) return "";
+    return locationId === "IPA_DA_NANG" ? "4" : locationId;
+  };
 
   const createEventMutation = useMutation({
     mutationFn: eventsApi.create,
@@ -124,7 +184,45 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
     onError: () => toast.error("Không thể tạo lịch công tác."),
   });
 
-  const currentMonth = monthOptions[monthIndex];
+  const updateEventMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Parameters<typeof eventsApi.patch>[1] }) => eventsApi.patch(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Đã cập nhật thông tin lịch.");
+      setDialogMode(null);
+      setIsManagementOpen(false);
+    },
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: eventsApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Đã xóa lịch công tác.");
+      setIsDeleteOpen(false);
+      setIsManagementOpen(false);
+    },
+  });
+
+  const rescheduleMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Parameters<typeof eventsApi.requestReschedule>[1] }) => eventsApi.requestReschedule(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Đã gửi yêu cầu đổi lịch.");
+      setDialogMode(null);
+    },
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: ({ id, joined }: { id: string; joined: boolean }) => eventsApi.join(id, joined),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["events"] }),
+  });
+
+  const currentMonth = {
+    month: currentMonthStart.getMonth(),
+    year: currentMonthStart.getFullYear(),
+    label: currentMonthLabel,
+  };
 
   const pagination = useMemo(() => {
     const meta = (eventsQuery.data as ScheduleEventListResponse | undefined)?.meta;
@@ -141,10 +239,6 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
     const items = queryData?.data?.items || queryData?.items || [];
     let events = items;
 
-    // Note: Backend now handles eventType, status, and search filters.
-    // We keep this memo to transform backend items into UI items if needed,
-    // and for any client-side specific filters like 'showOnlyJoined'.
-    
     if (showOnlyJoined && user?.id) {
       events = events.filter((e: ScheduleEventSource) => 
         e.organizerUserId === String(user.id) || 
@@ -152,26 +246,88 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
       );
     }
 
-    return events.map((e: ScheduleEventSource) => ({
-      id: e.id,
-      time: toTimeRange(e.startAt, e.endAt),
-      title: e.title,
-      location: e.locationId || "Văn phòng quản lý",
-      type: e.eventType,
-      startAt: e.startAt,
-      endAt: e.endAt,
-      isJoined: e.joinStates ? e.joinStates[String(user?.id)] === "JOINED" : false,
-      status: e.status,
-      organizerUserId: e.organizerUserId,
-      organizerName: members.find((m: AdminUser) => m.id === String(e.organizerUserId))?.fullName || "Thành viên IPA"
-    }));
-  }, [eventsQuery.data, showOnlyJoined, user?.id, members]);
-
-  const handleCreateSchedule = (values: Parameters<typeof eventsApi.create>[0]) => {
-    createEventMutation.mutate({
-      ...values,
-      organizerUserId: String(values.organizerUserId || user?.id || ""), // Fallback to current user if not selected
+    return events.map((e: ScheduleEventSource) => {
+      const pStatus = e.joinStates ? e.joinStates[String(user?.id)] : "PENDING";
+      return ({
+        ...e, // Spread raw properties for detailed view
+        id: e.id,
+        time: toTimeRange(e.startAt, e.endAt),
+        title: e.title,
+        location: locationLabelMap[normalizeLocationId(e.locationId)] || locationLabelMap[e.locationId || ""] || e.locationId || "Văn phòng quản lý",
+        type: e.eventType,
+        startAt: e.startAt,
+        endAt: e.endAt,
+        isJoined: pStatus === "JOINED",
+        participantStatus: pStatus as "PENDING" | "JOINED" | "DECLINED",
+        status: e.status,
+        organizerUserId: e.organizerUserId,
+        organizerName: members.find((m: AdminUser) => m.id === String(e.organizerUserId))?.fullName || "Thành viên IPA"
+      });
     });
+  }, [eventsQuery.data, showOnlyJoined, user?.id, members, locationLabelMap]);
+
+  const selectedEventFormValues = useMemo(() => {
+    if (!selectedEvent) return undefined;
+
+    return {
+      ...selectedEvent,
+      date: new Date(selectedEvent.startAt).toISOString().split("T")[0],
+      startTime: new Date(selectedEvent.startAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      endTime: new Date(selectedEvent.endAt || selectedEvent.startAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      locationId: normalizeLocationId(selectedEvent.locationId),
+      description: selectedEvent.description || "",
+      status: selectedEvent.status,
+    };
+  }, [selectedEvent]);
+
+  const handleCreateSchedule = (values: Parameters<Exclude<ComponentProps<typeof ScheduleForm>["onSubmit"], undefined>>[0]) => {
+    createEventMutation.mutate({
+      title: values.title,
+      description: values.description,
+      eventType: values.eventType,
+      status: values.status,
+      startAt: values.startAt,
+      endAt: values.endAt,
+      locationId: values.locationId ?? undefined,
+      organizerUserId: String(values.organizerUserId || user?.id || ""),
+      participantUserIds: (values.participantUserIds || []).map(String),
+    });
+  };
+
+  const handleUpdateSchedule = (values: Parameters<Exclude<ComponentProps<typeof ScheduleForm>["onSubmit"], undefined>>[0]) => {
+    if (!selectedEvent) return;
+    updateEventMutation.mutate({
+      id: selectedEvent.id,
+      payload: {
+        title: values.title,
+        description: values.description,
+        eventType: values.eventType,
+        status: values.status,
+        startAt: values.startAt,
+        endAt: values.endAt,
+        locationId: values.locationId ?? undefined,
+        organizerUserId: String(values.organizerUserId || ""),
+        participantUserIds: (values.participantUserIds || []).map(String),
+      }
+    });
+  };
+
+  const handleRescheduleSubmit = (payload: Parameters<typeof eventsApi.requestReschedule>[1]) => {
+    if (!selectedEvent) return;
+    rescheduleMutation.mutate({
+      id: selectedEvent.id,
+      payload
+    });
+  };
+
+  const handleAction = (mode: "detail" | "edit" | "reschedule" | "delete", event: UiEvent) => {
+    setSelectedEvent(event);
+    if (mode === "delete") {
+      setIsDeleteOpen(true);
+    } else {
+      setDialogMode(mode);
+      setIsManagementOpen(true);
+    }
   };
 
   return (
@@ -195,17 +351,6 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 ? `Đang xem lịch công tác của ${selectedStaffId === "ALL" ? "toàn bộ đơn vị" : "nhân viên cụ thể"}`
                 : "Quản lý và theo dõi lộ trình tác nghiệp cá nhân"}
             </p>
-            {viewMode === "month" && (
-              <div className="ml-4 flex items-center gap-2 rounded-full border border-slate-200/50 bg-slate-100 px-3 py-1 shadow-sm duration-300 animate-in slide-in-from-left-2">
-                <button onClick={() => setMonthIndex(p => (p - 1 + 3) % 3)} className="text-slate-500 transition-colors hover:text-primary">
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="min-w-[120px] text-center text-[10px] font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</span>
-                <button onClick={() => setMonthIndex(p => (p + 1) % 3)} className="text-slate-500 transition-colors hover:text-primary">
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
@@ -355,43 +500,32 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex rounded-xl bg-slate-100 p-1 shadow-inner">
-              <button 
-                onClick={() => setViewMode("week")} 
-                className={cn("rounded-lg px-5 py-2 text-[10px] font-black uppercase transition-all", 
-                viewMode === "week" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}
-              >
-                Tuần
-              </button>
-              <button 
-                onClick={() => setViewMode("month")} 
-                className={cn("rounded-lg px-5 py-2 text-[10px] font-black uppercase transition-all", 
-                viewMode === "month" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}
-              >
-                Tháng
-              </button>
-            </div>
-
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                  <button className="flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
-                  <Plus size={14} />
-                  TẠO LỊCH
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl">
-                <DialogHeader>
-                  <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-slate-900">Kế hoạch công tác mới</DialogTitle>
-                  <DialogDescription className="border-b border-slate-100 pb-4 text-xs font-semibold text-slate-500">Thiết lập thời gian, địa điểm và thành phần tham gia cho sự kiện mới.</DialogDescription>
-                </DialogHeader>
-                <ScheduleForm 
-                  onSubmit={handleCreateSchedule} 
-                  onCancel={() => setIsCreateOpen(false)} 
-                  isLoading={createEventMutation.isPending}
-                  defaultOrganizerId={effectiveOrganizerId || user?.id}
-                />
-              </DialogContent>
-            </Dialog>
+            {isManagement && (
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                    <button className="flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
+                    <Plus size={14} />
+                    TẠO LỊCH
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl px-6">
+                  <DialogHeader>
+                    <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-slate-900">Kế hoạch công tác mới</DialogTitle>
+                    <DialogDescription className="border-b border-slate-100 pb-4 text-xs font-semibold text-slate-500">Thiết lập thời gian, địa điểm và thành phần tham gia cho sự kiện mới.</DialogDescription>
+                  </DialogHeader>
+                  <ScheduleForm 
+                    onSubmit={handleCreateSchedule} 
+                    onCancel={() => setIsCreateOpen(false)} 
+                    isLoading={createEventMutation.isPending}
+                    defaultOrganizerId={effectiveOrganizerId || user?.id}
+                    mode="create"
+                    locationOptions={locationOptions}
+                    locationLoading={locationsQuery.isLoading}
+                    role={role}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </div>
@@ -404,10 +538,10 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</h3>
                 <div className="flex gap-2">
-                  <button onClick={() => setMonthIndex(p => (p - 1 + 3) % 3)} title="Tháng trước" aria-label="Tháng trước" className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
+                  <button onClick={() => setReferenceDate((prev) => subMonths(prev, 1))} title="Tháng trước" aria-label="Tháng trước" className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
                     <ChevronLeft size={16} />
                   </button>
-                  <button onClick={() => setMonthIndex(p => (p + 1) % 3)} title="Tháng sau" aria-label="Tháng sau" className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
+                  <button onClick={() => setReferenceDate((prev) => addMonths(prev, 1))} title="Tháng sau" aria-label="Tháng sau" className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -420,9 +554,9 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                   </span>
                 ))}
                 {Array.from({ length: 35 }).map((_, i) => {
-                  const day = i - (new Date(currentMonth.year, currentMonth.month, 1).getDay() - 1);
-                  const isValid = day > 0 && day <= new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
-                  const isToday = isValid && day === new Date().getDate() && currentMonth.month === new Date().getMonth();
+                  const day = i - (currentMonthStart.getDay() - 1);
+                  const isValid = day > 0 && day <= currentMonthEnd.getDate();
+                  const isToday = isValid && day === new Date().getDate() && currentMonthStart.getMonth() === new Date().getMonth();
 
                   return (
                     <button
@@ -488,6 +622,42 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
 
         {/* Main View Area */}
         <div className="space-y-6 lg:col-span-3">
+          {/* Consistent View Toolbar */}
+          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-4">
+               <div className="flex items-center gap-2 rounded-full border border-slate-200/50 bg-slate-100 px-3 py-1.5 shadow-sm">
+                  <button onClick={() => setReferenceDate((prev) => subMonths(prev, 1))} className="text-slate-500 transition-all hover:scale-110 hover:text-primary active:scale-90">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <span className="min-w-[140px] text-center text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</span>
+                  <button onClick={() => setReferenceDate((prev) => addMonths(prev, 1))} className="text-slate-500 transition-all hover:scale-110 hover:text-primary active:scale-90">
+                    <ChevronRight size={18} />
+                  </button>
+               </div>
+               <div className="h-4 w-px bg-slate-200" />
+               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  {viewMode === "week" ? "Chế độ xem tuần" : "Chế độ xem tháng"}
+               </p>
+            </div>
+
+            <div className="flex rounded-xl bg-slate-100 p-1 shadow-inner">
+              <button 
+                onClick={() => setViewMode("week")} 
+                className={cn("rounded-lg px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all", 
+                viewMode === "week" ? "bg-white text-primary shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-700")}
+              >
+                TUẦN
+              </button>
+              <button 
+                onClick={() => setViewMode("month")} 
+                className={cn("rounded-lg px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all", 
+                viewMode === "month" ? "bg-white text-primary shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-700")}
+              >
+                THÁNG
+              </button>
+            </div>
+          </div>
+
           <div className="min-h-[600px]">
             {viewMode === "week" ? (
               <ScheduleWeekView 
@@ -495,7 +665,11 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 isLoading={eventsQuery.isLoading} 
                 isError={eventsQuery.isError} 
                 errorMessage={errorMessage}
+                members={allUsers.length > 0 ? allUsers : members}
                 onRefetch={() => eventsQuery.refetch()}
+                onAction={handleAction}
+                onJoin={(event) => joinMutation.mutate({ id: event.id, joined: !event.isJoined })}
+                isManagement={isManagement}
               />
             ) : (
               <ScheduleMonthView 
@@ -503,17 +677,100 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 currentMonth={currentMonth}
                 selectedDay={selectedDay}
                 setSelectedDay={setSelectedDay}
+                onEventClick={(event) => handleAction("detail", event)}
               />
             )}
           </div>
+
+          {/* Unified Management Dialog */}
+          <Dialog open={isManagementOpen} onOpenChange={setIsManagementOpen}>
+            <DialogContent className="max-w-3xl px-6">
+              <DialogHeader>
+                <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-slate-900">
+                  {dialogMode === "detail" && "Chi tiết lịch công tác"}
+                  {dialogMode === "edit" && "Chỉnh sửa lịch công tác"}
+                  {dialogMode === "reschedule" && "Đề xuất thay đổi lịch"}
+                </DialogTitle>
+                <DialogDescription className="border-b border-slate-100 pb-4 text-xs font-semibold text-slate-500">
+                  {dialogMode === "detail" && "Theo dõi thông tin và thành phần tham dự sự kiện."}
+                  {dialogMode === "edit" && "Cập nhật các thông tin cơ bản cho sự kiện hiện tại."}
+                  {dialogMode === "reschedule" && "Gửi yêu cầu thay đổi thời gian diễn ra cho người chủ trì."}
+                </DialogDescription>
+              </DialogHeader>
+
+              {dialogMode === "detail" && selectedEvent && (
+                <ScheduleDetailView 
+                  event={selectedEvent} 
+                  members={allUsers.length > 0 ? allUsers : members} 
+                  onJoin={() => joinMutation.mutate({ id: selectedEvent.id, joined: !selectedEvent.isJoined })}
+                  onEdit={() => setDialogMode("edit")}
+                  onDelete={() => setIsDeleteOpen(true)}
+                  onReschedule={() => setDialogMode("reschedule")}
+                  isJoining={joinMutation.isPending}
+                  isManagement={isManagement}
+                />
+              )}
+
+              {dialogMode === "edit" && selectedEvent && (
+                <ScheduleForm 
+                  onSubmit={handleUpdateSchedule}
+                  onCancel={() => setIsManagementOpen(false)}
+                  isLoading={updateEventMutation.isPending}
+                  initialValues={selectedEventFormValues as unknown as Parameters<typeof ScheduleForm>[0]["initialValues"]}
+                  mode="edit"
+                  locationOptions={locationOptions}
+                  locationLoading={locationsQuery.isLoading}
+                />
+              )}
+
+              {dialogMode === "reschedule" && selectedEvent && (
+                <ScheduleRescheduleForm 
+                  event={selectedEvent}
+                  onCancel={() => setIsManagementOpen(false)}
+                  onSubmit={handleRescheduleSubmit}
+                  isLoading={rescheduleMutation.isPending}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Confirmation */}
+          <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-left font-title text-lg font-black uppercase text-slate-900">Xác nhận xóa lịch?</DialogTitle>
+                <DialogDescription className="text-left text-sm font-medium text-slate-500">
+                  Hành động này không thể hoàn tác. Lịch công tác sẽ bị xóa vĩnh viễn khỏi hệ thống và thông báo sẽ được gửi tới tất cả thành viên tham gia.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex-row justify-end gap-2 pt-4">
+                <DialogClose asChild>
+                  <Button variant="outline" className="border-slate-200 text-[10px] font-black uppercase tracking-widest">
+                    Hủy bỏ
+                  </Button>
+                </DialogClose>
+                <Button 
+                  onClick={() => selectedEvent && deleteEventMutation.mutate(selectedEvent.id)}
+                  className="bg-rose-600 px-6 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700"
+                >
+                  XÁC NHẬN XÓA
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Enhanced Pagination Control */}
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex flex-col gap-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Kết quả</p>
-                <p className="text-xs font-black text-slate-900">
-                  {pagination?.total || 0} <span className="text-[9px] font-bold uppercase text-slate-400">Sự kiện</span>
+                <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">
+                  Lịch công tác
+                </h1>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  {viewMode === "week" 
+                    ? `Tuần: ${format(currentWeekStart, "dd/MM")} - ${format(currentWeekEnd, "dd/MM")}`
+                    : `${currentMonth.label}`
+                  }
                 </p>
               </div>
 
@@ -536,55 +793,86 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="mr-2 flex items-center gap-1.5">
-                <p className="text-[10px] font-black uppercase text-slate-400">Trang</p>
-                <div className="flex h-8 w-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-black text-slate-900">
-                  {currentPage}
+              {viewMode === "week" ? (
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setReferenceDate(prev => subWeeks(prev, 1))}
+                    className="h-10 gap-2 border-slate-200 px-4 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
+                  >
+                    <ChevronLeft size={16} /> Tuần trước
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setReferenceDate(new Date())}
+                    className="h-10 border-slate-200 px-4 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
+                  >
+                    Hôm nay
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setReferenceDate(prev => addWeeks(prev, 1))}
+                    className="h-10 gap-2 border-slate-200 px-4 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
+                  >
+                    Tuần sau <ChevronRight size={16} />
+                  </Button>
                 </div>
-                <p className="text-[10px] font-black uppercase text-slate-400">/ {pagination?.total_pages || 1}</p>
-              </div>
+              ) : (
+                <>
+                  <div className="mr-2 flex items-center gap-1.5">
+                    <p className="text-[10px] font-black uppercase text-slate-400">Trang</p>
+                    <div className="flex h-8 w-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-black text-slate-900">
+                      {currentPage}
+                    </div>
+                    <p className="text-[10px] font-black uppercase text-slate-400">/ {pagination?.total_pages || 1}</p>
+                  </div>
 
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  title="Trang trước"
-                  aria-label="Trang trước"
-                  className="flex size-10 items-center justify-center rounded-xl border border-slate-100 text-slate-400 transition-all hover:bg-slate-50 hover:text-primary active:scale-90 disabled:opacity-20"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                
-                <div className="flex gap-1.5">
-                  {Array.from({ length: Math.min(5, pagination?.total_pages || 1) }).map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={cn(
-                          "h-10 w-10 rounded-xl text-xs font-black transition-all active:scale-90",
-                          currentPage === pageNum 
-                            ? "bg-slate-950 text-white shadow-xl shadow-slate-900/20" 
-                            : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                        )}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setCurrentPage((p: number) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      title="Trang trước"
+                      aria-label="Trang trước"
+                      className="flex size-10 items-center justify-center rounded-xl border border-slate-100 text-slate-400 transition-all hover:bg-slate-50 hover:text-primary active:scale-90 disabled:opacity-20"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    
+                    <div className="flex gap-1.5">
+                      {Array.from({ length: Math.min(5, pagination?.total_pages || 1) }).map((_, i) => {
+                        const pageNum = i + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={cn(
+                              "h-10 w-10 rounded-xl text-xs font-black transition-all active:scale-90",
+                              currentPage === pageNum 
+                                ? "bg-slate-950 text-white shadow-xl shadow-slate-900/20" 
+                                : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                            )}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                <button 
-                  onClick={() => setCurrentPage(p => Math.min(pagination?.total_pages || 1, p + 1))}
-                  disabled={currentPage === (pagination?.total_pages || 1)}
-                  title="Trang sau"
-                  aria-label="Trang sau"
-                  className="flex size-10 items-center justify-center rounded-xl border border-slate-100 text-slate-400 transition-all hover:bg-slate-50 hover:text-primary active:scale-90 disabled:opacity-20"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
+                    <button 
+                      onClick={() => setCurrentPage((p: number) => Math.min(pagination?.total_pages || 1, p + 1))}
+                      disabled={currentPage === (pagination?.total_pages || 1)}
+                      title="Trang sau"
+                      aria-label="Trang sau"
+                      className="flex size-10 items-center justify-center rounded-xl border border-slate-100 text-slate-400 transition-all hover:bg-slate-50 hover:text-primary active:scale-90 disabled:opacity-20"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

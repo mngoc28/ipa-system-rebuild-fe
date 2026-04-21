@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,13 +19,32 @@ const scheduleSchema = z.object({
   date: z.string().min(1, "Vui lòng chọn ngày"),
   startTime: z.string().min(1, "Giờ bắt đầu"),
   endTime: z.string().min(1, "Giờ kết thúc"),
-  locationId: z.string().min(1, "Vui lòng nhập địa điểm"),
+  locationId: z.string().optional().or(z.null()),
   organizerUserId: z.string().min(1, "Vui lòng chọn người chủ trì"),
   participantUserIds: z.array(z.string()).default([]),
+  status: z.string().min(1, "Vui lòng chọn trạng thái"),
   description: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.startTime && data.endTime) {
+    const start = new Date(`1970-01-01T${data.startTime}:00`);
+    const end = new Date(`1970-01-01T${data.endTime}:00`);
+    if (end <= start) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Giờ kết thúc phải sau giờ bắt đầu",
+        path: ["endTime"],
+      });
+    }
+  }
 });
 
 type ScheduleFormValues = z.infer<typeof scheduleSchema>;
+type ScheduleFormMode = "create" | "edit";
+
+type SelectOption = {
+  value: string;
+  label: string;
+};
 
 interface ScheduleFormProps {
   onSubmit: (values: ScheduleFormValues & { startAt: string; endAt: string; status: string }) => void;
@@ -33,9 +52,29 @@ interface ScheduleFormProps {
   isLoading?: boolean;
   defaultDate?: string;
   defaultOrganizerId?: string;
+  initialValues?: Partial<ScheduleFormValues>; // New prop for editing
+  mode?: ScheduleFormMode;
+  locationOptions?: SelectOption[];
+  locationLoading?: boolean;
+  role?: string;
 }
 
-export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDate, defaultOrganizerId }: ScheduleFormProps) {
+export default function ScheduleForm({
+  onSubmit,
+  onCancel,
+  isLoading,
+  defaultDate,
+  defaultOrganizerId,
+  initialValues,
+  mode = "create",
+  locationOptions = [],
+  locationLoading = false,
+  role,
+}: ScheduleFormProps) {
+  const isStaff = role?.toLowerCase() === "staff";
+  const organizerLabel = isStaff ? "Người thực hiện" : "Người chủ trì";
+  const organizerPlaceholder = isStaff ? "Chọn người thực hiện..." : "Chọn người chủ trì...";
+
   const { data: usersData } = useQuery({
     queryKey: ["admin-users-list"],
     queryFn: () => adminUsersApi.list({ pageSize: 100, status: "active" }),
@@ -50,6 +89,14 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
     queryKey: ["master-data", "event-types"],
     queryFn: () => masterDataApi.list("event-types"),
   });
+
+  const normalizedLocationOptions = useMemo(() => {
+    const items = [...locationOptions];
+    if (!items.some((option) => option.value === "IPA_DA_NANG")) {
+      items.unshift({ value: "IPA_DA_NANG", label: "Trung tâm Hành chính Đà Nẵng" });
+    }
+    return items;
+  }, [locationOptions]);
 
   const eventTypeItems = useMemo(() => {
     const items = eventTypesData?.data?.items || [];
@@ -67,19 +114,38 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<ScheduleFormValues>({
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
-      eventType: "MEETING",
-      date: defaultDate || new Date().toISOString().split("T")[0],
-      startTime: "09:00",
-      endTime: "10:30",
-      organizerUserId: defaultOrganizerId || "",
-      participantUserIds: defaultOrganizerId ? [defaultOrganizerId] : [],
-      locationId: "IPA_DA_NANG",
+      eventType: initialValues?.eventType || "MEETING",
+      date: initialValues?.date || defaultDate || new Date().toISOString().split("T")[0],
+      startTime: initialValues?.startTime || "09:00",
+      endTime: initialValues?.endTime || "10:30",
+      organizerUserId: initialValues?.organizerUserId ? String(initialValues.organizerUserId) : (defaultOrganizerId ? String(defaultOrganizerId) : ""),
+      participantUserIds: (initialValues?.participantUserIds || (defaultOrganizerId ? [defaultOrganizerId] : [])).map(String),
+      locationId: initialValues?.locationId ? String(initialValues.locationId) : "",
+      status: initialValues?.status || "PLANNED",
+      title: initialValues?.title || "",
+      description: initialValues?.description || "",
     },
   });
+
+  useEffect(() => {
+    reset({
+      eventType: initialValues?.eventType || "MEETING",
+      date: initialValues?.date || defaultDate || new Date().toISOString().split("T")[0],
+      startTime: initialValues?.startTime || "09:00",
+      endTime: initialValues?.endTime || "10:30",
+      organizerUserId: initialValues?.organizerUserId ? String(initialValues.organizerUserId) : (defaultOrganizerId ? String(defaultOrganizerId) : ""),
+      participantUserIds: (initialValues?.participantUserIds || (defaultOrganizerId ? [defaultOrganizerId] : [])).map(String),
+      locationId: initialValues?.locationId ? String(initialValues.locationId) : "",
+      status: initialValues?.status || "PLANNED",
+      title: initialValues?.title || "",
+      description: initialValues?.description || "",
+    });
+  }, [reset, initialValues, defaultDate, defaultOrganizerId]);
 
   const handleFormSubmit = (data: ScheduleFormValues) => {
     // Combine date and time
@@ -90,13 +156,13 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
       ...data,
       startAt,
       endAt,
-      status: "PLANNED",
+      status: data.status,
     });
   };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="flex h-full flex-col duration-300 animate-in fade-in zoom-in-95">
-      <div className="max-h-[70vh] flex-1 space-y-6 overflow-y-auto py-4 pr-2">
+      <div className="max-h-[70vh] flex-1 space-y-6 overflow-y-auto p-4 pr-2">
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Main Info */}
@@ -116,7 +182,7 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
               control={control}
               name="eventType"
               render={({ field }) => (
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Chọn loại hình" />
                   </SelectTrigger>
@@ -134,10 +200,23 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
 
           <div className="space-y-2">
             <Label htmlFor="location" className="text-[10px] font-black uppercase tracking-wider text-slate-500">Địa điểm *</Label>
-            <div className="relative">
-              <Input id="location" {...register("locationId")} className="pl-9" placeholder="Phòng họp IPA, Địa chỉ..." />
-              <MapPin className="absolute left-3 top-2.5 text-slate-400" size={16} />
-            </div>
+            <Controller
+              control={control}
+              name="locationId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value || ""}
+                  onValueChange={field.onChange}
+                  options={normalizedLocationOptions}
+                  loading={locationLoading}
+                  placeholder="Chọn địa điểm..."
+                  searchPlaceholder="Tìm địa điểm..."
+                  emptyMessage="Không có địa điểm phù hợp"
+                  icon={<MapPin size={16} />}
+                />
+              )}
+            />
+            {errors.locationId && <p className="text-[10px] font-bold uppercase text-rose-500">{errors.locationId.message}</p>}
           </div>
         </div>
 
@@ -162,25 +241,50 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
                </div>
                <div className="space-y-2">
                   <Label htmlFor="endTime" className="text-[10px] font-black uppercase tracking-wider text-slate-500">Kết thúc *</Label>
-                  <div className="relative">
+                   <div className="relative">
                     <Input id="endTime" type="time" {...register("endTime")} className="pl-9" />
                     <Clock className="absolute left-3 top-2.5 text-slate-400" size={16} />
                   </div>
+                  {errors.endTime && <p className="text-[10px] font-bold uppercase text-rose-500">{errors.endTime.message}</p>}
                </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Trạng thái</Label>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn trạng thái" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PLANNED">Đã lên lịch</SelectItem>
+                      <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
+                      <SelectItem value="DONE">Hoàn thành</SelectItem>
+                      <SelectItem value="CANCELLED">Đã hủy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="organizer" className="text-[10px] font-black uppercase tracking-wider text-slate-500">Người chủ trì *</Label>
+            <Label htmlFor="organizer" className="text-[10px] font-black uppercase tracking-wider text-slate-500">{organizerLabel} *</Label>
             <Controller
               control={control}
               name="organizerUserId"
               render={({ field }) => (
                 <SearchableSelect
-                  value={field.value}
+                  value={field.value || ""}
                   onValueChange={field.onChange}
                   options={userOptions}
-                  placeholder="Chọn người chủ trì..."
+                  placeholder={organizerPlaceholder}
+                   searchPlaceholder={`Tìm ${organizerLabel.toLowerCase()}...`}
+                  emptyMessage="Không có người dùng phù hợp"
+                  disabled={isStaff && mode === "create"}
                 />
               )}
             />
@@ -196,15 +300,17 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
           name="participantUserIds"
           render={({ field }) => (
             <SearchableSelect
-              value="" 
-              onValueChange={(val) => {
+              value=""
+               onValueChange={(val) => {
                 const sVal = String(val);
                 if (!field.value.includes(sVal)) {
                   field.onChange([...field.value, sVal]);
                 }
-              }} 
+              }}
               options={userOptions}
               placeholder="Thêm người tham gia..."
+              searchPlaceholder="Tìm người tham gia..."
+              emptyMessage="Không có người dùng phù hợp"
             />
           )}
         />
@@ -221,20 +327,20 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
                         <span key={pid} className="group inline-flex items-center gap-2 rounded bg-slate-100 py-1.5 pl-2.5 pr-1.5 text-[9px] font-bold uppercase text-slate-700 shadow-sm transition-colors hover:bg-slate-200">
                             <UsersIcon size={12} className="text-slate-400" />
                             {user.label.split(" (")[0]}
-                            <button 
-                              type="button" 
-                              onClick={() => field.onChange(field.value.filter((i: string) => String(i) !== pid))}
-                              className="ml-1 rounded-full p-0.5 transition-colors hover:bg-rose-100 hover:text-rose-600"
-                            >
-                              <Plus className="rotate-45" size={14} />
-                            </button>
+                             <button 
+                                type="button" 
+                                onClick={() => field.onChange(field.value.filter((i: string) => String(i) !== pid))}
+                                className="ml-1 rounded-full p-0.5 transition-colors hover:bg-rose-100 hover:text-rose-600"
+                              >
+                                <Plus className="rotate-45" size={14} />
+                              </button>
                         </span>
                     ) : null;
                   })}
                 </>
               )}
             />
-        </div>
+         </div>
       </div>
 
       <div className="space-y-2">
@@ -243,7 +349,7 @@ export default function ScheduleForm({ onSubmit, onCancel, isLoading, defaultDat
       </div>
     </div>
 
-    <div className="flex justify-end gap-3 border-t border-slate-100 bg-white pt-6">
+    <div className="flex justify-end gap-3 border-t border-slate-100 bg-white px-4 pt-6">
       <Button type="button" variant="outline" onClick={onCancel} className="px-8 text-[10px] font-black uppercase tracking-widest">
         Hủy bỏ
       </Button>

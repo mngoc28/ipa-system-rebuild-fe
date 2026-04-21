@@ -170,7 +170,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
   const { data: detailData, isLoading, refetch } = useDelegationDetailQuery(id);
   const { updateMutation } = useDelegationsQuery();
-  const detailError = detailData === undefined && !isLoading && id ? "Unable to load delegation details." : null;
+  const detailError = detailData === undefined && !isLoading && id ? "Không thể tải thông tin đoàn công tác." : null;
   const d = detailData?.data as DelegationDetailView | undefined;
 
   // Master Data & Users for forms
@@ -378,7 +378,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LoadingSpinner label="Loading delegation data..." />
+        <LoadingSpinner label="Đang tải dữ liệu đoàn công tác..." />
       </div>
     );
   }
@@ -399,7 +399,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   }
 
   if (!d) {
-    return <div className="p-8 text-center text-slate-500">Delegation does not exist.</div>;
+    return <div className="p-8 text-center text-slate-500">Đoàn công tác không tồn tại.</div>;
   }
 
   return (
@@ -434,12 +434,12 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
       <ApprovalActionBar role={role} delegation={d} onUpdate={() => navigate(0)} />
 
       <div ref={tabRef} className="flex gap-4 border-b border-slate-200">
-        <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")} label="OVERVIEW" icon={<Info size={14} />} />
-        <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} label="MEMBERS" icon={<Users size={14} />} />
-        <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} label="SCHEDULE" icon={<Calendar size={14} />} />
+        <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")} label="TỔNG QUAN" icon={<Info size={14} />} />
+        <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} label="THÀNH VIÊN" icon={<Users size={14} />} />
+        <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} label="LỊCH TRÌNH" icon={<Calendar size={14} />} />
         <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} label="CHECKLIST" icon={<CheckSquare size={14} />} />
-        <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} label="FOLLOW-UP" icon={<FileText size={14} />} />
-        <TabButton active={activeTab === "discussion"} onClick={() => setActiveTab("discussion")} label="DISCUSSION" icon={<MessageSquare size={14} />} />
+        <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} label="THEO DÕI" icon={<FileText size={14} />} />
+        <TabButton active={activeTab === "discussion"} onClick={() => setActiveTab("discussion")} label="THẢO LUẬN" icon={<MessageSquare size={14} />} />
       </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -447,40 +447,40 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
             {activeTab === "overview" && (
               <div className="space-y-8">
                 <div className="rounded-xl border border-slate-200 bg-white p-8">
-                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Objectives & Content</h3>
+                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Mục tiêu & Nội dung</h3>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
-                    {d.description || "No detailed description available."}
+                    {d.description || "Chưa có mô tả chi tiết."}
                   </p>
                   
                   <div className="mt-8">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sectors</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lĩnh vực</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {d.sectors?.length ? d.sectors.map((s) => (
                         <span key={s.id} className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
                           {s.name || s.name_vi}
                         </span>
-                      )) : <span className="text-xs italic text-slate-400">No sectors defined</span>}
+                      )) : <span className="text-xs italic text-slate-400">Chưa xác định lĩnh vực</span>}
                     </div>
                   </div>
 
                   <div className="mt-10 grid grid-cols-2 gap-8 border-t border-slate-100 pt-8 sm:grid-cols-3">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Status</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
                       <p className="mt-1 text-sm font-bold text-slate-900">{mapDelegationStatus(d.status)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</p>
                       <p className="mt-1 inline-flex w-fit items-center gap-2 rounded-md border border-slate-100 bg-slate-50 px-2 py-1 text-sm font-bold text-slate-900">
                         <CountryFlag countryName={d.country?.name_vi || ""} />
                         {d.country?.name_en || d.country?.name_vi || "N/A"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Host Unit</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Đơn vị chủ trì</p>
                       <p className="mt-1 text-sm font-bold text-slate-900">{d.host_unit?.unit_name || d.host_unit_id || "N/A"}</p>
                     </div>
                     <div>
-                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Partner</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Đối tác</p>
                        <p className="mt-1 text-sm font-bold text-slate-900">
                          {d.partners && d.partners.length > 0 
                            ? d.partners.map((p) => p.partner_name || p.name).join(", ") 
@@ -488,7 +488,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                        </p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Investment Potential</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiềm năng đầu tư</p>
                       <p className="mt-1 text-sm font-bold text-emerald-600">
                         {d.investment_potential ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.investment_potential) : "N/A"}
                       </p>
@@ -498,7 +498,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
                 {/* Contact Information Section */}
                 <div className="rounded-xl border border-slate-200 bg-white p-8">
-                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Contact Information</h3>
+                  <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-slate-900">Thông tin liên hệ</h3>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {d.contacts?.length ? d.contacts.map((c, idx: number) => (
                       <div key={idx} className="space-y-3 rounded-lg border border-slate-50 bg-slate-50/50 p-4">
@@ -533,7 +533,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                     className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary transition-all hover:bg-primary/20"
                   >
                     <Plus size={14} />
-                    Add Member
+                    Thêm thành viên
                   </button>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -546,7 +546,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                             </div>
                             <div>
                               <p className="text-sm font-bold text-slate-900">{m.full_name}</p>
-                              <p className="text-xs text-slate-500">{m.title || "Role not specified"}</p>
+                              <p className="text-xs text-slate-500">{m.title || "Chưa xác định chức vụ"}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -582,15 +582,15 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
                         <div className="space-y-2 border-t border-slate-50 pt-3">
                           <p className="text-xs text-slate-600">
-                            <span className="font-semibold text-slate-400 opacity-70">Organization:</span> {m.organization_name || "N/A"}
+                            <span className="font-semibold text-slate-400 opacity-70">Cơ quan:</span> {m.organization_name || "N/A"}
                           </p>
                           <div className="flex items-center gap-4 text-xs text-slate-500">
                              <p>
-                               <span className="font-semibold text-slate-400 opacity-70">Gender:</span> {m.gender || "N/A"}
+                               <span className="font-semibold text-slate-400 opacity-70">Giới tính:</span> {m.gender || "N/A"}
                              </p>
                              {m.identity_number && (
                                <p>
-                                 <span className="font-semibold text-slate-400 opacity-70">CCCD/PP:</span> {m.identity_number}
+                                 <span className="font-semibold text-slate-400 opacity-70">CCCD/Hộ chiếu:</span> {m.identity_number}
                                </p>
                              )}
                           </div>
@@ -609,7 +609,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                      className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary transition-all hover:bg-primary/20"
                    >
                      <Plus size={14} />
-                     Add Schedule
+                     Thêm lịch trình
                    </button>
                 </div>
                 {d.events?.length ? (
@@ -619,7 +619,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                         <div className="space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
-                              Schedule
+                              Lịch trình
                             </span>
                             <span className="text-xs font-bold text-slate-400">
                               {formatDate(event.start_at)}
@@ -627,8 +627,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                           </div>
                           <p className="text-sm font-bold text-slate-900">{event.title || "No Title"}</p>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                            {event.location ? <span>📍 {event.location.name_vi || event.location.name}</span> : event.location_id ? <span>📍 Location #{event.location_id}</span> : null}
-                            {event.staff ? <span>👤 {event.staff.name}</span> : event.staff_id ? <span>👤 PIC #{event.staff_id}</span> : null}
+                            {event.location ? <span>📍 {event.location.name_vi || event.location.name}</span> : event.location_id ? <span>📍 Địa điểm #{event.location_id}</span> : null}
+                            {event.staff ? <span>👤 {event.staff.name}</span> : event.staff_id ? <span>👤 Cán bộ #{event.staff_id}</span> : null}
                             {event.logistics_note ? <span>🚚 {event.logistics_note}</span> : null}
                           </div>
                           {event.description ? <p className="text-sm leading-relaxed text-slate-600">{event.description}</p> : null}
@@ -664,7 +664,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                     </div>
                   ))
                 ) : (
-                  <EmptyState message="No schedule items found." />
+                  <EmptyState message="Chưa có lịch trình nào được ghi nhận." />
                 )}
               </div>
            )}
@@ -679,7 +679,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                       className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 transition-all hover:bg-emerald-100"
                     >
                       <Plus size={14} />
-                      Add Item
+                      Thêm mục
                     </button>
                   </div>
                   {d.checklist?.length ? (
@@ -688,7 +688,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                         <div key={item.id ?? index} className="group rounded-lg border border-slate-100 bg-slate-50 p-4 transition-all hover:bg-slate-100/50">
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
-                               <p className="text-sm font-bold text-slate-900">{item.item_name || item.name || "No Title"}</p>
+                               <p className="text-sm font-bold text-slate-900">{item.item_name || item.name || "Không có tiêu đề"}</p>
                                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                   <button 
                                     onClick={() => handleOpenEditModal("edit-checklist", {
@@ -714,19 +714,19 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                </div>
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                              {item.status !== undefined && item.status !== null ? `Status: ${item.status === 2 ? "Completed" : "In Progress"}` : ""}
+                              {item.status !== undefined && item.status !== null ? `Trạng thái: ${item.status === 2 ? "Hoàn thành" : "Đang thực hiện"}` : ""}
                             </span>
                           </div>
                           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                             {item.assignee_user_id && (
-                              <span>👤 PIC: {userOptions.find(u => u.value === String(item.assignee_user_id))?.label || `#${item.assignee_user_id}`}</span>
+                              <span>👤 Cán bộ: {userOptions.find(u => u.value === String(item.assignee_user_id))?.label || `#${item.assignee_user_id}`}</span>
                             )}
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No checklist items found.</p>
+                    <p className="text-sm text-slate-400">Chưa có đầu việc nào trong checklist.</p>
                   )}
                 </section>
               </div>
@@ -736,7 +736,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <div className="space-y-6">
                 <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Outcomes & Monitoring</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Kết quả & Giám sát</h3>
                     <button 
                       onClick={() => {
                         const outcome = d.outcomes?.[0] || {};
@@ -749,7 +749,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                       className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 transition-all hover:bg-emerald-100"
                     >
                       <Edit2 size={14} />
-                      Edit Outcome
+                      Chỉnh sửa kết quả
                     </button>
                   </div>
                   {d.outcomes?.length ? (
@@ -778,13 +778,13 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                               {summary && (
                                 <div className="space-y-2">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Achieved Results</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Kết quả đạt được</p>
                                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{summary}</p>
                                 </div>
                               )}
                               {nextSteps && (
                                 <div className="space-y-2">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Next Tasks</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nhiệm vụ tiếp theo</p>
                                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-500">{nextSteps}</p>
                                 </div>
                               )}
@@ -794,7 +794,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No monitoring information available.</p>
+                    <p className="text-sm text-slate-400">Chưa có thông tin giám sát được ghi nhận.</p>
                   )}
                 </section>
               </div>

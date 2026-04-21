@@ -9,6 +9,7 @@ export interface EventItem {
     id: string;
     delegationId?: string | null;
     title: string;
+  description?: string | null;
     eventType: string;
     status: string;
     startAt: string;
@@ -55,6 +56,16 @@ export const eventsApi = {
   },
 
   /**
+   * Retrieves full details for a specific event.
+   * @param id - Target event ID.
+   * @returns Event detail object.
+   */
+  get: async (id: string) => {
+    const response = await axiosClient.get<ApiEnvelope<EventItem>>(`${getPrefix()}/${id}`);
+    return response.data;
+  },
+
+  /**
    * Registers a new event in the system.
    * @param payload - Comprehensive event details.
    * @returns The created event record.
@@ -62,6 +73,7 @@ export const eventsApi = {
   create: async (payload: {
     delegationId?: string;
     title: string;
+    description?: string;
     eventType: string;
     status: string;
     startAt: string;
@@ -80,7 +92,7 @@ export const eventsApi = {
    * @param payload - Fields to be updated.
    * @returns Update confirmation.
    */
-  patch: async (id: string, payload: Partial<{ title: string; status: string; startAt: string; endAt: string; locationId: string }>) => {
+  patch: async (id: string, payload: Partial<{ title: string; description: string; eventType: string; status: string; startAt: string; endAt: string; locationId: string; organizerUserId: string; participantUserIds: string[] }>) => {
     const response = await axiosClient.patch<ApiEnvelope<{ updated: boolean; event: EventItem }>>(`${getPrefix()}/${id}`, payload);
     return response.data;
   },
@@ -106,6 +118,16 @@ export const eventsApi = {
    */
   requestReschedule: async (id: string, payload: { proposedStartAt: string; proposedEndAt: string; reason: string }) => {
     const response = await axiosClient.post<ApiEnvelope<{ id: string; status: string }>>(`${getPrefix()}/${id}/reschedule-requests`, payload);
+    return response.data;
+  },
+
+  /**
+   * Permanently removes an event from the system.
+   * @param id - ID of the event to delete.
+   * @returns Deletion confirmation.
+   */
+  delete: async (id: string) => {
+    const response = await axiosClient.delete<ApiEnvelope<{ deleted: boolean }>>(`${getPrefix()}/${id}`);
     return response.data;
   },
 };

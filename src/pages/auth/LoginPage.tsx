@@ -98,7 +98,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen overflow-hidden bg-slate-50 font-sans antialiased">
+    <main className="flex min-h-screen overflow-hidden bg-brand-dark/[0.02] font-sans antialiased">
       {/* Left Column: Branding (45%) */}
       <section className="relative hidden items-center justify-center overflow-hidden lg:flex lg:w-[45%]">
         <div className="absolute inset-0 z-0">
@@ -156,7 +156,7 @@ export default function LoginPage() {
       <section className="relative flex w-full flex-col items-center justify-center bg-[#f9f9ff] px-6 lg:w-[55%] lg:px-24">
         {/* Language Selector Sticky Corner */}
         <div className="absolute right-8 top-8 flex items-center space-x-4">
-          <button className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-[#003fb1]">
+          <button className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-brand-text-dark/40 transition-colors hover:text-primary">
             <Globe className="text-sm" size={16} />
             <span>Tiếng Việt</span>
             <ChevronDown size={14} />
@@ -166,21 +166,21 @@ export default function LoginPage() {
         {/* Login Card Container */}
         <div className="w-full max-w-md">
           <div className="mb-10 text-center lg:text-left">
-            <h2 className="mb-2 font-title text-3xl font-black text-slate-900">Chào mừng trở lại</h2>
-            <p className="text-sm font-medium text-slate-500">Vui lòng đăng nhập để truy cập hệ thống quản lý.</p>
+            <h2 className="mb-2 font-title text-3xl font-black text-brand-text-dark">Chào mừng trở lại</h2>
+            <p className="text-sm font-medium text-brand-text-dark/40">Vui lòng đăng nhập để truy cập hệ thống quản lý.</p>
           </div>
 
-          <div className="group/card relative overflow-hidden rounded-[1.25rem] border border-slate-100 bg-white p-10 shadow-[0_20px_50px_rgba(18,28,42,0.05)] transition-all">
+          <div className="group/card relative overflow-hidden rounded-[1.25rem] border border-brand-dark/10 bg-white p-10 shadow-[0_20px_50px_rgba(18,28,42,0.05)] transition-all">
             <form onSubmit={handleLogin} className="relative z-10 space-y-6">
               {/* Username Field */}
               <div className="space-y-2">
-                <label className="ml-1 block text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="username">Tên đăng nhập</label>
+                <label className="ml-1 block text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40" htmlFor="username">Tên đăng nhập</label>
                 <div className="group relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-300 transition-colors group-focus-within:text-[#003fb1]">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-brand-text-dark/20 transition-colors group-focus-within:text-primary">
                     <User size={18} />
                   </span>
                   <input 
-                    className="block w-full rounded-xl border-none bg-[#eff3ff] py-4 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20" 
+                    className="block w-full rounded-xl border-none bg-brand-dark/[0.04] py-4 pl-12 pr-4 text-sm font-medium text-brand-text-dark outline-none transition-all placeholder:text-brand-text-dark/30 focus:ring-2 focus:ring-primary/20" 
                     id="username" 
                     name="username" 
                     value={username}
@@ -196,24 +196,24 @@ export default function LoginPage() {
               {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="password">Mật khẩu</label>
+                  <label className="block text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40" htmlFor="password">Mật khẩu</label>
                   <button
                     type="button"
                     onClick={() => {
                       setShowForgotForm((prev) => !prev);
                       setForgotValue(username.trim());
                     }}
-                    className="text-[10px] font-black uppercase tracking-widest text-[#003fb1] transition-colors hover:underline"
+                    className="text-[10px] font-black uppercase tracking-widest text-primary transition-colors hover:underline"
                   >
                     Quên mật khẩu?
                   </button>
                 </div>
                 <div className="group relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-300 transition-colors group-focus-within:text-[#003fb1]">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-brand-text-dark/20 transition-colors group-focus-within:text-primary">
                     <Lock size={18} />
                   </span>
                   <input 
-                    className="block w-full rounded-xl border-none bg-[#eff3ff] px-12 py-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400/50 focus:ring-2 focus:ring-[#003fb1]/20" 
+                    className="block w-full rounded-xl border-none bg-brand-dark/[0.04] px-12 py-4 text-sm font-medium text-brand-text-dark outline-none transition-all placeholder:text-brand-text-dark/30 focus:ring-2 focus:ring-primary/20" 
                     id="password" 
                     name="password" 
                     value={password}
@@ -227,7 +227,7 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                     aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition-colors hover:text-[#003fb1]" 
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-brand-text-dark/30 transition-colors hover:text-primary" 
                     type="button"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -237,32 +237,32 @@ export default function LoginPage() {
 
               {/* Remember Me */}
               <div className="ml-1 flex items-center space-x-3">
-                <input className="size-4 cursor-pointer rounded-md border-slate-200 text-[#003fb1] focus:ring-[#003fb1]/20" id="remember" name="remember" type="checkbox"/>
-                <label className="cursor-pointer select-none text-[11px] font-black uppercase tracking-widest text-slate-400" htmlFor="remember">Ghi nhớ đăng nhập</label>
+                <input className="size-4 cursor-pointer rounded-md border-brand-dark/10 text-primary focus:ring-primary/20" id="remember" name="remember" type="checkbox"/>
+                <label className="cursor-pointer select-none text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40" htmlFor="remember">Ghi nhớ đăng nhập</label>
               </div>
 
               {showForgotForm && (
-                <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Khôi phục mật khẩu</p>
+                <div className="space-y-3 rounded-xl border border-primary/10 bg-primary/5 p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Khôi phục mật khẩu</p>
                   <input
                     value={forgotValue}
                     onChange={(event) => setForgotValue(event.target.value)}
                     placeholder="Nhập email hoặc tên đăng nhập"
-                    className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none focus:border-[#003fb1] focus:ring-2 focus:ring-[#003fb1]/20"
+                    className="w-full rounded-lg border border-primary/20 bg-white px-3 py-2 text-sm font-semibold text-brand-text-dark/80 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={handleForgotPassword}
                       disabled={isSendingReset}
-                      className="rounded-lg bg-[#003fb1] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                      className="rounded-lg bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                     >
                       {isSendingReset ? "Đang gửi..." : "Gửi hướng dẫn"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowForgotForm(false)}
-                      className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50"
+                      className="rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 hover:bg-brand-dark/[0.02]"
                     >
                       Hủy
                     </button>
@@ -273,7 +273,7 @@ export default function LoginPage() {
               {/* Login Button */}
               <button 
                 className={cn(
-                  "w-full bg-[#003fb1] text-white font-black text-xs uppercase tracking-[0.15em] py-4 rounded-xl shadow-lg shadow-blue-900/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3",
+                  "w-full bg-primary text-white font-black text-xs uppercase tracking-[0.15em] py-4 rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3",
                   isSubmitting && "opacity-80 cursor-not-allowed"
                 )}
                 type="submit"
@@ -286,10 +286,10 @@ export default function LoginPage() {
               {/* Social Divider */}
               <div className="relative py-4">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-100"></div>
+                  <div className="w-full border-t border-brand-dark/5"></div>
                 </div>
                 <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-                  <span className="bg-white px-4 text-slate-300">HOẶC</span>
+                  <span className="bg-white px-4 text-brand-text-dark/20">HOẶC</span>
                 </div>
               </div>
 
@@ -301,8 +301,8 @@ export default function LoginPage() {
                 disabled={isVneidLoading}
               >
                 <img 
-                  className="size-6 object-contain grayscale transition-all duration-500 group-hover/vneid:grayscale-0" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJSn_CEWm46o4BCymNR0Nc9L6fddl3y6khHQm1mwbDCJRBdd9Eh2darg2fr5v8UUYUh-JyyjNjTRC9vV3mg80UAze-UzHLTzYNabKjoIwJjh3TYYBUtyaFF7sC_Q54NhHsMnQZ4wW4by3RvjVWLknv5ZCLwpGsHRLubgzbIZWecaIH7FhJq9xWnF7UITTGoQJ29RjLj3TGFEuSaDLP1LPmgsAHf5INSdaeF3g1xW8W9tBLDFE2nbVmLCdO07JnYSbKvM71Kk8hWHs" 
+                    className="size-6 object-contain transition-all duration-500" 
+                    src="/download.jpg" 
                   alt="VNeID Logo" 
                 />
                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 transition-colors group-hover/vneid:text-[#003fb1]">
@@ -315,17 +315,17 @@ export default function LoginPage() {
 
           {/* Footer Text */}
           <div className="mt-12 space-y-2 text-center">
-            <p className="text-[9px] font-bold uppercase leading-relaxed tracking-widest text-slate-400">
+            <p className="text-[9px] font-bold uppercase leading-relaxed tracking-widest text-brand-text-dark/40">
               Bản quyền © 2024 Ban Xúc tiến và Hỗ trợ đầu tư Đà Nẵng (IPA Đà Nẵng).
             </p>
-            <p className="text-[8px] font-medium uppercase tracking-[0.3em] text-slate-300">
+            <p className="text-[8px] font-medium uppercase tracking-[0.3em] text-brand-text-dark/20">
               Trung tâm Phát triển hạ tầng CNTT - Sở TT&TT
             </p>
           </div>
         </div>
 
         {/* Floating Decoration */}
-        <div className="pointer-events-none absolute bottom-[-100px] left-[-100px] size-64 rounded-full bg-blue-500/5 blur-3xl"></div>
+        <div className="pointer-events-none absolute bottom-[-100px] left-[-100px] size-64 rounded-full bg-primary/5 blur-3xl"></div>
       </section>
     </main>
   );

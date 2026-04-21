@@ -96,6 +96,16 @@ module.exports = {
           5: "hsl(var(--chart-5))",
         },
 
+        brand: {
+          dark: {
+            DEFAULT: "hsl(var(--brand-dark))",
+            900: "hsl(var(--brand-dark-900))",
+            foreground: "hsl(var(--brand-dark-foreground))",
+          },
+          text: {
+            dark: "hsl(var(--brand-text-dark))",
+          }
+        },
         // dark
         dark: {
           DEFAULT: "hsl(var(--dark))",

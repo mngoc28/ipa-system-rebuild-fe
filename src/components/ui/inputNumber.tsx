@@ -41,7 +41,7 @@ export default function InputNumber({ value, onChange, placeholder, ...props }: 
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
       placeholder={placeholder}
-      className="flex h-12 w-full rounded border border-slate-300 bg-white px-4 py-3 text-base text-slate-700 transition-colors placeholder:text-muted-foreground focus-visible:border-slate-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+      className="flex h-12 w-full rounded border border-brand-dark/10 bg-white px-4 py-3 text-base text-brand-text-dark transition-colors placeholder:text-muted-foreground focus-visible:border-primary/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
       {...props}
     />
   );

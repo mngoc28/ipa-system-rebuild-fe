@@ -115,7 +115,7 @@ export default function ScheduleWeekView({
             <div key={event.id} className="group flex gap-8">
               <div className="w-24 space-y-1 pt-2 text-right">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">{dayName}</p>
-                <p className="text-sm font-black text-slate-900">{dateStr}</p>
+                <p className="text-sm font-black text-brand-text-dark">{dateStr}</p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {event.time.split(" - ")[0]}
                 </p>
@@ -158,7 +158,7 @@ export default function ScheduleWeekView({
                 </div>
 
                 <div className="mb-4 space-y-1">
-                  <h3 className="line-clamp-2 min-h-10 font-title text-base font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">
+                  <h3 className="line-clamp-2 min-h-10 font-title text-base font-black uppercase tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">
                     {event.title}
                   </h3>
                   <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
@@ -221,7 +221,7 @@ export default function ScheduleWeekView({
 
                 <div className="mt-auto flex items-center justify-between gap-3">
                   <div className="flex flex-col">
-                    <p className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-900">
+                    <p className="flex items-center gap-1.5 text-[10px] font-black uppercase text-brand-text-dark">
                       <Clock className="size-3.5 text-primary" /> {event.time}
                     </p>
                     <p className="pl-5 text-[9px] font-bold text-slate-400">

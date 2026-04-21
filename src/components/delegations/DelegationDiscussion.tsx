@@ -230,7 +230,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                   </div>
                   <div className={`relative flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[80%]`}>
                     <div className="mb-1 flex items-center gap-2">
-                      <span className="text-[11px] font-black uppercase tracking-tight text-slate-900">
+                      <span className="text-[11px] font-black uppercase tracking-tight text-brand-text-dark">
                         {comment.commenter?.full_name || "UnknownUser"}
                       </span>
                       <span className="text-[9px] font-medium text-slate-400">

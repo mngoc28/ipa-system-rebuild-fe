@@ -62,12 +62,12 @@ export default function CityOverviewPage() {
             <Sparkles size={22} />
           </div>
           <div className="space-y-1">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-slate-950">Không tải được City Overview</h1>
+            <h1 className="text-2xl font-black uppercase tracking-tight text-brand-dark">Không tải được City Overview</h1>
             <p className="text-sm font-medium text-slate-500">Kiểm tra lại backend dashboard API rồi thử tải lại dữ liệu.</p>
           </div>
           <button
             onClick={handleRefresh}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
           >
             <RefreshCw size={14} />
             Tải lại
@@ -93,9 +93,9 @@ export default function CityOverviewPage() {
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
       <section
-        className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20 md:p-8"
+        className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-brand-dark p-6 text-white shadow-2xl shadow-brand-dark/20 md:p-8"
         style={{
-          background: "linear-gradient(135deg, #020617 0%, #0f172a 52%, #0f766e 100%)",
+          background: "linear-gradient(135deg, hsl(var(--brand-dark)) 0%, hsl(var(--brand-dark-900)) 52%, #0f766e 100%)",
         }}
       >
         <div className="absolute inset-0 opacity-40">
@@ -122,7 +122,7 @@ export default function CityOverviewPage() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={handleRefresh}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-100"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-dark transition hover:bg-slate-100"
               >
                 <RefreshCw size={14} />
                 Tải dữ liệu
@@ -161,7 +161,7 @@ export default function CityOverviewPage() {
                 <MetricBlock label="Giá trị đang mở" value={formatCurrency(city?.activePipelineValue)} accent="from-cyan-400/25 to-cyan-500/10" />
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+              <div className="rounded-2xl border border-white/10 bg-brand-dark/40 p-4">
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.28em] text-white/45">
                   <span>Pipeline stages</span>
                   <span>{totalStages} dự án</span>
@@ -197,7 +197,7 @@ export default function CityOverviewPage() {
       <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
         <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm lg:col-span-1">
           <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Strategic snapshot</p>
-          <h2 className="mt-1 text-lg font-black uppercase tracking-tight text-slate-950">Điểm nóng quyết định hôm nay</h2>
+          <h2 className="mt-1 text-lg font-black uppercase tracking-tight text-brand-dark">Điểm nóng quyết định hôm nay</h2>
           <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
             {cityBrief.activeShare >= 70
               ? "Pipeline đang có tỷ trọng mở tốt, có thể ưu tiên chốt các dự án lớn và giữ nhịp sự kiện đã lên lịch."
@@ -206,7 +206,7 @@ export default function CityOverviewPage() {
                 : "Pipeline đang mỏng, cần tăng tốc tạo cơ hội mới và kiểm soát các stage chậm chuyển đổi."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => navigate("/reports/city")} className="rounded-xl bg-slate-950 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800">
+            <button onClick={() => navigate("/reports/city")} className="rounded-xl bg-brand-dark px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800">
               Mở báo cáo
             </button>
             <button onClick={() => navigate("/approvals")} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 transition hover:bg-slate-50">
@@ -251,17 +251,17 @@ export default function CityOverviewPage() {
                 <div key={item.stageId} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(item.stageName, "Chưa có giai đoạn")}</p>
+                      <p className="text-sm font-black uppercase tracking-tight text-brand-dark">{formatDisplayLabel(item.stageName, "Chưa có giai đoạn")}</p>
                       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{formatDisplayLabel(item.stageCode, "Không có mã")}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-black text-slate-950">{item.projectCount}</p>
+                      <p className="text-sm font-black text-brand-dark">{item.projectCount}</p>
                       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">dự án</p>
                     </div>
                   </div>
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-slate-950 via-primary to-amber-400"
+                      className="h-full rounded-full bg-gradient-to-r from-brand-dark via-primary to-amber-400"
                       style={{ width: `${Math.max(6, (item.projectCount / totalStages) * 100)}%` }}
                     />
                   </div>
@@ -285,7 +285,7 @@ export default function CityOverviewPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">{formatDateTime(event.startAt)}</p>
-                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(event.title, "Sự kiện chưa đặt tên")}</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-brand-dark">{formatDisplayLabel(event.title, "Sự kiện chưa đặt tên")}</h3>
                       <p className="text-[10px] font-medium text-slate-400">
                         {formatDisplayLabel(event.delegationName, "Không gắn đoàn")}
                         {event.locationName ? ` · ${formatDisplayLabel(event.locationName, "Không gắn địa điểm")}` : ""}
@@ -314,7 +314,7 @@ export default function CityOverviewPage() {
                         <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{project.projectCode}</span>
                         <span className="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-primary">{formatDisplayLabel(project.stageName, "Chưa có giai đoạn")}</span>
                       </div>
-                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(project.projectName, "Dự án chưa đặt tên")}</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-brand-dark">{formatDisplayLabel(project.projectName, "Dự án chưa đặt tên")}</h3>
                       <p className="text-[10px] font-medium text-slate-400">
                         {formatDisplayLabel(project.partnerName, "Chưa gắn partner")}
                         {project.delegationName ? ` · ${formatDisplayLabel(project.delegationName, "Chưa gắn đoàn")}` : ""}
@@ -342,7 +342,7 @@ export default function CityOverviewPage() {
                 <div key={task.id} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-sm font-black uppercase tracking-tight text-slate-950">{formatDisplayLabel(task.title, "Đầu việc chưa đặt tên")}</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-brand-dark">{formatDisplayLabel(task.title, "Đầu việc chưa đặt tên")}</h3>
                       <span className={cn("rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em]", getPriorityClasses(task.priority))}>
                         {getPriorityLabel(task.priority)}
                       </span>
@@ -369,15 +369,15 @@ export default function CityOverviewPage() {
             ) : (
               topPartners.map((partner, index) => (
                 <div key={partner.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-sm font-black text-white">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-brand-dark text-sm font-black text-white">
                     {String(index + 1).padStart(2, "0")}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-black uppercase tracking-tight text-slate-950">{partner.partnerName}</p>
+                    <p className="truncate text-sm font-black uppercase tracking-tight text-brand-dark">{partner.partnerName}</p>
                     <p className="text-[10px] font-medium text-slate-400">{partner.projectCount} dự án đang nối</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-black text-slate-950">{partner.score !== null ? partner.score.toFixed(2) : "N/A"}</p>
+                    <p className="text-sm font-black text-brand-dark">{partner.score !== null ? partner.score.toFixed(2) : "N/A"}</p>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">score</p>
                   </div>
                 </div>
@@ -388,7 +388,7 @@ export default function CityOverviewPage() {
 
         <PanelCard title="Điểm nhấn thành phố" subtitle="Tóm lược vận hành hiện tại" icon={<Building2 size={18} />}>
           <div className="grid gap-3 sm:grid-cols-2">
-            <MetricBlock label="Tổng dự án" value={String(city?.pipelineProjects ?? 0)} accent="from-slate-900 to-slate-700" />
+            <MetricBlock label="Tổng dự án" value={String(city?.pipelineProjects ?? 0)} accent="from-brand-dark-900 to-slate-700" />
             <MetricBlock label="Đối tác" value={String(city?.partners ?? 0)} accent="from-primary to-primary/70" />
             <MetricBlock label="Đoàn đang mở" value={String(city?.activeDelegations ?? 0)} accent="from-amber-400 to-amber-300" />
             <MetricBlock label="Sự kiện tới" value={String(city?.upcomingEvents ?? 0)} accent="from-cyan-500 to-cyan-300" />
@@ -436,8 +436,8 @@ function PanelCard({
     <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-5 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
-          <div className="flex items-center gap-2 text-slate-950">
-            <span className="rounded-lg bg-slate-950 p-2 text-white">{icon}</span>
+          <div className="flex items-center gap-2 text-brand-dark">
+            <span className="rounded-lg bg-brand-dark p-2 text-white">{icon}</span>
             <h2 className="text-base font-black uppercase tracking-tight">{title}</h2>
           </div>
           <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">{subtitle}</p>
@@ -452,7 +452,7 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-left">
       <p className="text-[9px] font-black uppercase tracking-[0.24em] text-slate-400">{label}</p>
-      <p className="mt-1 truncate text-[11px] font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-1 truncate text-[11px] font-black uppercase tracking-tight text-brand-dark">{value}</p>
     </div>
   );
 }
@@ -465,7 +465,7 @@ function InsightCard({ title, value, detail }: { title: string; value: string; d
   return (
     <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{title}</p>
-      <p className="mt-2 text-lg font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-2 text-lg font-black uppercase tracking-tight text-brand-dark">{value}</p>
       <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{detail}</p>
     </div>
   );

@@ -55,12 +55,12 @@ export function DatePicker({
           id={id}
           variant={"outline"}
           className={cn(
-            "h-auto w-full justify-start rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
-            !date && "text-slate-500",
+            "h-auto w-full justify-start rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-4 py-3 text-left font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
+            !date && "text-brand-text-dark/40",
             className
           )}
         >
-          <CalendarIcon className="mr-3 size-4 text-slate-400" />
+          <CalendarIcon className="mr-3 size-4 text-brand-text-dark/40" />
           {date ? formatDate(date) : <span>{placeholder}</span>}
           <input type="hidden" name={name} value={date instanceof Date ? date.toISOString().split('T')[0] : date} />
         </Button>

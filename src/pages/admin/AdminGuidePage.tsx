@@ -31,7 +31,7 @@ export default function AdminGuidePage() {
             <BookOpen size={30} />
           </div>
           <div>
-            <h1 className="font-title text-3xl font-black uppercase tracking-tight text-slate-900">Hướng dẫn Quản trị</h1>
+            <h1 className="font-title text-3xl font-black uppercase tracking-tight text-brand-text-dark">Hướng dẫn Quản trị</h1>
             <p className="mt-1 text-base font-medium text-slate-500">Tài liệu hướng dẫn vận hành hệ thống dành cho người quản trị (Admin).</p>
           </div>
         </div>
@@ -106,11 +106,11 @@ export default function AdminGuidePage() {
               <p>Tính năng này giúp tự động hóa việc hiển thị thông báo theo lịch trình:</p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-                  <p className="mb-2 font-bold text-slate-900">Ngày bắt đầu</p>
+                  <p className="mb-2 font-bold text-brand-text-dark">Ngày bắt đầu</p>
                   <p className="text-[11px]">Thông báo sẽ ở trạng thái <b>"Chờ hiệu lực"</b> cho đến khi tới ngày này.</p>
                 </div>
                 <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-                  <p className="mb-2 font-bold text-slate-900">Ngày kết thúc</p>
+                  <p className="mb-2 font-bold text-brand-text-dark">Ngày kết thúc</p>
                   <p className="text-[11px]">Hệ thống tự động chuyển sang trạng thái <b>"Đã hết hạn"</b> và ẩn khỏi giao diện người dùng.</p>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function AdminGuidePage() {
               <ShieldCheck size={20} />
               <h2 className="text-xl font-black uppercase tracking-tight">4. Lưu ý vận hành an toàn</h2>
             </div>
-            <div className="space-y-4 rounded-2xl bg-slate-900 p-6 text-slate-300 shadow-xl">
+            <div className="space-y-4 rounded-2xl bg-brand-dark-900 p-6 text-slate-300 shadow-xl">
               <div className="flex items-start gap-4">
                 <MousePointer2 className="mt-1 shrink-0 text-primary" size={18} />
                 <div>
@@ -161,7 +161,7 @@ function GuideNavLink({ href, label, icon }: { href: string; label: string; icon
     >
       <div className="flex items-center gap-3">
         <span className="text-slate-400 transition-colors group-hover:text-primary">{icon}</span>
-        <span className="text-[11px] font-black uppercase tracking-tight text-slate-500 group-hover:text-slate-900">
+        <span className="text-[11px] font-black uppercase tracking-tight text-slate-500 group-hover:text-brand-text-dark">
           {label}
         </span>
       </div>
@@ -175,7 +175,7 @@ function GuideFeatureCard({ title, desc, icon }: { title: string; desc: string; 
     <div className="flex items-start gap-4 rounded-xl border border-slate-100 bg-white p-4 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
       <div className="mt-1">{icon}</div>
       <div className="space-y-1">
-        <p className="text-sm font-bold uppercase tracking-tight text-slate-900">{title}</p>
+        <p className="text-sm font-bold uppercase tracking-tight text-brand-text-dark">{title}</p>
         <p className="text-[11px] leading-relaxed text-slate-500">{desc}</p>
       </div>
     </div>

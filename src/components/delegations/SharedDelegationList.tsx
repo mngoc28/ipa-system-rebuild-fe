@@ -192,7 +192,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <nav className="mb-2 flex" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-2 text-xs font-medium text-slate-500">
+            <ol className="flex items-center space-x-2 text-xs font-medium text-brand-text-dark/40">
               <li>
                 <button onClick={() => navigate("/dashboard")} className="transition-colors hover:text-primary">
                   System
@@ -200,21 +200,21 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
               </li>
               <li className="flex items-center space-x-2">
                 <ChevronDown size={12} className="-rotate-90" />
-                <span className="text-slate-900">Delegation Management</span>
+                <span className="text-brand-text-dark">Delegation Management</span>
               </li>
             </ol>
           </nav>
-          <h1 className="font-title text-2xl font-black text-slate-900">Manage Delegations</h1>
+          <h1 className="font-title text-2xl font-black text-brand-text-dark">Manage Delegations</h1>
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:bg-slate-50">
+          <button onClick={handleExport} className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02]">
             <Download size={14} />
             Export Data
           </button>
           <button
             onClick={() => navigate(`/delegations/create`)}
-            className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95"
+            className="flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:bg-accent/90"
           >
             <Plus size={16} />
             Create New
@@ -222,29 +222,29 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-200 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 border-b border-brand-dark/10 sm:flex-row sm:items-center">
         <div className="flex gap-8">
-          <button onClick={() => setActiveTab("inbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "inbound" ? "text-primary" : "text-slate-500 hover:text-slate-700")}>
+          <button onClick={() => setActiveTab("inbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "inbound" ? "text-primary" : "text-brand-text-dark/40 hover:text-brand-text-dark/60")}>
             Inbound Delegations
             {activeTab === "inbound" && <div className="absolute inset-x-0 bottom-0 h-1 rounded-t-full bg-primary" />}
           </button>
-          <button onClick={() => setActiveTab("outbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "outbound" ? "text-primary" : "text-slate-500 hover:text-slate-700")}>
+          <button onClick={() => setActiveTab("outbound")} className={cn("relative pb-4 text-sm font-bold transition-all", activeTab === "outbound" ? "text-primary" : "text-brand-text-dark/40 hover:text-brand-text-dark/60")}>
             Outbound Delegations
             {activeTab === "outbound" && <div className="absolute inset-x-0 bottom-0 h-1 rounded-t-full bg-primary" />}
           </button>
         </div>
 
-        <div className="mb-3 flex items-center gap-1 rounded-lg bg-slate-100 p-1 sm:mb-0">
+        <div className="mb-3 flex items-center gap-1 rounded-lg bg-brand-dark/[0.04] p-1 sm:mb-0">
           <button
             onClick={() => setViewMode("kanban")}
-            className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all", viewMode === "kanban" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}
+            className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all", viewMode === "kanban" ? "bg-white text-primary shadow-sm" : "text-brand-text-dark/40 hover:text-brand-text-dark/60")}
           >
             <LayoutGrid size={12} />
             Kanban
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all", viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700")}
+            className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all", viewMode === "list" ? "bg-white text-primary shadow-sm" : "text-brand-text-dark/40 hover:text-brand-text-dark/60")}
           >
             <List size={12} />
             Table List
@@ -255,18 +255,18 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 md:flex-row">
           <div className="group relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary" size={16} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-text-dark/40 transition-colors group-focus-within:text-primary" size={16} />
             <input
               type="text"
               placeholder="Search delegations by name, code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium shadow-sm outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+              className="w-full rounded-lg border border-brand-dark/10 bg-white py-2.5 pl-11 pr-4 text-xs font-medium text-brand-text-dark shadow-sm outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
             />
             {searchTerm && (
               <button 
                 onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-brand-text-dark/40 hover:bg-brand-dark/[0.04] hover:text-brand-text-dark/60"
               >
                 <X size={14} />
               </button>
@@ -278,7 +278,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
               "flex items-center gap-2 rounded-lg border px-4 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all",
               isFilterOpen || hasActiveFilters 
                 ? "border-primary/20 bg-primary/5 text-primary" 
-                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
+                : "border-brand-dark/10 bg-white text-brand-text-dark/60 hover:bg-brand-dark/[0.02] shadow-sm"
             )}
           >
             <Filter size={14} />
@@ -293,7 +293,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-rose-600 transition-all hover:bg-rose-50"
+              className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-rose-600 transition-all hover:bg-rose-50"
             >
               <RotateCcw size={14} />
               Reset All
@@ -303,9 +303,9 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
 
         {/* Advanced Filters */}
         {isFilterOpen && (
-          <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 animate-in slide-in-from-top-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4 animate-in slide-in-from-top-2 md:grid-cols-4">
             <div className="space-y-1.5">
-              <label htmlFor="filter-status" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Status</label>
+              <label htmlFor="filter-status" className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Status</label>
               <SelectField
                 id="filter-status"
                 value={statusFilter}
@@ -326,7 +326,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-priority" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Priority Level</label>
+              <label htmlFor="filter-priority" className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Priority Level</label>
               <SelectField
                 id="filter-priority"
                 value={priorityFilter}
@@ -343,7 +343,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-country" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country</label>
+              <label htmlFor="filter-country" className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Country</label>
               <SelectField
                 id="filter-country"
                 value={countryFilter}
@@ -358,7 +358,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="filter-staff" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Owner / PIC</label>
+              <label htmlFor="filter-staff" className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Owner / PIC</label>
               <SelectField
                 id="filter-staff"
                 value={staffFilter}
@@ -392,9 +392,9 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
             </button>
           </div>
         ) : delegations.length === 0 ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">No delegations found</p>
-            <p className="max-w-md text-sm text-slate-500">Create a new delegation record or adjust filters to see results.</p>
+          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-8 text-center">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-text-dark/20">No delegations found</p>
+            <p className="max-w-md text-sm text-brand-text-dark/40">Create a new delegation record or adjust filters to see results.</p>
           </div>
         ) : (
           viewMode === "kanban" ? (

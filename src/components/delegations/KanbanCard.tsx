@@ -73,7 +73,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
       {...listeners}
       onClick={() => navigate(`/delegations/${item.id}`)}
       className={cn(
-        "group relative cursor-grab overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md active:cursor-grabbing",
+        "group relative cursor-grab overflow-hidden rounded-xl border border-brand-dark/10 bg-white p-3.5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md active:cursor-grabbing",
         isDragging && "opacity-30",
         isOverlay && "rotate-1 scale-[1.02] cursor-grabbing border-primary shadow-xl ring-4 ring-primary/5",
       )}
@@ -81,15 +81,15 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
       {/* Priority/Status Indicator */}
       <div 
         className="absolute right-0 top-0 h-full w-1 rounded-r-lg" 
-        style={{ backgroundColor: color || (item.priority === "high" ? "#f43f5e" : item.priority === "medium" ? "#fbbf24" : "#f1f5f9") }} 
+        style={{ backgroundColor: color || (item.priority === "high" ? "#f43f5e" : item.priority === "medium" ? "#fbbf24" : "var(--primary)") }} 
       />
 
       <div className="flex flex-col gap-3">
         {/* Top Info */}
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-1.5">
-            <span className="w-fit rounded border border-slate-100 bg-slate-50 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-tighter text-slate-500">#{item.code}</span>
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <span className="w-fit rounded border border-brand-dark/10 bg-brand-dark/[0.02] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-tighter text-brand-text-dark/40">#{item.code}</span>
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">
               <CountryFlag countryName={item.country} />
               <span className="max-w-[100px] truncate">{item.country}</span>
             </div>
@@ -100,7 +100,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
               <DropdownMenuTrigger asChild>
                 <button 
                   onClick={(e) => e.stopPropagation()} 
-                  className="flex size-7 items-center justify-center rounded-lg border border-transparent text-slate-400 transition-all hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:scale-90"
+                  className="flex size-7 items-center justify-center rounded-lg border border-transparent text-brand-text-dark/40 transition-all hover:border-brand-dark/10 hover:bg-brand-dark/[0.04] hover:text-brand-text-dark active:scale-90"
                 >
                   <MoreVertical size={14} />
                 </button>
@@ -125,27 +125,27 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
         </div>
 
         {/* Title */}
-        <h4 className="line-clamp-2 text-xs font-black uppercase leading-tight tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.name}</h4>
+        <h4 className="line-clamp-2 text-xs font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.name}</h4>
 
         {/* Metadata */}
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            <Calendar size={10} className="text-slate-300" />
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-text-dark/40">
+            <Calendar size={10} className="text-brand-text-dark/20" />
             <span>{item.startDate}</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            <MapPin size={10} className="text-slate-300" />
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-text-dark/40">
+            <MapPin size={10} className="text-brand-text-dark/20" />
             <span className="truncate">{item.partnerOrg}</span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-1 flex items-center justify-between border-t border-slate-50 pt-2.5">
+        <div className="mt-1 flex items-center justify-between border-t border-brand-dark/5 pt-2.5">
           <div className="flex items-center gap-1.5">
             <div className="size-6 overflow-hidden rounded-full border border-white shadow-sm">
               <img src={item.staff.avatar} alt={item.staff.name} className="size-full object-cover" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-900">{item.staff.name.split(" ").pop()}</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark">{item.staff.name.split(" ").pop()}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
               <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
                   <div 
-                    className={cn("flex items-center gap-1 rounded bg-slate-50 border border-slate-100 px-1.5 py-0.5 text-[9px] font-black shadow-sm transition-all cursor-help", overdue ? "text-rose-600 border-rose-100 bg-rose-50" : "text-slate-400")}
+                    className={cn("flex items-center gap-1 rounded bg-brand-dark/[0.02] border border-brand-dark/10 px-1.5 py-0.5 text-[9px] font-black shadow-sm transition-all cursor-help", overdue ? "text-rose-600 border-rose-100 bg-rose-50" : "text-brand-text-dark/40")}
                   >
                     <ClipboardList size={10} />
                     <span>{item.actionItems.total}</span>

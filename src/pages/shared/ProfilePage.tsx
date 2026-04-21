@@ -100,20 +100,20 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 duration-500 animate-in fade-in">
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Hồ sơ cá nhân</h1>
-        <p className="mt-1 text-sm font-medium text-slate-500">Quản lý thông tin tài khoản và đơn vị công tác.</p>
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+        <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Hồ sơ cá nhân</h1>
+        <p className="mt-1 text-sm font-medium text-brand-text-dark/40">Quản lý thông tin tài khoản và đơn vị công tác.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-1">
+        <div className="rounded-xl border border-brand-dark/10 bg-white p-5 shadow-sm md:col-span-1">
           <div className="group relative mx-auto size-24">
-            <div className="relative size-full overflow-hidden rounded-full border-4 border-slate-50 bg-slate-100 shadow-sm ring-1 ring-slate-200">
+            <div className="relative size-full overflow-hidden rounded-full border-4 border-brand-dark/5 bg-brand-dark/[0.02] shadow-sm ring-1 ring-brand-dark/10">
               {user?.avatar ? (
                 <img src={user.avatar} className="size-full object-cover" alt="Profile" />
               ) : (
                 <div className="flex size-full items-center justify-center">
-                  <User size={36} className="text-slate-400" />
+                  <User size={36} className="text-brand-text-dark/40" />
                 </div>
               )}
               
@@ -143,63 +143,63 @@ export default function ProfilePage() {
             />
           </div>
           <div className="mt-4 text-center">
-            <p className="text-sm font-bold tracking-tight text-slate-900">{user?.fullName ?? "Người dùng"}</p>
+            <p className="text-sm font-bold tracking-tight text-brand-text-dark">{user?.fullName ?? "Người dùng"}</p>
             <div className="mt-1 flex items-center justify-center gap-1">
                <span className="inline-flex items-center rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-primary ring-1 ring-inset ring-primary/10">
                  {roleLabel}
                </span>
             </div>
-            <p className="mt-1 text-[11px] font-medium text-slate-500">@{user?.username}</p>
+            <p className="mt-1 text-[11px] font-medium text-brand-text-dark/40">@{user?.username}</p>
           </div>
         </div>
 
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-2">
+        <div className="space-y-4 rounded-xl border border-brand-dark/10 bg-white p-5 shadow-sm md:col-span-2">
           <label className="block space-y-2">
-            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40">
               <User size={14} /> Họ và tên
             </span>
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-primary/30"
+              className="h-11 w-full rounded-lg border border-brand-dark/10 px-3 text-sm text-brand-text-dark outline-none transition focus:border-primary/30"
             />
           </label>
 
           <label className="block space-y-2">
-            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40">
               <Mail size={14} /> Email
             </span>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-primary/30"
+              className="h-11 w-full rounded-lg border border-brand-dark/10 px-3 text-sm text-brand-text-dark outline-none transition focus:border-primary/30"
             />
           </label>
 
           <label className="block space-y-2">
-            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40">
               <Phone size={14} /> Số điện thoại
             </span>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-primary/30"
+              className="h-11 w-full rounded-lg border border-brand-dark/10 px-3 text-sm text-brand-text-dark outline-none transition focus:border-primary/30"
             />
           </label>
 
           <label className="block space-y-2">
-            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/40">
               <Building2 size={14} /> Đơn vị
             </span>
             <input
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
               disabled
-              className="h-11 w-full cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none"
+              className="h-11 w-full cursor-not-allowed rounded-lg border border-brand-dark/10 bg-brand-dark/[0.01] px-3 text-sm text-brand-text-dark/60 outline-none"
             />
           </label>
 
-          <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-[11px] font-semibold text-blue-700">
+          <div className="rounded-lg border border-primary/10 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary">
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck size={14} /> Quyền hiện tại: {user?.role}
             </span>

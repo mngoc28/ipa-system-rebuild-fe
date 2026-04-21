@@ -57,10 +57,10 @@ const DataTable = <T extends object>({
   };
 
   return (
-    <div className="overflow-x-auto rounded border border-blue-100">
+    <div className="overflow-x-auto rounded border border-brand-dark/10">
       {isLoading ? (
         <div className="flex h-40 w-full items-center justify-center">
-          <Loader2 className="size-8 animate-spin text-slate-500" />
+          <Loader2 className="size-8 animate-spin text-primary" />
         </div>
       ) : isError ? (
         <div className="flex h-40 w-full items-center justify-center">
@@ -68,7 +68,7 @@ const DataTable = <T extends object>({
         </div>
       ) : (
         <Table>
-          <TableHeader className="bg-slate-100">
+          <TableHeader className="bg-brand-dark/[0.04]">
             <TableRow className="whitespace-nowrap">
               {columns.map((column, index) => (
                 <TableHead
@@ -83,7 +83,7 @@ const DataTable = <T extends object>({
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="px-6 py-10 text-center text-slate-500">
+                <TableCell colSpan={columns.length} className="px-6 py-10 text-center text-brand-text-dark/40">
                   {noDataMessage || t("common.no_data")}
                 </TableCell>
               </TableRow>
@@ -91,7 +91,7 @@ const DataTable = <T extends object>({
               data.map((item, rowIndex) => (
                 <TableRow
                   key={rowIndex}
-                  className="cursor-pointer border-b border-blue-100 hover:bg-slate-50"
+                  className="cursor-pointer border-b border-brand-dark/5 hover:bg-brand-dark/[0.02]"
                   onClick={() => onRowClick?.(item)}
                 >
                   {columns.map((column, colIndex) => (

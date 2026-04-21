@@ -11,7 +11,7 @@ export default function Hero() {
           alt="Da Nang City" 
           className="size-full object-cover"
         />
-        <div className="absolute inset-0 bg-slate-900/70" />
+        <div className="absolute inset-0 bg-brand-dark-900/70" />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 text-center">
@@ -20,14 +20,14 @@ export default function Hero() {
         </span>
         <h1 className="mb-6 font-title text-5xl font-black uppercase tracking-tight text-white lg:text-7xl">
           Cơ Quan Xúc Tiến Đầu Tư <br />
-          <span className="text-blue-400">IPA Đà Nẵng</span>
+          <span className="text-primary">IPA Đà Nẵng</span>
         </h1>
-        <p className="mx-auto mb-10 max-w-2xl text-lg text-slate-300">
+        <p className="mx-auto mb-10 max-w-2xl text-lg text-white/70">
           Nền tảng số cửa ngõ, cung cấp thông tin minh bạch, kết nối các nhà đầu tư chiến lược với những cơ hội phát triển bền vững tại trung tâm kinh tế duyên hải Miền Trung.
         </p>
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link to="/auth/login" className="group flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg transition-all hover:bg-blue-500">
+          <Link to="/auth/login" className="group flex items-center gap-2 rounded-lg bg-primary px-8 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg transition-all hover:bg-primary/90">
             Đăng nhập Hệ thống
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>

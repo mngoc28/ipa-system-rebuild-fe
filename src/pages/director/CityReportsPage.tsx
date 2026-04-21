@@ -80,7 +80,7 @@ export default function CityReportsPage() {
             <Sparkles size={22} />
           </div>
           <div className="space-y-1">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-slate-950">Không tải được City Reports</h1>
+            <h1 className="text-2xl font-black uppercase tracking-tight text-brand-dark">Không tải được City Reports</h1>
             <p className="text-sm font-medium text-slate-500">Kiểm tra lại backend report API rồi thử tải lại dữ liệu.</p>
           </div>
           <button
@@ -88,7 +88,7 @@ export default function CityReportsPage() {
               void summaryQuery.refetch();
               void definitionsQuery.refetch();
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-slate-800"
           >
             <RefreshCw size={14} />
             Tải lại
@@ -115,7 +115,7 @@ export default function CityReportsPage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
           <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Báo cáo chiến lược thành phố</p>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Báo cáo Chiến lược Thành phố</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Báo cáo Chiến lược Thành phố</h1>
           <p className="text-sm font-medium text-slate-500">Các báo cáo định kỳ về tình hình xúc tiến đầu tư và kinh tế đối ngoại của Đà Nẵng.</p>
         </div>
         <div className="flex gap-2">
@@ -161,14 +161,14 @@ export default function CityReportsPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Mẫu đang dùng</p>
-              <h2 className="text-base font-black uppercase tracking-tight text-slate-950">{selectedDefinition?.report_name ?? "Chưa chọn mẫu"}</h2>
+              <h2 className="text-base font-black uppercase tracking-tight text-brand-dark">{selectedDefinition?.report_name ?? "Chưa chọn mẫu"}</h2>
               <p className="text-[11px] font-medium text-slate-500">Mã mẫu: {selectedDefinition?.report_code ?? "N/A"}</p>
             </div>
             <div className="rounded-2xl bg-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
               Scope: city
             </div>
           </div>
-          <pre className="mt-4 overflow-auto rounded-2xl bg-slate-950 p-4 text-[11px] text-slate-100">{JSON.stringify(selectedDefinition?.query_config ?? {}, null, 2)}</pre>
+          <pre className="mt-4 overflow-auto rounded-2xl bg-brand-dark p-4 text-[11px] text-slate-100">{JSON.stringify(selectedDefinition?.query_config ?? {}, null, 2)}</pre>
         </div>
       )}
 
@@ -182,12 +182,12 @@ export default function CityReportsPage() {
       <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="rounded-xl bg-slate-950 p-3 text-white">
+            <div className="rounded-xl bg-brand-dark p-3 text-white">
               <Activity size={18} />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Bản đồ quyết định</p>
-              <h2 className="text-lg font-black uppercase tracking-tight text-slate-950">Tín hiệu báo cáo quan trọng</h2>
+              <h2 className="text-lg font-black uppercase tracking-tight text-brand-dark">Tín hiệu báo cáo quan trọng</h2>
             </div>
           </div>
 
@@ -200,12 +200,12 @@ export default function CityReportsPage() {
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-slate-950 p-3 text-white">
+            <div className="rounded-xl bg-brand-dark p-3 text-white">
               <AlertTriangle size={18} />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Giải thích số 0</p>
-              <h2 className="text-base font-black uppercase tracking-tight text-slate-950">Không phải lỗi hiển thị, mà là thiếu dữ liệu chu kỳ</h2>
+              <h2 className="text-base font-black uppercase tracking-tight text-brand-dark">Không phải lỗi hiển thị, mà là thiếu dữ liệu chu kỳ</h2>
             </div>
           </div>
           <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
@@ -217,7 +217,7 @@ export default function CityReportsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
+            <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
               <BarChart3 size={20} className="text-primary" /> Tập tin báo cáo chiến lược
             </h2>
             <button onClick={handleExportReport} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
@@ -243,7 +243,7 @@ export default function CityReportsPage() {
                       <FileText size={18} />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-primary">{formatDisplayLabel(run.outputFileName ?? run.reportName, "Báo cáo chiến lược")}</h4>
+                      <h4 className="truncate text-sm font-bold text-brand-text-dark transition-colors group-hover:text-primary">{formatDisplayLabel(run.outputFileName ?? run.reportName, "Báo cáo chiến lược")}</h4>
                       <p className="mt-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
                         {run.reportCode} &bull; {formatRunStatus(run.status)}
                       </p>
@@ -267,7 +267,7 @@ export default function CityReportsPage() {
           </div>
         </div>
 
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-inner shadow-xl shadow-slate-950/20">
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-brand-dark p-6 text-white shadow-inner shadow-xl shadow-brand-dark/20">
           <div className="relative z-10 space-y-6">
             <div className="flex size-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-300 shadow-inner">
               <TrendingUp size={20} />
@@ -308,7 +308,7 @@ function StatItem({ title, value, sub, note, icon, color }: { title: string; val
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg border shadow-sm", colors[color])}>{icon}</div>
       <div className="space-y-1">
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-        <p className="text-2xl font-black leading-none tracking-tight text-slate-950">{value}</p>
+        <p className="text-2xl font-black leading-none tracking-tight text-brand-dark">{value}</p>
         <p className="text-[9px] font-black uppercase tracking-tight text-slate-500">{sub}</p>
         <p className="text-[10px] font-medium leading-5 text-slate-500">{note}</p>
       </div>
@@ -329,7 +329,7 @@ function StrategicNote({ title, value, detail, tone }: { title: string; value: s
         <CheckCircle2 size={16} />
       </div>
       <p className="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{title}</p>
-      <p className="mt-1 text-sm font-black uppercase tracking-tight text-slate-950">{value}</p>
+      <p className="mt-1 text-sm font-black uppercase tracking-tight text-brand-dark">{value}</p>
       <p className="mt-1 text-[11px] font-medium leading-5 text-slate-500">{detail}</p>
     </div>
   );

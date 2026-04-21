@@ -133,7 +133,7 @@ export default function NotificationModal() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[380px] overflow-hidden rounded-xl border-slate-200 p-0 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 py-3">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">Thông báo</h3>
+          <h3 className="text-xs font-black uppercase tracking-widest text-brand-text-dark">Thông báo</h3>
           <div className="flex gap-1">
             <Button 
               variant="ghost" 
@@ -177,7 +177,7 @@ export default function NotificationModal() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className={cn(
-                      "truncate text-xs font-bold text-slate-900",
+                      "truncate text-xs font-bold text-brand-text-dark",
                       !notification.readAt && "text-primary"
                     )}>
                       {notification.title}

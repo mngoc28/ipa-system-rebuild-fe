@@ -6,8 +6,8 @@ const PlainTextarea = forwardRef<HTMLTextAreaElement, PlainTextareaProps>(({ cla
   <textarea
     ref={ref}
     className={cn(
-      "flex min-h-[120px] w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-700",
-      "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+      "flex min-h-[120px] w-full rounded-md border border-brand-dark/10 bg-white px-3 py-2 text-base text-brand-text-dark",
+      "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
       "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
       disableResize ? "resize-none" : "resize-y",
       className,

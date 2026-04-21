@@ -47,7 +47,7 @@ export function DeleteConfirmDialog({
           <div className="flex size-12 items-center justify-center rounded-full bg-rose-50 text-rose-600">
             <AlertTriangle size={24} />
           </div>
-          <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-900">{title}</DialogTitle>
+          <DialogTitle className="text-lg font-black uppercase tracking-tight text-brand-text-dark">{title}</DialogTitle>
           <DialogDescription className="text-center text-sm font-medium text-slate-500">
             {description}
           </DialogDescription>

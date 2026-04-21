@@ -210,7 +210,7 @@ export default function MinutesListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Quản lý Biên bản</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Quản lý Biên bản</h1>
           <p className="mt-1 text-sm font-semibold text-slate-500">Lập biên bản làm việc, ký số và lưu trữ hồ sơ pháp lý của dự án.</p>
         </div>
 
@@ -227,7 +227,7 @@ export default function MinutesListPage() {
       </div>
 
       {/* Templates Feature */}
-      <div className="group relative overflow-hidden rounded-xl bg-slate-900 p-6 text-white shadow-lg shadow-slate-900/20">
+      <div className="group relative overflow-hidden rounded-xl bg-brand-dark-900 p-6 text-white shadow-lg shadow-brand-dark-900/20">
         <PenTool size={80} className="absolute -bottom-4 -right-4 rotate-12 text-white opacity-10 transition-all duration-700 group-hover:rotate-0" />
         <div className="relative z-10 space-y-4 lg:w-2/3">
           <div className="space-y-1">
@@ -236,7 +236,7 @@ export default function MinutesListPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {["BIÊN BẢN GHI NHỚ (MOU)", "BIÊN BẢN KHẢO SÁT", "BIÊN BẢN HỌP ĐOÀN"].map((tpl, i) => (
-              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-slate-950">
+              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-brand-dark">
                 {tpl}
               </button>
             ))}
@@ -308,7 +308,7 @@ export default function MinutesListPage() {
                   <FileText size={20} />
                 </div>
                 <div className="space-y-0.5">
-                  <h4 className="text-sm font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.title}</h4>
+                  <h4 className="text-sm font-black uppercase tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
                   <div className="flex items-center gap-4">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{item.type}</span>
                     <div className={cn("flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest", item.status === "Signed" ? "text-emerald-600" : "text-slate-400")}>
@@ -323,10 +323,10 @@ export default function MinutesListPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => handleView(item.id)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-950 hover:text-white">
+                <button onClick={() => handleView(item.id)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-brand-dark hover:text-white">
                   <Eye size={14} /> Xem
                 </button>
-                <button onClick={() => handleDownload(item.title)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-950 hover:text-white">
+                <button onClick={() => handleDownload(item.title)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-brand-dark hover:text-white">
                   <Download size={14} /> Gốc
                 </button>
                 <button onClick={() => handleShare(item.title)} className="rounded border border-primary/20 bg-primary/5 p-2 text-primary shadow-sm transition-all hover:bg-primary hover:text-white">
@@ -362,7 +362,7 @@ export default function MinutesListPage() {
                   onClick={() => handlePagination(pageNumber)}
                   className={cn(
                     "h-7 w-7 rounded border text-[10px] font-bold transition-colors",
-                    pageNumber === page ? "border-slate-950 bg-slate-950 text-white shadow-md" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50",
+                    pageNumber === page ? "border-brand-dark bg-brand-dark text-white shadow-md" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50",
                   )}
                 >
                   {pageNumber}

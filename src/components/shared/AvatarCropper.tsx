@@ -115,7 +115,7 @@ export const AvatarCropper: React.FC<AvatarCropperProps> = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="relative h-[400px] w-full overflow-hidden rounded-xl bg-slate-900 shadow-inner">
+      <div className="relative h-[400px] w-full overflow-hidden rounded-xl bg-brand-dark-900 shadow-inner">
         <Cropper
           image={image}
           crop={crop}
@@ -127,7 +127,7 @@ export const AvatarCropper: React.FC<AvatarCropperProps> = ({
           cropShape="round"
           showGrid={false}
           style={{
-            containerStyle: { background: "#0f172a" },
+            containerStyle: { background: "hsl(var(--brand-dark-900))" },
             cropAreaStyle: { border: "2px solid white" }
           }}
         />

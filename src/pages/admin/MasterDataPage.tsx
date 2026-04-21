@@ -278,14 +278,14 @@ export default function MasterDataPage() {
     <div className="flex flex-col gap-6 duration-500 animate-in fade-in lg:flex-row">
       <aside className="w-full shrink-0 space-y-6 lg:w-[320px]">
         <div>
-          <h1 className="flex items-center gap-3 font-title text-2xl font-black uppercase tracking-tight text-slate-900">
+          <h1 className="flex items-center gap-3 font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">
             <Database size={24} className="text-primary" />
             Danh mục hệ thống
           </h1>
-          <p className="mt-1 text-xs font-medium uppercase tracking-tight text-slate-500">Cấu hình dữ liệu nền cho toàn hệ thống.</p>
+          <p className="mt-1 text-xs font-medium uppercase tracking-tight text-brand-text-dark/40">Cấu hình dữ liệu nền cho toàn hệ thống.</p>
         </div>
 
-        <div className="space-y-1 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
+        <div className="space-y-1 rounded-xl border border-brand-dark/10 bg-white p-1.5 shadow-sm">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -309,13 +309,13 @@ export default function MasterDataPage() {
           ))}
         </div>
 
-        <div className="space-y-4 rounded-xl border border-slate-900 bg-slate-950 p-6 text-white shadow-xl">
+        <div className="space-y-4 rounded-xl border border-brand-dark-900 bg-brand-dark p-6 text-white shadow-xl">
           <div className="flex size-10 items-center justify-center rounded-lg border border-primary/20 bg-primary shadow-lg">
             <Settings2 size={20} />
           </div>
           <div className="space-y-1">
             <p className="text-xs font-black uppercase tracking-tight text-white">Yêu cầu bổ sung dữ liệu?</p>
-            <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-slate-500">Liên hệ IT để cấu hình thêm các trường dữ liệu tùy chỉnh.</p>
+            <p className="text-[10px] font-medium uppercase leading-relaxed tracking-widest text-slate-400">Liên hệ IT để cấu hình thêm các trường dữ liệu tùy chỉnh.</p>
           </div>
           <button
             onClick={() => {
@@ -329,8 +329,8 @@ export default function MasterDataPage() {
         </div>
       </aside>
 
-      <main className="flex flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/30 p-5 md:flex-row">
+      <main className="flex flex-1 flex-col overflow-hidden rounded-xl border border-brand-dark/10 bg-white shadow-sm">
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-brand-dark/5 bg-brand-dark/[0.01] p-5 md:flex-row">
           <div className="relative w-full md:w-[320px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
@@ -354,21 +354,21 @@ export default function MasterDataPage() {
         <div className="flex-1 overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/20">
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Tên thuộc tính</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Định danh (Key)</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</th>
-                <th className="px-6 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Thao tác</th>
+              <tr className="border-b border-brand-dark/5 bg-brand-dark/[0.01]">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Tên thuộc tính</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Định danh (Key)</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Trạng thái</th>
+                <th className="px-6 py-3 text-right text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-brand-dark/5">
               {pagedRecords.map((item) => (
-                <tr key={item.id} className="group transition-all hover:bg-slate-50/50">
+                <tr key={item.id} className="group transition-all hover:bg-brand-dark/[0.02]">
                   <td className="whitespace-nowrap px-6 py-4">
-                    <span className="text-xs font-bold text-slate-900 transition-colors group-hover:text-primary">{item.name_vi}</span>
+                    <span className="text-xs font-bold text-brand-text-dark transition-colors group-hover:text-primary">{item.name_vi}</span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <code className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-black uppercase text-slate-500">{item.code}</code>
+                    <code className="rounded border border-brand-dark/10 bg-brand-dark/[0.02] px-2 py-0.5 font-mono text-[10px] font-black uppercase text-brand-text-dark/40">{item.code}</code>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
@@ -378,10 +378,10 @@ export default function MasterDataPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
-                      <button aria-label={`Chỉnh sửa ${item.name_vi}`} title={`Chỉnh sửa ${item.name_vi}`} onClick={() => handleEditRecord(item)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-primary/10 hover:bg-primary/5 hover:text-primary">
+                      <button aria-label={`Chỉnh sửa ${item.name_vi}`} title={`Chỉnh sửa ${item.name_vi}`} onClick={() => handleEditRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-primary/10 hover:bg-primary/5 hover:text-primary">
                         <Edit3 size={14} />
                       </button>
-                      <button aria-label={`Xóa ${item.name_vi}`} title={`Xóa ${item.name_vi}`} onClick={() => handleDeleteRecord(item)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600">
+                      <button aria-label={`Xóa ${item.name_vi}`} title={`Xóa ${item.name_vi}`} onClick={() => handleDeleteRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -392,14 +392,14 @@ export default function MasterDataPage() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Tổng cộng <span className="text-slate-900">{filteredRecords.length}</span> bản ghi hệ thống
+        <div className="flex items-center justify-between border-t border-brand-dark/5 bg-brand-dark/[0.01] px-6 py-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">
+            Tổng cộng <span className="text-brand-text-dark">{filteredRecords.length}</span> bản ghi hệ thống
           </p>
           <div className="flex gap-1">
-            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === 1}>Trang trước</button>
-            <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white">{normalizedPage}</button>
-            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50" disabled={normalizedPage === totalPages}>Trang kế</button>
+            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/60 transition-colors hover:bg-brand-dark/[0.02] disabled:opacity-50" disabled={normalizedPage === 1}>Trang trước</button>
+            <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white shadow-sm shadow-primary/20">{normalizedPage}</button>
+            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/60 transition-colors hover:bg-brand-dark/[0.02] disabled:opacity-50" disabled={normalizedPage === totalPages}>Trang kế</button>
           </div>
         </div>
       </main>
@@ -420,7 +420,7 @@ export default function MasterDataPage() {
           </DialogHeader>
 
           <div className="grid gap-4 py-2 md:grid-cols-2">
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-brand-text-dark/40">
               <span>Key</span>
               <input
                 id="master-data-create-code"
@@ -428,11 +428,11 @@ export default function MasterDataPage() {
                 value={formState.code}
                 onChange={(e) => updateFormField("code", e.target.value)}
                 placeholder="COUNTRIES_5"
-                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-slate-200")}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-brand-dark/10")}
               />
               {formErrors.code && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.code}</p>}
             </label>
-            <label htmlFor="master-data-create-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-create-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-brand-text-dark/40">
               <span>Trạng thái</span>
               <SelectField
                 id="master-data-create-status"
@@ -511,18 +511,18 @@ export default function MasterDataPage() {
           </DialogHeader>
 
           <div className="grid gap-4 py-2 md:grid-cols-2">
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-brand-text-dark/40">
               <span>Key</span>
               <input
                 id="master-data-edit-code"
                 name="code"
                 value={formState.code}
                 onChange={(e) => updateFormField("code", e.target.value)}
-                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-slate-200")}
+                className={cn("w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/5", formErrors.code ? "border-rose-300" : "border-brand-dark/10")}
               />
               {formErrors.code && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.code}</p>}
             </label>
-            <label htmlFor="master-data-edit-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-edit-status" className="space-y-2 text-xs font-bold uppercase tracking-widest text-brand-text-dark/40">
               <span>Trạng thái</span>
               <SelectField
                 id="master-data-edit-status"

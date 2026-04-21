@@ -336,7 +336,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
       <div className="flex flex-col gap-6 border-b border-slate-100 pb-8 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <h1 className="font-title text-3xl font-black uppercase tracking-tight text-slate-900">
+            <h1 className="font-title text-3xl font-black uppercase tracking-tight text-brand-text-dark">
               {managementView === "TEAM" ? (role === "Director" || role === "Admin" ? "Quản trị Lịch IPA" : "Quản trị Lịch Đơn vị") : "Lịch làm việc của tôi"}
             </h1>
             {isManagement && (
@@ -366,7 +366,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 }}
                 className={cn(
                   "rounded-lg px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all",
-                  managementView === "PERSONAL" ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"
+                  managementView === "PERSONAL" ? "bg-white text-brand-text-dark shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"
                 )}
               >
                 CÁ NHÂN
@@ -378,7 +378,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 }}
                 className={cn(
                   "rounded-lg px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all",
-                  managementView === "TEAM" ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"
+                  managementView === "TEAM" ? "bg-white text-brand-text-dark shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"
                 )}
               >
                 ĐỘI NHÓM
@@ -394,7 +394,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                   setSelectedStaffId(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="h-10 w-48 appearance-none rounded-xl border border-slate-200 bg-white pl-4 pr-10 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm outline-none transition-all hover:border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="h-10 w-48 appearance-none rounded-xl border border-slate-200 bg-white pl-4 pr-10 text-[10px] font-black uppercase tracking-widest text-brand-text-dark shadow-sm outline-none transition-all hover:border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
               >
                 <option value="ALL">TẤT CẢ NHÂN VIÊN</option>
                 {members.map((m) => (
@@ -480,7 +480,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                     <CheckCircle2 size={14} className="text-emerald-500" /> Đã xác nhận
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setStatusFilter("DONE")} className="flex items-center gap-2 rounded-lg py-2 text-xs font-bold text-slate-700">
-                    <div className="flex size-3.5 items-center justify-center rounded-full bg-slate-900 text-[8px] text-white">✓</div> Hoàn thành
+                    <div className="flex size-3.5 items-center justify-center rounded-full bg-brand-dark-900 text-[8px] text-white">✓</div> Hoàn thành
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -503,14 +503,14 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             {isManagement && (
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                    <button className="flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
+                    <button className="flex items-center gap-2 rounded-xl bg-brand-dark px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-brand-dark-900/10 transition-all hover:bg-slate-800 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
                     <Plus size={14} />
                     TẠO LỊCH
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl px-6">
                   <DialogHeader>
-                    <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-slate-900">Kế hoạch công tác mới</DialogTitle>
+                    <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-brand-text-dark">Kế hoạch công tác mới</DialogTitle>
                     <DialogDescription className="border-b border-slate-100 pb-4 text-xs font-semibold text-slate-500">Thiết lập thời gian, địa điểm và thành phần tham gia cho sự kiện mới.</DialogDescription>
                   </DialogHeader>
                   <ScheduleForm 
@@ -536,7 +536,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
           {viewMode === "week" ? (
             <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm duration-300 animate-in fade-in">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-brand-text-dark">{currentMonth.label}</h3>
                 <div className="flex gap-2">
                   <button onClick={() => setReferenceDate((prev) => subMonths(prev, 1))} title="Tháng trước" aria-label="Tháng trước" className="rounded-lg border border-slate-100 p-1.5 text-slate-400 transition-all hover:bg-slate-50 active:scale-90">
                     <ChevronLeft size={16} />
@@ -580,7 +580,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm duration-300 animate-in slide-in-from-left-4">
                <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Danh sách ngày</p>
-                  <h3 className="mt-1 font-title text-sm font-black uppercase text-slate-900">
+                  <h3 className="mt-1 font-title text-sm font-black uppercase text-brand-text-dark">
                     Ngày {selectedDay} tháng {currentMonth.month + 1}
                   </h3>
                </div>
@@ -602,7 +602,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             </div>
           )}
 
-          <div className="group relative space-y-6 overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20">
+          <div className="group relative space-y-6 overflow-hidden rounded-xl bg-brand-dark p-6 text-white shadow-xl shadow-brand-dark/20">
             <Zap size={64} className="absolute -bottom-4 -right-4 text-white opacity-5 transition-all duration-700 group-hover:rotate-12" />
             <div className="space-y-1">
               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Tính năng mới</p>
@@ -613,7 +613,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 setOutlookConnected((prev) => !prev);
                 toast.success(!outlookConnected ? "Đã kết nối Outlook." : "Đã ngắt kết nối Outlook.");
               }}
-              className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 text-[9px] font-black uppercase tracking-widest text-white transition-all hover:bg-white hover:text-slate-900 active:scale-95"
+              className="w-full rounded-lg border border-white/10 bg-white/5 py-2.5 text-[9px] font-black uppercase tracking-widest text-white transition-all hover:bg-white hover:text-brand-text-dark active:scale-95"
             >
               {outlookConnected ? "ĐÃ KẾT NỐI" : "KHÁM PHÁ NGAY"}
             </button>
@@ -629,7 +629,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                   <button onClick={() => setReferenceDate((prev) => subMonths(prev, 1))} className="text-slate-500 transition-all hover:scale-110 hover:text-primary active:scale-90">
                     <ChevronLeft size={18} />
                   </button>
-                  <span className="min-w-[140px] text-center text-xs font-black uppercase tracking-widest text-slate-900">{currentMonth.label}</span>
+                  <span className="min-w-[140px] text-center text-xs font-black uppercase tracking-widest text-brand-text-dark">{currentMonth.label}</span>
                   <button onClick={() => setReferenceDate((prev) => addMonths(prev, 1))} className="text-slate-500 transition-all hover:scale-110 hover:text-primary active:scale-90">
                     <ChevronRight size={18} />
                   </button>
@@ -686,7 +686,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
           <Dialog open={isManagementOpen} onOpenChange={setIsManagementOpen}>
             <DialogContent className="max-w-3xl px-6">
               <DialogHeader>
-                <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-slate-900">
+                <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-brand-text-dark">
                   {dialogMode === "detail" && "Chi tiết lịch công tác"}
                   {dialogMode === "edit" && "Chỉnh sửa lịch công tác"}
                   {dialogMode === "reschedule" && "Đề xuất thay đổi lịch"}
@@ -738,7 +738,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
           <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-left font-title text-lg font-black uppercase text-slate-900">Xác nhận xóa lịch?</DialogTitle>
+                <DialogTitle className="text-left font-title text-lg font-black uppercase text-brand-text-dark">Xác nhận xóa lịch?</DialogTitle>
                 <DialogDescription className="text-left text-sm font-medium text-slate-500">
                   Hành động này không thể hoàn tác. Lịch công tác sẽ bị xóa vĩnh viễn khỏi hệ thống và thông báo sẽ được gửi tới tất cả thành viên tham gia.
                 </DialogDescription>
@@ -763,7 +763,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex flex-col gap-1">
-                <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">
+                <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">
                   Lịch công tác
                 </h1>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -824,7 +824,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 <>
                   <div className="mr-2 flex items-center gap-1.5">
                     <p className="text-[10px] font-black uppercase text-slate-400">Trang</p>
-                    <div className="flex h-8 w-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-black text-slate-900">
+                    <div className="flex h-8 w-12 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-black text-brand-text-dark">
                       {currentPage}
                     </div>
                     <p className="text-[10px] font-black uppercase text-slate-400">/ {pagination?.total_pages || 1}</p>
@@ -851,7 +851,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                             className={cn(
                               "h-10 w-10 rounded-xl text-xs font-black transition-all active:scale-90",
                               currentPage === pageNum 
-                                ? "bg-slate-950 text-white shadow-xl shadow-slate-900/20" 
+                                ? "bg-brand-dark text-white shadow-xl shadow-brand-dark-900/20" 
                                 : "bg-slate-50 text-slate-500 hover:bg-slate-100"
                             )}
                           >

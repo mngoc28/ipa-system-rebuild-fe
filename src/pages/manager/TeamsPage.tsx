@@ -103,12 +103,12 @@ export default function TeamsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Đội nhóm & Nhân sự</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Đội nhóm & Nhân sự</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Quản lý hiệu suất và lịch trình làm việc của phòng ban.</p>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95"
+          className="flex items-center gap-2 rounded-lg bg-brand-dark-900 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-brand-dark-900/10 transition-all hover:bg-slate-800 active:scale-95"
         >
           <UserPlus size={16} /> THÊM THÀNH VIÊN
         </button>
@@ -167,14 +167,14 @@ export default function TeamsPage() {
             </div>
 
             <div className="mb-4 space-y-0.5">
-              <h3 className="text-sm font-bold text-slate-900">{member.name}</h3>
+              <h3 className="text-sm font-bold text-brand-text-dark">{member.name}</h3>
               <p className="text-[10px] font-black uppercase tracking-widest text-primary">{member.role}</p>
             </div>
 
             <div className="mb-5 space-y-2">
               <div className="flex items-center justify-between text-[10px] font-black uppercase text-slate-400">
                 <span>Hiệu suất</span>
-                <span className="text-slate-900">{member.performance}%</span>
+                <span className="text-brand-text-dark">{member.performance}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                 <div
@@ -238,7 +238,7 @@ export default function TeamsPage() {
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20 lg:p-10">
+      <div className="relative overflow-hidden rounded-xl bg-brand-dark p-6 text-white shadow-xl shadow-brand-dark/20 lg:p-10">
         <div className="relative z-10 flex flex-col items-center justify-between gap-10 lg:flex-row">
           <div className="max-w-lg space-y-6">
             <div className="flex size-10 items-center justify-center rounded-lg border border-white/5 bg-white/10 text-amber-400 shadow-inner">
@@ -330,7 +330,7 @@ export default function TeamsPage() {
 
 function TeamStat({ label, value, accent }: { label: string; value: number; accent: "slate" | "emerald" | "amber" | "rose" }) {
   const accentClasses = {
-    slate: "border-slate-200 bg-white text-slate-900",
+    slate: "border-slate-200 bg-white text-brand-text-dark",
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
     amber: "border-amber-200 bg-amber-50 text-amber-700",
     rose: "border-rose-200 bg-rose-50 text-rose-700",

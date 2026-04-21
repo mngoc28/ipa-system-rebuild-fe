@@ -69,14 +69,14 @@ export default function MinutesListPage() {
 
   if (listQuery.isLoading || delegationsQuery.isLoading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-12 text-sm font-semibold text-slate-500">
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-12 text-sm font-semibold text-brand-text-dark/40">
         <LoadingSpinner label="Đang tải biên bản..." />
       </div>
     );
   }
 
   if (listQuery.isError || delegationsQuery.isError) {
-    return <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-sm font-semibold text-rose-600">Không thể tải danh sách biên bản.</div>;
+    return <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm font-semibold text-destructive">Không thể tải danh sách biên bản.</div>;
   }
 
   const minutes = (listQuery.data?.data?.items ?? []).map((item) => ({
@@ -210,12 +210,12 @@ export default function MinutesListPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Quản lý Biên bản</h1>
-          <p className="mt-1 text-sm font-semibold text-slate-500">Lập biên bản làm việc, ký số và lưu trữ hồ sơ pháp lý của dự án.</p>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Quản lý Biên bản</h1>
+          <p className="mt-1 text-sm font-semibold text-brand-text-dark/60">Lập biên bản làm việc, ký số và lưu trữ hồ sơ pháp lý của dự án.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleOpenHistory} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:bg-slate-50">
+          <button onClick={handleOpenHistory} className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02]">
             <History size={16} />
             Lịch sử ký
           </button>
@@ -227,16 +227,16 @@ export default function MinutesListPage() {
       </div>
 
       {/* Templates Feature */}
-      <div className="group relative overflow-hidden rounded-xl bg-slate-900 p-6 text-white shadow-lg shadow-slate-900/20">
+      <div className="group relative overflow-hidden rounded-xl bg-brand-dark-900 p-6 text-white shadow-lg shadow-brand-dark-900/20">
         <PenTool size={80} className="absolute -bottom-4 -right-4 rotate-12 text-white opacity-10 transition-all duration-700 group-hover:rotate-0" />
         <div className="relative z-10 space-y-4 lg:w-2/3">
           <div className="space-y-1">
             <h3 className="text-sm font-black uppercase tracking-widest text-white">Tạo biên bản từ mẫu chuyên nghiệp</h3>
-            <p className="text-xs font-medium text-slate-400">Sử dụng các mẫu biên bản đã được chuẩn hóa để tiết kiệm thời gian và đảm bảo tính pháp lý.</p>
+            <p className="text-xs font-medium text-white/60">Sử dụng các mẫu biên bản đã được chuẩn hóa để tiết kiệm thời gian và đảm bảo tính pháp lý.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {["BIÊN BẢN GHI NHỚ (MOU)", "BIÊN BẢN KHẢO SÁT", "BIÊN BẢN HỌP ĐOÀN"].map((tpl, i) => (
-              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-slate-950">
+              <button key={i} onClick={() => handleTemplate(tpl)} className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-brand-dark">
                 {tpl}
               </button>
             ))}
@@ -245,11 +245,11 @@ export default function MinutesListPage() {
       </div>
 
       {/* Main List Area */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
         {showHistoryPanel && (
-          <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-700">Lịch sử ký số gần đây</h3>
-            <div className="mt-3 space-y-2 text-[11px] font-semibold text-slate-600">
+          <div className="mb-5 rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/80">Lịch sử ký số gần đây</h3>
+            <div className="mt-3 space-y-2 text-[11px] font-semibold text-brand-text-dark/60">
               <p>10:15 - Biên bản Samsung được ký bởi Nguyễn Minh Châu.</p>
               <p>09:42 - Biên bản khảo sát KCN được gửi duyệt.</p>
             </div>
@@ -259,10 +259,10 @@ export default function MinutesListPage() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex flex-1 items-center gap-3">
             <div className="group relative w-full max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={16} />
               <input
                 placeholder="Tìm tên biên bản, đối tác..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-10 py-2.5 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
+                className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-10 py-2.5 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -273,14 +273,14 @@ export default function MinutesListPage() {
                     setSearchQuery("");
                     setPage(1);
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition-all hover:bg-slate-200 hover:text-slate-700"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-brand-text-dark/40 transition-all hover:bg-brand-dark/5 hover:text-brand-text-dark/80"
                   aria-label="Xóa tìm kiếm"
                 >
                   <X size={14} />
                 </button>
               )}
             </div>
-            <button onClick={handleFilter} title="Bộ lọc biên bản" aria-label="Bộ lọc biên bản" className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-slate-400 transition-all hover:bg-white hover:text-primary">
+            <button onClick={handleFilter} title="Bộ lọc biên bản" aria-label="Bộ lọc biên bản" className="rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] p-2.5 text-brand-text-dark/40 transition-all hover:bg-white hover:text-primary">
               <Filter size={16} />
             </button>
           </div>
@@ -288,45 +288,45 @@ export default function MinutesListPage() {
 
         <div className="space-y-3">
           {listQuery.isFetching && !listQuery.data ? (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-12 text-sm font-semibold text-slate-500">
+            <div className="rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-12 text-sm font-semibold text-brand-text-dark/40">
               <LoadingSpinner label="Đang cập nhật danh sách biên bản..." />
             </div>
           ) : visibleMinutes.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Không có biên bản phù hợp.</div>
+            <div className="rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-6 text-sm font-semibold text-brand-text-dark/40">Không có biên bản phù hợp.</div>
           ) : visibleMinutes.map((item) => (
             <div
               key={item.id}
-              className="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-md lg:flex-row lg:items-center"
+              className="group flex flex-col justify-between gap-4 rounded-xl border border-brand-dark/5 bg-brand-dark/[0.01] p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-md lg:flex-row lg:items-center"
             >
               <div className="flex items-center gap-4">
                 <div
                   className={cn(
                     "flex h-12 w-12 items-center justify-center rounded-lg text-white shadow-md border",
-                    item.status === "Signed" ? "bg-emerald-600 border-emerald-700 shadow-emerald-600/10" : item.status === "Pending" ? "bg-amber-500 border-amber-600 shadow-amber-500/10" : "bg-slate-500 border-slate-600 shadow-slate-500/10",
+                    item.status === "Signed" ? "bg-emerald-600 border-emerald-700 shadow-emerald-600/10" : item.status === "Pending" ? "bg-amber-500 border-amber-600 shadow-amber-500/10" : "bg-brand-dark border-brand-dark/10 shadow-brand-dark/10",
                   )}
                 >
                   <FileText size={20} />
                 </div>
                 <div className="space-y-0.5">
-                  <h4 className="text-sm font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.title}</h4>
+                  <h4 className="text-sm font-black uppercase tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
                   <div className="flex items-center gap-4">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{item.type}</span>
-                    <div className={cn("flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest", item.status === "Signed" ? "text-emerald-600" : "text-slate-400")}>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.type}</span>
+                    <div className={cn("flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest", item.status === "Signed" ? "text-emerald-600" : "text-brand-text-dark/40")}>
                       {item.status === "Signed" ? <CheckCircle2 size={10} /> : <Clock size={10} />}
                       {item.status === "Signed" ? "Đã ký số" : item.status === "Pending" ? "Chờ ký" : "Bản nháp"}
                     </div>
                   </div>
-                  <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                  <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-text-dark/40">
                     Cập nhật: {item.date} &bull; {item.author}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => handleView(item.id)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-950 hover:text-white">
+                <button onClick={() => handleView(item.id)} className="flex items-center gap-2 rounded border border-brand-dark/10 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-brand-text-dark/80 shadow-sm transition-all hover:bg-brand-dark hover:text-white">
                   <Eye size={14} /> Xem
                 </button>
-                <button onClick={() => handleDownload(item.title)} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-950 hover:text-white">
+                <button onClick={() => handleDownload(item.title)} className="flex items-center gap-2 rounded border border-brand-dark/10 bg-white px-3 py-2 text-[9px] font-black uppercase tracking-widest text-brand-text-dark/80 shadow-sm transition-all hover:bg-brand-dark hover:text-white">
                   <Download size={14} /> Gốc
                 </button>
                 <button onClick={() => handleShare(item.title)} title={`Chia sẻ nhanh ${item.title}`} aria-label={`Chia sẻ nhanh ${item.title}`} className="rounded border border-primary/20 bg-primary/5 p-2 text-primary shadow-sm transition-all hover:bg-primary hover:text-white">
@@ -334,7 +334,7 @@ export default function MinutesListPage() {
                 </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="p-2 text-slate-300 transition-all hover:text-slate-600" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
+                    <button className="p-2 text-brand-text-dark/20 transition-all hover:text-brand-text-dark/60" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                       <MoreVertical size={16} />
                     </button>
                   </DropdownMenuTrigger>
@@ -351,8 +351,8 @@ export default function MinutesListPage() {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 md:flex-row md:items-center md:justify-between">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <div className="mt-6 flex flex-col gap-3 border-t border-brand-dark/5 pt-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-dark/40">
               Hiển thị {pageLabelStart}-{pageLabelEnd} / {totalItems} biên bản
             </p>
             <div className="flex flex-wrap items-center gap-1">
@@ -362,7 +362,7 @@ export default function MinutesListPage() {
                   onClick={() => handlePagination(pageNumber)}
                   className={cn(
                     "h-7 w-7 rounded border text-[10px] font-bold transition-colors",
-                    pageNumber === page ? "border-slate-950 bg-slate-950 text-white shadow-md" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50",
+                    pageNumber === page ? "border-brand-dark bg-brand-dark text-white shadow-md" : "border-brand-dark/10 bg-white text-brand-text-dark/40 hover:opacity-90",
                   )}
                 >
                   {pageNumber}

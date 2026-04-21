@@ -32,8 +32,8 @@ export default function AdminDashboardPage() {
       title: "Tài khoản (Tổng)", 
       value: stats?.total_users ? String(stats.total_users) : "0", 
       icon: Users, 
-      color: "text-blue-500", 
-      bg: "bg-blue-50" 
+      color: "text-primary", 
+      bg: "bg-primary/5" 
     },
     { 
       title: "Tải Server (CPU)", 
@@ -53,8 +53,8 @@ export default function AdminDashboardPage() {
       title: "Cảnh báo Bảo mật", 
       value: stats?.security_alerts_count !== undefined ? String(stats.security_alerts_count) : "0", 
       icon: ShieldAlert, 
-      color: stats?.security_alerts_count && stats.security_alerts_count > 0 ? "text-rose-500" : "text-slate-400", 
-      bg: "bg-slate-50" 
+      color: stats?.security_alerts_count && stats.security_alerts_count > 0 ? "text-rose-500" : "text-brand-text-dark/40", 
+      bg: "bg-brand-dark/[0.02]" 
     },
   ];
 
@@ -63,14 +63,14 @@ export default function AdminDashboardPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">SYSADMIN DASHBOARD</h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">Giám sát tổng thể hoạt động hệ thống và máy chủ.</p>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">SYSADMIN DASHBOARD</h1>
+          <p className="mt-1 text-sm font-medium text-brand-text-dark/40">Giám sát tổng thể hoạt động hệ thống và máy chủ.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => void handleClearCache()} disabled={isClearingCache} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
+          <button onClick={() => void handleClearCache()} disabled={isClearingCache} className="rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
             {isClearingCache ? "ĐANG XÓA CACHE..." : "XÓA CACHE RAM"}
           </button>
-          <button onClick={handleBackup} className="rounded-lg bg-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm transition-all hover:bg-slate-200 active:scale-95" aria-disabled="true">
+          <button onClick={handleBackup} className="rounded-lg bg-brand-dark/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40 shadow-sm transition-all hover:bg-brand-dark/10 active:scale-95" aria-disabled="true">
             BACKUP DATABASE
           </button>
         </div>
@@ -78,17 +78,17 @@ export default function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         {dashboardStats.map((stat, i) => (
-          <div key={i} className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-slate-300">
+          <div key={i} className="group relative flex flex-col overflow-hidden rounded-xl border border-brand-dark/10 bg-white p-5 shadow-sm transition-all hover:border-brand-dark/20">
             <div className={cn("mb-4 flex h-10 w-10 items-center justify-center rounded-lg border transition-colors", stat.bg)}>
               <stat.icon className={stat.color} size={20} />
             </div>
             
             <div className="mt-auto">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.title}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{stat.title}</p>
               {isLoading ? (
-                <div className="mt-2 h-8 w-16 animate-pulse rounded bg-slate-100" />
+                <div className="mt-2 h-8 w-16 animate-pulse rounded bg-brand-dark/[0.01]" />
               ) : (
-                <p className="mt-1 text-2xl font-black tracking-tight text-slate-900 transition-colors group-hover:text-primary">
+                <p className="mt-1 text-2xl font-black tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">
                   {stat.value}
                 </p>
               )}

@@ -69,7 +69,7 @@ export default function ScheduleDetailView({
             {event.status}
           </span>
         </div>
-        <h2 className="font-title text-2xl font-black uppercase leading-tight tracking-tight text-slate-900">
+        <h2 className="font-title text-2xl font-black uppercase leading-tight tracking-tight text-brand-text-dark">
           {event.title}
         </h2>
       </div>
@@ -114,7 +114,7 @@ export default function ScheduleDetailView({
 
       {/* Participants List */}
       <div className="space-y-4">
-        <h3 className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-slate-900">
+        <h3 className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-brand-text-dark">
           Danh sách tham dự
           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] text-slate-500">{participants.length} người</span>
         </h3>

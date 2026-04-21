@@ -448,7 +448,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           <button onClick={() => navigate(-1)} title="Go Back" aria-label="Go Back" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="font-title text-2xl font-black text-slate-900">
+          <h1 className="font-title text-2xl font-black text-brand-text-dark">
             {isEdit ? "Cập nhật thông tin đoàn công tác" : "Thiết lập đoàn công tác mới"}
           </h1>
         </div>
@@ -474,7 +474,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           <button
             onClick={() => handleSave(role === "staff" ? 1 : formData.status)}
             disabled={isSubmitting}
-            className="flex items-center gap-2 rounded-lg bg-primary px-8 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg bg-accent px-8 py-3 text-[11px] font-bold uppercase tracking-wider text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {role === "staff" && (formData.status === 0 || !isEdit) ? (
               <>
@@ -762,7 +762,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                     isVip: false
                   });
                 }}
-                className="rounded-lg bg-slate-900 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-slate-800 active:scale-95 lg:col-span-4"
+                className="rounded-lg bg-brand-dark-900 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-slate-800 active:scale-95 lg:col-span-4"
               >
                 Add Member to List
               </button>
@@ -946,7 +946,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                           (document.getElementById('chk-name') as HTMLInputElement).value = '';
                           setTempChecklistPic("");
                         }}
-                        className="w-full rounded-lg bg-slate-900 py-2.5 text-[10px] font-black uppercase tracking-widest text-white"
+                        className="w-full rounded-lg bg-brand-dark-900 py-2.5 text-[10px] font-black uppercase tracking-widest text-white"
                      >Thêm nhiệm vụ</button>
                   </div>
                </div>

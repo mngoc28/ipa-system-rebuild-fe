@@ -80,7 +80,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </div>
             <div className="space-y-1">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-slate-900">{title}</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-brand-text-dark">{title}</DialogTitle>
               </DialogHeader>
               <DialogDescription className="leading-relaxed text-slate-500">
                 {description}

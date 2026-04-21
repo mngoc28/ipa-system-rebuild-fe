@@ -58,23 +58,23 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
-          <h1 className="font-title text-3xl font-black uppercase leading-tight tracking-tight text-slate-900">
+          <h1 className="font-title text-3xl font-black uppercase leading-tight tracking-tight text-brand-text-dark">
             {isDirector ? "Báo cáo chiến lược," : isManager ? "Quản lý đơn vị," : isAdmin ? "Quản trị hệ thống," : "Tin vắn nghiệp vụ,"}{" "}
             <span className="text-primary">{user?.fullName || "Cán bộ IPA"}</span> 👋
           </h1>
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500 opacity-70">
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand-text-dark/40 opacity-70">
             {isAdmin ? "HỆ THỐNG ĐANG VẬN HÀNH ỔN ĐỊNH" : `IPA ĐÀ NẴNG • THỨ 6, 10/04/2026`}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="group relative hidden w-72 lg:block">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-all group-focus-within:text-primary" size={16} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-text-dark/40 transition-all group-focus-within:text-primary" size={16} />
             <input
               placeholder="Tìm nhanh đoàn, tài liệu, đối tác..."
-              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-[11px] font-bold shadow-sm outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+              className="w-full rounded-lg border border-brand-dark/10 bg-white py-2.5 pl-11 pr-4 text-[11px] font-bold shadow-sm outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
             />
           </div>
-          <button onClick={() => navigate(quickActionPath)} className="flex items-center gap-2 rounded-lg bg-slate-950 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-950/20 transition-all hover:bg-slate-800 active:scale-95">
+          <button onClick={() => navigate(quickActionPath)} className="flex items-center gap-2 rounded-lg bg-brand-dark px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-brand-dark/20 transition-all hover:opacity-90 active:scale-95">
             <Zap size={14} className="text-amber-400" />
             {isAdmin ? "XEM LOG HỆ THỐNG" : "BÁO CÁO NHANH"}
           </button>
@@ -116,9 +116,9 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
-          <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-50 pb-5">
-              <h2 className="flex items-center gap-3 font-title text-base font-black uppercase tracking-tight text-slate-900">
+          <div className="space-y-6 rounded-xl border border-brand-dark/10 bg-white p-7 shadow-sm">
+            <div className="flex items-center justify-between border-b border-brand-dark/5 pb-5">
+              <h2 className="flex items-center gap-3 font-title text-base font-black uppercase tracking-tight text-brand-text-dark">
                 {isAdmin ? <ShieldCheck size={20} className="text-primary" /> : <CheckCircle2 size={20} className="text-primary" />}
                 {isAdmin ? "Nhật ký vận hành hệ thống" : "Đầu việc trọng tâm & Khẩn cấp"}
               </h2>
@@ -128,41 +128,41 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-4">
               {taskFeed.length === 0 && (
-                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-xs font-semibold text-slate-500">
-                  Chua co dau viec tu API.
+                <div className="rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-6 text-xs font-semibold text-brand-text-dark/40">
+                  Chưa có đầu việc từ API.
                 </div>
               )}
               {taskFeed.map((item) => (
                 <div
                   key={item.id}
                   className={cn(
-                    "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-slate-50/50 hover:shadow-lg hover:shadow-slate-100/50",
-                    item.priority === "urgent" ? "border-rose-100 bg-rose-50/30" : "border-slate-100 bg-white",
+                    "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
+                    item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
                   )}
                 >
                   <div
                     className={cn(
                       "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
-                      item.priority === "urgent" ? "border-rose-300 text-rose-500 bg-white" : "border-slate-300 text-slate-400 bg-white",
+                      item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
                     )}
                   >
                     <Clock size={12} />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-slate-900 transition-colors group-hover:text-primary">{item.title}</h4>
+                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
                       {item.priority && (
-                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-200")}>
+                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
                           {item.priority}
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.delegation || item.user || "GENERAL"}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
                     <div className="mt-3 flex items-center gap-4">
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                        <Calendar size={12} className="text-slate-300" /> {item.deadline || item.time || "N/A"}
+                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
+                        <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
                       </span>
-                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-rose-600">!! QUÁ HẠN XỬ LÝ</span>}
+                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
                     </div>
                   </div>
                 </div>
@@ -191,20 +191,20 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-8">
-          <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-50 pb-5">
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{isAdmin ? "USERS ONLINE" : "SỰ KIỆN TRONG NGÀY"}</h2>
+          <div className="space-y-6 rounded-xl border border-brand-dark/10 bg-white p-7 shadow-sm">
+            <div className="flex items-center justify-between border-b border-brand-dark/5 pb-5">
+              <h2 className="text-xs font-black uppercase tracking-widest text-brand-text-dark">{isAdmin ? "USERS ONLINE" : "SỰ KIỆN TRONG NGÀY"}</h2>
               <Calendar size={16} className="text-primary" />
             </div>
-            <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-slate-100">
+            <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-brand-dark/5">
               {timelineItems.map((item) => (
                 <div key={item.id} className="group relative pl-10">
-                  <div className="absolute left-[8.5px] top-1.5 z-10 size-2 rounded-sm bg-slate-200 shadow-[0_0_0_4px_white] ring-1 ring-slate-100 transition-all group-hover:bg-primary" />
+                  <div className="absolute left-[8.5px] top-1.5 z-10 size-2 rounded-sm bg-brand-dark/10 shadow-[0_0_0_4px_white] ring-1 ring-brand-dark/5 transition-all group-hover:bg-primary" />
                   <div className="space-y-1">
                     <p className="text-[9px] font-black uppercase tracking-widest text-primary">{item.time || item.role}</p>
-                    <h4 className="truncate text-xs font-black uppercase leading-tight tracking-tight text-slate-900">{item.title || item.name}</h4>
-                    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-slate-400">
-                      <MapPin size={12} className="text-slate-300" /> {item.location || item.ip}
+                    <h4 className="truncate text-xs font-black uppercase leading-tight tracking-tight text-brand-text-dark">{item.title || item.name}</h4>
+                    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-brand-text-dark/40">
+                      <MapPin size={12} className="text-brand-text-dark/20" /> {item.location || item.ip}
                     </p>
                   </div>
                 </div>
@@ -212,13 +212,13 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={() => navigate(isAdmin ? "/admin/users" : "/schedule")}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm transition-all hover:bg-slate-950 hover:text-white active:scale-95"
+              className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] py-3 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark hover:text-white active:scale-95"
             >
               {isAdmin ? "QUẢN LÝ PHÂN QUYỀN" : "XEM TOÀN BỘ LỊCH TUẦN"}
             </button>
           </div>
 
-          <div onClick={() => navigate("/notifications")} className="group relative cursor-pointer overflow-hidden rounded-xl bg-slate-950 p-7 text-white shadow-2xl shadow-slate-950/20 transition-all active:scale-[0.98]">
+          <div onClick={() => navigate("/notifications")} className="group relative cursor-pointer overflow-hidden rounded-xl bg-brand-dark p-7 text-white shadow-2xl shadow-brand-dark/20 transition-all active:scale-[0.98]">
             <div className="relative z-10 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="rounded-lg bg-white/10 p-2 text-amber-400 shadow-inner">
@@ -248,13 +248,13 @@ function StatCard({ title, value, note, icon, color }: StatCardProps) {
     purple: "text-purple-600 bg-white border-purple-100",
   };
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.98]">
-      <div className="absolute right-[-10px] top-[-10px] size-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
+    <div className="group relative overflow-hidden rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-brand-dark/[0.05] active:scale-[0.98]">
+      <div className="absolute right-[-10px] top-[-10px] size-20 rounded-full bg-brand-dark/[0.02] opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
       <div className="relative z-10 space-y-5">
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}> {icon} </div>
         <div>
-          <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-          <p className="text-3xl font-black tracking-tighter text-slate-950">{value}</p>
+          <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{title}</p>
+          <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <ArrowUpRight size={14} className="animate-pulse" /> {note}
@@ -271,7 +271,7 @@ function HighlightCard({ title, detail, action, color, icon, progress, onClick }
   };
 
   return (
-    <div className={cn("relative space-y-6 overflow-hidden rounded-xl p-8 text-white shadow-2xl transition-all active:scale-[0.98] cursor-pointer", color === "dark" ? "bg-slate-900 shadow-slate-900/10" : "bg-primary shadow-primary/10")}>
+    <div className={cn("relative space-y-6 overflow-hidden rounded-xl p-8 text-white shadow-2xl transition-all active:scale-[0.98] cursor-pointer", color === "dark" ? "bg-brand-dark-900 shadow-brand-dark-900/10" : "bg-primary shadow-primary/10")}>
       <div className="absolute right-6 top-6 scale-150 text-white opacity-5">{icon}</div>
       <div className="space-y-1">
         <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">HỆ THỐNG IPA</p>
@@ -296,7 +296,7 @@ function HighlightCard({ title, detail, action, color, icon, progress, onClick }
         onClick={handleCardClick}
         className={cn(
           "flex w-full items-center justify-center gap-2 rounded-lg py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
-          color === "dark" ? "bg-white text-slate-950 hover:bg-slate-100" : "bg-slate-950 text-white hover:bg-slate-900",
+          color === "dark" ? "bg-white text-brand-dark hover:bg-brand-dark/5" : "bg-brand-dark text-white hover:bg-brand-dark-900",
         )}
       >
         {action} <ChevronRight size={16} />

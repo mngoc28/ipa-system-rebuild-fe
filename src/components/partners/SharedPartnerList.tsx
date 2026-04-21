@@ -165,13 +165,13 @@ export default function SharedPartnerList() {
       {/* Header Section */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Đối tác & Nhà đầu tư</h1>
-          <p className="mt-1 text-sm font-semibold text-slate-500">Quản lý quan hệ đối tác và tiềm năng đầu tư hệ thống.</p>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Đối tác & Nhà đầu tư</h1>
+          <p className="mt-1 text-sm font-semibold text-brand-text-dark/60">Quản lý quan hệ đối tác và tiềm năng đầu tư hệ thống.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={handleSync}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-brand-dark/10 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-brand-text-dark/70 shadow-sm transition-all hover:bg-brand-dark/[0.03]"
           >
             Đồng bộ CRM
           </button>
@@ -189,39 +189,39 @@ export default function SharedPartnerList() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="group relative space-y-4 overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/10">
+        <div className="group relative space-y-4 overflow-hidden rounded-xl bg-brand-dark p-6 text-white shadow-xl shadow-brand-dark/10">
           <Globe size={60} className="absolute -bottom-4 -right-4 text-white opacity-10 transition-all duration-700 group-hover:scale-110" />
           <h3 className="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-white/40">Đối tác toàn cầu</h3>
           <p className="mt-4 text-3xl font-black leading-none tracking-tighter">{meta?.total ?? 0}</p>
           <p className="mt-2 text-[9px] font-black uppercase leading-none tracking-widest text-white/30">Dữ liệu từ hệ thống IPA</p>
         </div>
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-slate-400">Thị trường trọng điểm</h3>
-          <p className="mt-4 text-3xl font-black leading-none tracking-tighter text-slate-900">Việt Nam</p>
+        <div className="space-y-4 rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+          <h3 className="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-brand-text-dark/40">Thị trường trọng điểm</h3>
+          <p className="mt-4 text-3xl font-black leading-none tracking-tighter text-brand-text-dark">Việt Nam</p>
           <p className="mt-2 text-[9px] font-black uppercase leading-none tracking-widest text-emerald-600">Tỉ lệ quan tâm cao nhất</p>
         </div>
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-slate-400">Trung bình đánh giá</h3>
+        <div className="space-y-4 rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
+          <h3 className="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-brand-text-dark/40">Trung bình đánh giá</h3>
           <div className="mt-4 flex items-center gap-4">
-            <p className="text-3xl font-black leading-none tracking-tighter text-slate-900">4.5</p>
+            <p className="text-3xl font-black leading-none tracking-tighter text-brand-text-dark">4.5</p>
             <div className="flex text-amber-500">
               {[1, 2, 3, 4, 5].map((i) => <Star key={i} fill="currentColor" size={14} />)}
             </div>
           </div>
-          <p className="mt-2 text-[9px] font-black uppercase leading-none tracking-widest text-slate-400">Dựa trên 150+ phản hồi</p>
+          <p className="mt-2 text-[9px] font-black uppercase leading-none tracking-widest text-brand-text-dark/40">Dựa trên 150+ phản hồi</p>
         </div>
       </div>
 
       {/* Filter Section */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="group relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={16} />
             <input
               placeholder="Tìm tên đối tác, mã đối tác..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
+              className="w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] py-2.5 pl-10 pr-4 text-[11px] font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -241,43 +241,43 @@ export default function SharedPartnerList() {
               <LoadingSpinner label="Đang tải dữ liệu..." />
             </div>
         ) : partnersQuery.isError ? (
-          <div className="flex min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-rose-100 bg-rose-50 p-8 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Không tải được dữ liệu</p>
-            <p className="max-w-md text-sm font-medium text-rose-700">{partnerErrorMessage}</p>
+          <div className="flex min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-destructive/10 bg-destructive/5 p-8 text-center">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-destructive">Không tải được dữ liệu</p>
+            <p className="max-w-md text-sm font-medium text-destructive/80">{partnerErrorMessage}</p>
             <button
               onClick={() => partnersQuery.refetch()}
-              className="rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-700"
+              className="rounded-lg bg-destructive px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:opacity-90"
             >
               Thử lại
             </button>
           </div>
         ) : partners.length === 0 ? (
-          <div className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Chưa có đối tác nào</p>
-            <p className="max-w-md text-sm text-slate-500">Tạo mới đối tác hoặc đồng bộ CRM để hiển thị dữ liệu trong danh sách này.</p>
+          <div className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-8 text-center">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-text-dark/40">Chưa có đối tác nào</p>
+            <p className="max-w-md text-sm text-brand-text-dark/50">Tạo mới đối tác hoặc đồng bộ CRM để hiển thị dữ liệu trong danh sách này.</p>
           </div>
         ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {partners.map((partner) => (
                 <div
                 key={partner.id}
-                className="group relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/30 p-5 transition-all hover:border-primary/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.99]"
+                className="group relative overflow-hidden rounded-xl border border-brand-dark/5 bg-brand-dark/[0.01] p-5 transition-all hover:border-primary/30 hover:bg-white hover:shadow-xl hover:shadow-brand-dark/5 active:scale-[0.99]"
                 >
                 <div className="mb-5 flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                    <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-primary shadow-sm transition-all group-hover:border-slate-950 group-hover:bg-slate-950 group-hover:text-white">
+                    <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border border-brand-dark/10 bg-white text-primary shadow-sm transition-all group-hover:border-brand-dark group-hover:bg-brand-dark group-hover:text-white">
                         <Building2 size={24} />
                     </div>
                     <div>
-                        <h4 className="text-sm font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary">{partner.name}</h4>
-                        <span className="mt-0.5 block text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        <h4 className="text-sm font-black uppercase tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{partner.name}</h4>
+                        <span className="mt-0.5 block text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">
                         {partner.partnerCode} • {partner.category} • {partner.country}
                         </span>
                     </div>
                     </div>
                     <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="rounded-lg p-2 text-slate-300 transition-all hover:bg-slate-50 hover:text-slate-600" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
+                        <button className="rounded-lg p-2 text-brand-text-dark/30 transition-all hover:bg-brand-dark/[0.02] hover:text-brand-text-dark/70" title="Mở thêm tuỳ chọn" aria-label="Mở thêm tuỳ chọn">
                         <MoreVertical size={16} />
                         </button>
                     </DropdownMenuTrigger>
@@ -299,7 +299,7 @@ export default function SharedPartnerList() {
                                 setSelectedPartnerId(partner.id);
                                 setIsDeleteModalOpen(true);
                             }}
-                            className="text-red-500"
+                            className="font-bold text-destructive"
                         >
                             Xóa đối tác
                         </DropdownMenuItem>
@@ -308,35 +308,35 @@ export default function SharedPartnerList() {
                 </div>
 
                 <div className="mb-6 grid grid-cols-2 gap-2">
-                    <div className="rounded-lg border border-slate-100 bg-white p-3 text-center shadow-sm">
-                    <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-slate-400">Đầu mối</p>
-                    <p className="truncate text-xs font-black text-slate-900">{partner.representative}</p>
+                    <div className="rounded-lg border border-brand-dark/5 bg-white p-3 text-center shadow-sm">
+                    <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-brand-text-dark/40">Đầu mối</p>
+                    <p className="truncate text-xs font-black text-brand-text-dark">{partner.representative}</p>
                     </div>
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-slate-100 bg-white p-3 text-center shadow-sm">
-                    <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-slate-400">Vị thế</p>
+                    <div className="flex flex-col items-center justify-center rounded-lg border border-brand-dark/5 bg-white p-3 text-center shadow-sm">
+                    <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-brand-text-dark/40">Vị thế</p>
                     <span className={cn("inline-block rounded px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest", partner.status === "Active" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-primary/5 text-primary border border-primary/10")}>
                         {partner.status}
                     </span>
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-100 pt-4">
+                <div className="flex items-center justify-between border-t border-brand-dark/5 pt-4">
                     <div className="flex items-center gap-1.5">
                     <Star size={12} fill="#F59E0B" className="text-amber-500" />
-                    <span className="text-[10px] font-black text-slate-900">{partner.score.toFixed(1)} / 5</span>
+                    <span className="text-[10px] font-black text-brand-text-dark">{partner.score.toFixed(1)} / 5</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                           onClick={() => contactMutation.mutate(partner.id)}
                           title={`Gửi email cho ${partner.name}`}
                           aria-label={`Gửi email cho ${partner.name}`}
-                          className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all hover:bg-slate-950 hover:text-white active:scale-90"
+                          className="rounded-lg border border-brand-dark/10 bg-white p-2 text-brand-text-dark/40 shadow-sm transition-all hover:bg-brand-dark hover:text-white active:scale-90"
                         >
                             <Mail size={14} />
                         </button>
                         <button 
                           onClick={() => navigate(`/partners/${partner.id}`)}
-                            className="flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2.5 text-[9px] font-black uppercase leading-none tracking-widest text-white shadow-lg shadow-slate-950/20 transition-all hover:bg-slate-800 active:scale-95"
+                            className="flex items-center gap-2 rounded-lg bg-brand-dark px-4 py-2.5 text-[9px] font-black uppercase leading-none tracking-widest text-white shadow-lg shadow-brand-dark/20 transition-all hover:opacity-90 active:scale-95"
                         >
                             CHI TIẾT <ExternalLink size={12} />
                         </button>
@@ -350,21 +350,21 @@ export default function SharedPartnerList() {
         {/* Pagination placeholder */}
         {meta && (meta.total_pages || 0) > 1 && (
             <div className="mt-8 flex items-center justify-center gap-2">
-                 <button 
+                  <button 
                     disabled={page === 1}
                     onClick={() => setPage(p => p - 1)}
-                    className="rounded-md border border-slate-200 px-3 py-1 text-[10px] font-bold uppercase transition-all hover:bg-slate-50 disabled:opacity-30"
-                 >
-                     Trước
-                 </button>
-                 <span className="text-[10px] font-black uppercase text-slate-400">Trang {page} / {meta.total_pages}</span>
-                 <button 
+                    className="rounded-md border border-brand-dark/10 px-3 py-1 text-[10px] font-bold uppercase text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.02] disabled:opacity-30"
+                  >
+                      Trước
+                  </button>
+                  <span className="text-[10px] font-black uppercase text-brand-text-dark/20">Trang {page} / {meta.total_pages}</span>
+                  <button 
                     disabled={page === (meta.total_pages || 0)}
                     onClick={() => setPage(p => p + 1)}
-                    className="rounded-md border border-slate-200 px-3 py-1 text-[10px] font-bold uppercase transition-all hover:bg-slate-50 disabled:opacity-30"
-                 >
-                     Sau
-                 </button>
+                    className="rounded-md border border-brand-dark/10 px-3 py-1 text-[10px] font-bold uppercase text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.02] disabled:opacity-30"
+                  >
+                      Sau
+                  </button>
             </div>
         )}
       </div>
@@ -431,15 +431,15 @@ export default function SharedPartnerList() {
                    />
                  </div>
                </div>
-               <div className="space-y-2">
-                 <Label>Ghi chú</Label>
-                 <textarea
-                  value={formPartner.notes}
-                  onChange={(e) => setFormPartner({ ...formPartner, notes: e.target.value })}
-                  className="min-h-28 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
-                  placeholder="Thông tin ghi chú, điều kiện hợp tác, ưu tiên liên hệ..."
-                 />
-               </div>
+                <div className="space-y-2">
+                  <Label>Ghi chú</Label>
+                  <textarea
+                   value={formPartner.notes}
+                   onChange={(e) => setFormPartner({ ...formPartner, notes: e.target.value })}
+                   className="min-h-28 w-full rounded-lg border border-brand-dark/10 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
+                   placeholder="Thông tin ghi chú, điều kiện hợp tác, ưu tiên liên hệ..."
+                  />
+                </div>
                    <DialogFooter>
                                    <button type="submit" disabled={createMutation.isPending || optionsQuery.isLoading} className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-xs font-black uppercase text-white hover:bg-primary/90 disabled:opacity-50">
                     {createMutation.isPending ? <LoadingSpinner variant="small" className="text-white" label="Đang tạo..." /> : "Tạo hồ sơ"}
@@ -521,7 +521,7 @@ export default function SharedPartnerList() {
                  <textarea
                   value={formPartner.notes}
                   onChange={(e) => setFormPartner({ ...formPartner, notes: e.target.value })}
-                  className="min-h-28 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
+                  className="min-h-28 w-full rounded-lg border border-brand-dark/10 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
                  />
                </div>
                    <DialogFooter>
@@ -536,15 +536,15 @@ export default function SharedPartnerList() {
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
           <DialogContent>
               <DialogHeader>
-                  <DialogTitle className="text-red-600">Xác nhận xóa</DialogTitle>
+                  <DialogTitle className="font-black text-destructive">Xác nhận xóa</DialogTitle>
                   <DialogDescription>Bạn có chắc chắn muốn xóa đối tác này? Hành động này sẽ thực hiện soft-delete.</DialogDescription>
               </DialogHeader>
-              <div className="mb-4 rounded-lg border border-red-100 bg-red-50 p-4">
-                  <p className="text-xs font-bold text-red-800">Cảnh báo: Hồ sơ sẽ không còn xuất hiện trong danh sách chính thức.</p>
+              <div className="mb-4 rounded-lg border border-destructive/10 bg-destructive/5 p-4">
+                  <p className="text-xs font-bold text-destructive">Cảnh báo: Hồ sơ sẽ không còn xuất hiện trong danh sách chính thức.</p>
               </div>
               <DialogFooter>
-                   <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-2 text-xs font-bold text-slate-400">Hủy</button>
-                   <button onClick={handleDeleteConfirm} disabled={deleteMutation.isPending} className="flex items-center gap-2 rounded-lg bg-red-600 px-6 py-2 text-xs font-black uppercase text-white hover:bg-red-700 disabled:opacity-50">
+                   <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-2 text-xs font-bold text-brand-text-dark/40 transition-colors hover:text-brand-text-dark/60">Hủy</button>
+                   <button onClick={handleDeleteConfirm} disabled={deleteMutation.isPending} className="flex items-center gap-2 rounded-lg bg-destructive px-6 py-2 text-xs font-black uppercase text-white hover:opacity-90 disabled:opacity-50">
                       {deleteMutation.isPending ? <LoadingSpinner variant="small" className="text-white" label="Đang xóa..." /> : "Xóa vĩnh viễn"}
                     </button>
               </DialogFooter>
@@ -574,60 +574,60 @@ export default function SharedPartnerList() {
           ) : selectedPartnerDetail ? (
             <div className="space-y-6 py-2">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tên đối tác</p>
-                  <p className="mt-2 text-sm font-black text-slate-900">{selectedPartnerDetail.partnerName}</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Tên đối tác</p>
+                  <p className="mt-2 text-sm font-black text-brand-text-dark">{selectedPartnerDetail.partnerName}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã đối tác</p>
-                  <p className="mt-2 text-sm font-black text-slate-900">{selectedPartnerDetail.partnerCode}</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Mã đối tác</p>
+                  <p className="mt-2 text-sm font-black text-brand-text-dark">{selectedPartnerDetail.partnerCode}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quốc gia</p>
-                  <p className="mt-2 text-sm font-bold text-slate-900">{selectedPartnerDetail.countryName || "N/A"}</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Quốc gia</p>
+                  <p className="mt-2 text-sm font-bold text-brand-text-dark">{selectedPartnerDetail.countryName || "N/A"}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lĩnh vực</p>
-                  <p className="mt-2 text-sm font-bold text-slate-900">{selectedPartnerDetail.sectorName || "N/A"}</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Lĩnh vực</p>
+                  <p className="mt-2 text-sm font-bold text-brand-text-dark">{selectedPartnerDetail.sectorName || "N/A"}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
-                  <p className="mt-2 text-sm font-black uppercase text-slate-900">{mapPartnerStatus(selectedPartnerDetail.status)}</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Trạng thái</p>
+                  <p className="mt-2 text-sm font-black uppercase text-brand-text-dark">{mapPartnerStatus(selectedPartnerDetail.status)}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Điểm đánh giá</p>
-                  <p className="mt-2 text-sm font-black text-slate-900">{Number(selectedPartnerDetail.score ?? 0).toFixed(1)} / 5</p>
+                <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Điểm đánh giá</p>
+                  <p className="mt-2 text-sm font-black text-brand-text-dark">{Number(selectedPartnerDetail.score ?? 0).toFixed(1)} / 5</p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Website</p>
-                <p className="mt-2 break-all text-sm text-slate-900">{selectedPartnerDetail.website || "Chưa cập nhật"}</p>
+              <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Website</p>
+                <p className="mt-2 break-all text-sm text-brand-text-dark">{selectedPartnerDetail.website || "Chưa cập nhật"}</p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ghi chú</p>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{selectedPartnerDetail.notes || "Chưa có ghi chú."}</p>
+              <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Ghi chú</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-brand-text-dark/80">{selectedPartnerDetail.notes || "Chưa có ghi chú."}</p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Liên hệ</p>
+              <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Liên hệ</p>
                 <div className="mt-3 space-y-3">
                   {(selectedPartnerDetail.contacts ?? []).length === 0 ? (
-                    <p className="text-sm text-slate-500">Chưa có đầu mối liên hệ.</p>
+                    <p className="text-sm font-semibold text-brand-text-dark/40">Chưa có đầu mối liên hệ.</p>
                   ) : (
                     selectedPartnerDetail.contacts!.map((contact) => (
-                      <div key={contact.id} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                      <div key={contact.id} className="rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] p-3">
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-sm font-black text-slate-900">{contact.fullName}</p>
-                            <p className="text-xs text-slate-500">{contact.title || "Chưa có chức danh"}</p>
+                            <p className="text-sm font-black text-brand-text-dark">{contact.fullName}</p>
+                            <p className="text-xs font-semibold text-brand-text-dark/40">{contact.title || "Chưa có chức danh"}</p>
                           </div>
                           {contact.isPrimary && (
                             <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600">Chính</span>
                           )}
                         </div>
-                        <div className="mt-3 grid gap-2 text-xs text-slate-600 md:grid-cols-2">
+                        <div className="mt-3 grid gap-2 text-xs font-medium text-brand-text-dark/60 md:grid-cols-2">
                           <p>Email: {contact.email || "N/A"}</p>
                           <p>Điện thoại: {contact.phone || "N/A"}</p>
                         </div>
@@ -637,19 +637,19 @@ export default function SharedPartnerList() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tương tác gần đây</p>
+              <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Tương tác gần đây</p>
                 <div className="mt-3 space-y-3">
                   {(selectedPartnerDetail.recentInteractions ?? []).length === 0 ? (
-                    <p className="text-sm text-slate-500">Chưa có lịch sử tương tác.</p>
+                    <p className="text-sm font-semibold text-brand-text-dark/40">Chưa có lịch sử tương tác.</p>
                   ) : (
                     selectedPartnerDetail.recentInteractions!.map((interaction) => (
-                      <div key={interaction.id} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                      <div key={interaction.id} className="rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] p-3">
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-black text-slate-900">Loại {interaction.interactionType}</p>
-                          <p className="text-xs text-slate-400">{interaction.interactionAt || "N/A"}</p>
+                          <p className="text-sm font-black text-brand-text-dark">Loại {interaction.interactionType}</p>
+                          <p className="text-xs font-bold text-brand-text-dark/40">{interaction.interactionAt || "N/A"}</p>
                         </div>
-                        <p className="mt-2 text-sm text-slate-600">{interaction.summary || "Không có mô tả."}</p>
+                        <p className="mt-2 text-sm font-medium text-brand-text-dark/60">{interaction.summary || "Không có mô tả."}</p>
                       </div>
                     ))
                   )}

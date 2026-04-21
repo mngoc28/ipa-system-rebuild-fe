@@ -56,7 +56,7 @@ export default function UnitReportsPage() {
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-slate-900">Báo cáo Đơn vị</h1>
+          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Báo cáo Đơn vị</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Tổng hợp báo cáo tuần, tháng và KPI của phòng ban.</p>
         </div>
         <button
@@ -77,21 +77,21 @@ export default function UnitReportsPage() {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mẫu báo cáo</p>
-          <p className="mt-1 text-xl font-black text-slate-900">{definitions.length}</p>
+          <p className="mt-1 text-xl font-black text-brand-text-dark">{definitions.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiến trình gần nhất</p>
-          <p className="mt-1 text-xl font-black text-slate-900">{runStatusQuery.data?.data?.status || "-"}</p>
+          <p className="mt-1 text-xl font-black text-brand-text-dark">{runStatusQuery.data?.data?.status || "-"}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã chạy</p>
-          <p className="mt-1 truncate text-sm font-black text-slate-900">{runStatusQuery.data?.data?.run_id || "-"}</p>
+          <p className="mt-1 truncate text-sm font-black text-brand-text-dark">{runStatusQuery.data?.data?.run_id || "-"}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Monthly KPI card */}
-        <div className="relative col-span-1 space-y-6 overflow-hidden rounded-xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/20 lg:col-span-2">
+        <div className="relative col-span-1 space-y-6 overflow-hidden rounded-xl bg-brand-dark p-6 text-white shadow-xl shadow-brand-dark/20 lg:col-span-2">
           <TrendingUp size={64} className="absolute right-4 top-4 text-white opacity-5" />
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Kết quả KPI tháng 04/2026</p>
@@ -117,7 +117,7 @@ export default function UnitReportsPage() {
             <PieChart size={24} />
           </div>
           <div className="space-y-1">
-            <h4 className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-900">Phân tích mảng việc</h4>
+            <h4 className="text-[10px] font-black uppercase leading-none tracking-widest text-brand-text-dark">Phân tích mảng việc</h4>
             <p className="text-[10px] font-medium text-slate-400">Tự động hóa báo cáo tháng</p>
           </div>
           <button aria-label="Xem biểu đồ KPI" onClick={() => setShowChartPanel((prev) => !prev)} className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all hover:border-primary/50 hover:text-primary active:scale-95">Xem biểu đồ</button>
@@ -132,7 +132,7 @@ export default function UnitReportsPage() {
 
       <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:p-10">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-slate-900">
+          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
             <FileText size={20} className="text-primary" /> Lịch sử Báo cáo
           </h2>
           <button aria-label="Mở bộ lọc báo cáo" title="Mở bộ lọc báo cáo" onClick={() => setShowReportFilter((prev) => !prev)} className="rounded-lg border border-slate-100 bg-slate-50 p-2 text-slate-400 transition-all hover:text-primary">
@@ -164,7 +164,7 @@ export default function UnitReportsPage() {
                   <FileText size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 transition-colors group-hover:text-primary">Run {report.run_id}</h4>
+                  <h4 className="text-sm font-bold text-brand-text-dark transition-colors group-hover:text-primary">Run {report.run_id}</h4>
                   <div className="mt-0.5 flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">{report.report_code}</span>
                     <span className="text-[10px] font-medium text-slate-400">&bull; {report.status}</span>

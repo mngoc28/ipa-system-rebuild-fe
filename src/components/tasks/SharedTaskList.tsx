@@ -178,10 +178,10 @@ export default function SharedTaskList() {
 
   const handleToggleStatus = (task: TaskUiItem) => {
     const statusMap: Record<TaskStatus, number> = {
-      Todo: 1,       // -> In-progress
-      "In-progress": 2, // -> Done
-      Done: 0,        // -> Todo
-      Canceled: 1,    // -> In-progress
+      "Cần làm": 1,       // -> Đang xử lý
+      "Đang xử lý": 2, // -> Hoàn thành
+      "Hoàn thành": 0,        // -> Cần làm
+      "Đã hủy": 1,    // -> Đang xử lý
     };
     updateMutation.mutate({ id: task.id, payload: { status: statusMap[task.status] } });
   };
@@ -222,9 +222,9 @@ export default function SharedTaskList() {
       {/* Stats Bar */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatsBox label="TỔNG NHIỆM VỤ" value={meta?.total?.toString() ?? "0"} icon={<Clock size={16} />} color="navy" />
-        <StatsBox label="KHẨN CẤP / QUÁ HẠN" value={tasks.filter(t => t.priority === "Urgent" || t.isOverdue).length.toString()} icon={<AlertCircle size={16} />} color="rose" />
-        <StatsBox label="ĐANG XỬ LÝ" value={tasks.filter(t => t.status === "In-progress").length.toString()} icon={<Zap size={16} />} color="amber" />
-        <StatsBox label="HOÀN THÀNH" value={tasks.filter(t => t.status === "Done").length.toString()} icon={<CheckCircle2 size={16} />} color="emerald" />
+        <StatsBox label="KHẨN CẤP / QUÁ HẠN" value={tasks.filter(t => t.priority === "Khẩn cấp" || t.isOverdue).length.toString()} icon={<AlertCircle size={16} />} color="rose" />
+        <StatsBox label="ĐANG XỬ LÝ" value={tasks.filter(t => t.status === "Đang xử lý").length.toString()} icon={<Zap size={16} />} color="amber" />
+        <StatsBox label="HOÀN THÀNH" value={tasks.filter(t => t.status === "Hoàn thành").length.toString()} icon={<CheckCircle2 size={16} />} color="emerald" />
       </div>
 
       {/* Content View */}
@@ -264,8 +264,8 @@ export default function SharedTaskList() {
         </div>
       ) : activeView === "board" ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <BoardColumn title="Cần xử lý" count={tasks.filter(t => t.status === "Todo").length} color="slate" onAdd={() => setIsModalOpen(true)}>
-            {tasks.filter(t => t.status === "Todo").map(task => (
+          <BoardColumn title="Cần xử lý" count={tasks.filter(t => t.status === "Cần làm").length} color="slate" onAdd={() => setIsModalOpen(true)}>
+            {tasks.filter(t => t.status === "Cần làm").map(task => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -275,8 +275,8 @@ export default function SharedTaskList() {
               />
             ))}
           </BoardColumn>
-          <BoardColumn title="Đang thực hiện" count={tasks.filter(t => t.status === "In-progress").length} color="amber" onAdd={() => setIsModalOpen(true)}>
-            {tasks.filter(t => t.status === "In-progress").map(task => (
+          <BoardColumn title="Đang thực hiện" count={tasks.filter(t => t.status === "Đang xử lý").length} color="amber" onAdd={() => setIsModalOpen(true)}>
+            {tasks.filter(t => t.status === "Đang xử lý").map(task => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -286,8 +286,8 @@ export default function SharedTaskList() {
               />
             ))}
           </BoardColumn>
-          <BoardColumn title="Đã hoàn thành" count={tasks.filter(t => t.status === "Done").length} color="emerald" onAdd={() => setIsModalOpen(true)}>
-            {tasks.filter(t => t.status === "Done").map(task => (
+          <BoardColumn title="Đã hoàn thành" count={tasks.filter(t => t.status === "Hoàn thành").length} color="emerald" onAdd={() => setIsModalOpen(true)}>
+            {tasks.filter(t => t.status === "Hoàn thành").map(task => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -311,13 +311,13 @@ export default function SharedTaskList() {
                     onClick={(e) => { e.stopPropagation(); handleToggleStatus(task); }}
                     className={cn(
                       "group flex h-5 w-5 items-center justify-center rounded border transition-all",
-                      task.status === "Done" ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-300 hover:border-primary"
+                      task.status === "Hoàn thành" ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-300 hover:border-primary"
                     )}
                   >
-                    {task.status === "Done" && <CheckCircle2 size={12} />}
+                    {task.status === "Hoàn thành" && <CheckCircle2 size={12} />}
                   </button>
                   <div>
-                    <h4 className={cn("text-sm font-bold text-brand-text-dark uppercase tracking-tight", task.status === "Done" && "line-through opacity-50")}>{task.title}</h4>
+                    <h4 className={cn("text-sm font-bold text-brand-text-dark uppercase tracking-tight", task.status === "Hoàn thành" && "line-through opacity-50")}>{task.title}</h4>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Giao bởi: {task.creator}</p>
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export default function SharedTaskList() {
                        )}
                     </div>
                   )}
-                  <span className={cn("rounded px-2 py-0.5 text-[9px] font-black uppercase border tracking-widest", task.priority === "Urgent" ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-slate-50 text-slate-500 border-slate-200")}>
+                  <span className={cn("rounded px-2 py-0.5 text-[9px] font-black uppercase border tracking-widest", task.priority === "Khẩn cấp" ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-slate-50 text-slate-500 border-slate-200")}>
                     {task.priority}
                   </span>
                   <button aria-label={`Xem chi tiết nhiệm vụ ${task.title}`} className="rounded border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-brand-dark-900 hover:text-white">Chi tiết</button>
@@ -522,7 +522,7 @@ function TaskCard({ task, onClick, onStatusToggle, onDelete }: { task: TaskUiIte
         <div className="flex items-start justify-between">
           <span className={cn(
             "rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest border", 
-            task.priority === "Urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-100"
+            task.priority === "Khẩn cấp" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-100"
           )}>
             {task.priority}
           </span>
@@ -541,7 +541,7 @@ function TaskCard({ task, onClick, onStatusToggle, onDelete }: { task: TaskUiIte
           </DropdownMenu>
         </div>
 
-        <h4 className={cn("text-xs font-black leading-snug text-brand-text-dark transition-colors group-hover:text-primary uppercase tracking-tight", task.status === "Done" && "line-through opacity-40 text-slate-400")}>
+        <h4 className={cn("text-xs font-black leading-snug text-brand-text-dark transition-colors group-hover:text-primary uppercase tracking-tight", task.status === "Hoàn thành" && "line-through opacity-40 text-slate-400")}>
           {task.title}
         </h4>
 

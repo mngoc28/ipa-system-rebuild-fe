@@ -78,9 +78,9 @@ export const useCreatePartnerMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner-options"] });
-      toast.success("New partner added successfully.");
+      toast.success("Đã thêm đối tác mới thành công.");
     },
-    onError: () => toast.error("Failed to add partner."),
+    onError: () => toast.error("Thêm đối tác thất bại."),
   });
 };
 
@@ -95,9 +95,9 @@ export const useUpdatePartnerMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner"] });
-      toast.success("Partner information updated.");
+      toast.success("Đã cập nhật thông tin đối tác.");
     },
-    onError: () => toast.error("Failed to update partner."),
+    onError: () => toast.error("Cập nhật thông tin đối tác thất bại."),
   });
 };
 
@@ -111,9 +111,9 @@ export const useDeletePartnerMutation = () => {
     mutationFn: (id: string) => partnersApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("Partner deleted.");
+      toast.success("Đã xóa đối tác.");
     },
-    onError: () => toast.error("Failed to delete partner."),
+    onError: () => toast.error("Xóa đối tác thất bại."),
   });
 };
 
@@ -132,9 +132,9 @@ export const useAddPartnerContactMutation = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("Draft email for partner generated.");
+      toast.success("Đã tạo email nháp cho đối tác.");
     },
-    onError: () => toast.error("Failed to create quick contact."),
+    onError: () => toast.error("Không thể tạo liên hệ nhanh."),
   });
 };
 
@@ -154,9 +154,9 @@ export const useSyncPartnersMutation = (partners: PartnerUiItem[]) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
-      toast.success("CRM synchronized and partner scores updated.");
+      toast.success("Đã đồng bộ CRM và cập nhật điểm đối tác.");
     },
-    onError: () => toast.error("CRM synchronization failed."),
+    onError: () => toast.error("Đồng bộ CRM thất bại."),
   });
 };
 
@@ -179,15 +179,15 @@ export const usePromotePartnerStatusMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
       queryClient.invalidateQueries({ queryKey: ["partner"] });
-      toast.success("Partner status promoted.");
+      toast.success("Đã thăng cấp trạng thái đối tác.");
     },
     onError: (error) => {
       if (error instanceof Error && error.message === "MAX_STATUS_REACHED") {
-        toast.info("Partner is already at the highest status.");
+        toast.info("Đối tác đã ở trạng thái cao nhất.");
         return;
       }
 
-      toast.error("Failed to promote status.");
+      toast.error("Thăng cấp trạng thái thất bại.");
     },
   });
 };

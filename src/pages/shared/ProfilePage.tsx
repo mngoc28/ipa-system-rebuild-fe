@@ -110,7 +110,14 @@ export default function ProfilePage() {
           <div className="group relative mx-auto size-24">
             <div className="relative size-full overflow-hidden rounded-full border-4 border-brand-dark/5 bg-brand-dark/[0.02] shadow-sm ring-1 ring-brand-dark/10">
               {user?.avatar ? (
-                <img src={user.avatar} className="size-full object-cover" alt="Profile" />
+                <img
+                  src={user.avatar}
+                  className="size-full object-cover"
+                  alt="Profile"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+                  }}
+                />
               ) : (
                 <div className="flex size-full items-center justify-center">
                   <User size={36} className="text-brand-text-dark/40" />

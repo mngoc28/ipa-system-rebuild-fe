@@ -34,7 +34,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Error creating delegation record.");
+      toast.error(error.response?.data?.error?.message || "Lỗi khi tạo hồ sơ đoàn công tác.");
     },
   });
 
@@ -46,7 +46,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegation", variables.id.toString()] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Error updating delegation record.");
+      toast.error(error.response?.data?.error?.message || "Lỗi khi cập nhật hồ sơ đoàn công tác.");
     },
   });
 
@@ -56,7 +56,7 @@ export const useDelegationsQuery = (query?: DelegationsQuery) => {
       queryClient.invalidateQueries({ queryKey: ["delegations"] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Error deleting delegation record.");
+      toast.error(error.response?.data?.error?.message || "Lỗi khi xóa hồ sơ đoàn công tác.");
     },
   });
 
@@ -105,7 +105,7 @@ export const useAddDelegationCommentMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Failed to load comments.");
+      toast.error(error.response?.data?.error?.message || "Không thể gửi bình luận.");
     },
   });
 };
@@ -119,10 +119,10 @@ export const useUpdateDelegationCommentMutation = () => {
       delegationsApi.updateComment(id, commentId, content),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
-      toast.success("Comment updated successfully.");
+      toast.success("Đã cập nhật bình luận thành công.");
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Failed to update comment.");
+      toast.error(error.response?.data?.error?.message || "Cập nhật bình luận thất bại.");
     },
   });
 };
@@ -137,10 +137,10 @@ export const useDeleteDelegationCommentMutation = () => {
       delegationsApi.deleteComment(id, commentId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["delegation-comments", variables.id.toString()] });
-      toast.success("Comment deleted successfully.");
+      toast.success("Đã xóa bình luận thành công.");
     },
     onError: (error: ApiErrorLike) => {
-      toast.error(error.response?.data?.error?.message || "Failed to delete comment.");
+      toast.error(error.response?.data?.error?.message || "Xóa bình luận thất bại.");
     },
   });
 };

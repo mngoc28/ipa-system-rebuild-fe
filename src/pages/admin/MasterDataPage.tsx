@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Settings2, Map, Flag, Briefcase, Tags, Plus, Search, Edit3, Trash2, ChevronRight, Database } from "lucide-react";
+import { Settings2, Map, Flag, Briefcase, Tags, Plus, Search, Edit3, Trash2, ChevronRight, Database, MapPin, Layers } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { cn } from "@/lib/utils";
 import { MasterDataItem, masterDataApi } from "@/api/masterDataApi";
@@ -99,13 +99,15 @@ const parseApiError = (error: unknown): ParsedApiError => {
   };
 };
 
-type DomainKey = "countries" | "delegation-types" | "priorities" | "event-types";
+type DomainKey = "countries" | "delegation-types" | "priorities" | "event-types" | "sectors" | "locations";
 
 const categories: Array<{ id: DomainKey; name: string; icon: typeof Flag; color: string }> = [
   { id: "countries", name: "Danh bạ Quốc gia", icon: Flag, color: "text-rose-500" },
   { id: "delegation-types", name: "Loại hình đoàn", icon: Briefcase, color: "text-blue-500" },
   { id: "priorities", name: "Mức độ ưu tiên", icon: Tags, color: "text-amber-500" },
   { id: "event-types", name: "Loại sự kiện", icon: Map, color: "text-emerald-500" },
+  { id: "sectors", name: "Lĩnh vực kinh doanh", icon: Layers, color: "text-indigo-500" },
+  { id: "locations", name: "Địa điểm công tác", icon: MapPin, color: "text-orange-500" },
 ];
 
 export default function MasterDataPage() {

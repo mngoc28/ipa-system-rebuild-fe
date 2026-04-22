@@ -1,7 +1,7 @@
 /**
  * Internal UI status for partners, representing their lead or relationship stage.
  */
-export type PartnerUiStatus = "Lead" | "Partner" | "Active";
+export type PartnerUiStatus = "Tiềm năng" | "Đối tác" | "Đang hoạt động";
 
 /**
  * Interface representing a contact person associated with a partner organization.
@@ -103,9 +103,9 @@ export interface PartnerUiItem {
  * @returns Normalized status string for UI display.
  */
 export const mapPartnerStatus = (status: number): PartnerUiStatus => {
-  if (status === 2) return "Active";
-  if (status === 1) return "Partner";
-  return "Lead";
+  if (status === 2) return "Đang hoạt động";
+  if (status === 1) return "Đối tác";
+  return "Tiềm năng";
 };
 
 /**
@@ -114,8 +114,8 @@ export const mapPartnerStatus = (status: number): PartnerUiStatus => {
  * @returns Equivalent numeric code for API compatibility.
  */
 export const getPartnerStatusValue = (status: PartnerUiStatus): number => {
-  if (status === "Active") return 2;
-  if (status === "Partner") return 1;
+  if (status === "Đang hoạt động") return 2;
+  if (status === "Đối tác") return 1;
   return 0;
 };
 

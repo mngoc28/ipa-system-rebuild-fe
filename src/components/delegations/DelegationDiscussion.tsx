@@ -168,7 +168,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   };
 
   const handleDeleteComment = (commentId: number) => {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa bình luận này không?")) return;
     
     deleteCommentMutation.mutate({ 
       id: delegationId.toString(), 

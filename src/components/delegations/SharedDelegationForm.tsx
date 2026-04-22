@@ -155,7 +155,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
 
   const { data: sectorsData } = useQuery({
     queryKey: ["master-data-sectors"],
-    queryFn: () => masterDataApi.list("sector"),
+    queryFn: () => masterDataApi.list("sectors"),
   });
 
   const sectorOptions = React.useMemo(() => 
@@ -165,7 +165,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
 
   const { data: locationsData } = useQuery({
     queryKey: ["master-data-locations"],
-    queryFn: () => masterDataApi.list("location"),
+    queryFn: () => masterDataApi.list("locations"),
   });
 
   const locationOptions = React.useMemo(() => 
@@ -256,7 +256,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       scheduleItems: initialScheduleItems,
     },
     isSubmitting,
-    restoreToastMessage: "Unsaved draft has been restored.",
+    restoreToastMessage: "Bản nháp đã được khôi phục.",
     restoreToastId: "delegation-form-draft-restored",
     onRestore: (draftValue) => {
       const normalized = draftValue as {
@@ -418,7 +418,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       updateMutation.mutate({ id: id!, data: payload }, {
         onSuccess: () => {
           clearDraft();
-          toast.success(finalStatus === 1 ? "Delegation record submitted for approval." : "Delegation record updated successfully.");
+          toast.success(finalStatus === 1 ? "Hồ sơ đoàn công tác đã được gửi phê duyệt." : "Cập nhật hồ sơ đoàn công tác thành công.");
           navigate(`/delegations`);
         }
       });
@@ -426,7 +426,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
       createMutation.mutate(payload, {
         onSuccess: () => {
           clearDraft();
-          toast.success(finalStatus === 1 ? "Delegation record created and submitted for approval." : "Delegation record created (Draft).");
+          toast.success(finalStatus === 1 ? "Hồ sơ đoàn công tác đã được tạo và gửi phê duyệt." : "Hồ sơ đoàn công tác đã được tạo (Bản nháp).");
           navigate(`/delegations`);
         }
       });

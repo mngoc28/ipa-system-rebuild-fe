@@ -76,20 +76,20 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
     navigate(`/delegations/${item.id}/edit`);
-    toast.info(`Opening editor: ${item.name}`);
+    toast.info(`Đang mở trình chỉnh sửa: ${item.name}`);
   };
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>, item: DelegationItem) => {
     e.stopPropagation();
     if (!onDelete) {
-      toast.error("Delete action is currently unavailable.");
+      toast.error("Hiện không thể xóa mục này.");
       return;
     }
 
     try {
       await onDelete(item.id);
     } catch {
-      toast.error("Failed to delete delegation record.");
+      toast.error("Không thể xóa hồ sơ đoàn công tác.");
     }
   };
 
@@ -167,13 +167,13 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right">
                   <div className="flex scale-95 items-center justify-end gap-1 opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                    <button onClick={(e) => handleView(e, item.id)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="View details">
+                    <button onClick={(e) => handleView(e, item.id)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Xem chi tiết">
                       <Eye size={14} />
                     </button>
-                    <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Edit delegation">
+                    <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Chỉnh sửa đoàn công tác">
                       <Edit2 size={14} />
                     </button>
-                    <button onClick={(e) => handleDelete(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-rose-50 hover:text-rose-600" title="Delete record">
+                    <button onClick={(e) => handleDelete(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-rose-50 hover:text-rose-600" title="Xóa hồ sơ">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -195,7 +195,7 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
         </p>
 
         <div className="flex items-center gap-1">
-          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} title="Previous page" aria-label="Previous page" className="p-2 text-brand-text-dark/40 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} title="Trang trước" aria-label="Trang trước" className="p-2 text-brand-text-dark/40 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} className="rotate-180" />
           </button>
 
@@ -211,7 +211,7 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
             ))}
           </div>
 
-          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} title="Next page" aria-label="Next page" className="p-2 text-brand-text-dark/40 transition-colors hover:text-primary disabled:opacity-30">
+          <button disabled={normalizedPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)} title="Trang sau" aria-label="Trang sau" className="p-2 text-brand-text-dark/40 transition-colors hover:text-primary disabled:opacity-30">
             <ChevronRight size={16} />
           </button>
         </div>

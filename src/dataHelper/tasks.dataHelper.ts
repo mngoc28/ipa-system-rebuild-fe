@@ -51,6 +51,7 @@ export interface TaskCreatePayload {
   priority?: number;
   due_at?: string;
   assignee_ids?: number[];
+  notify_assignees?: boolean;
 }
 
 export interface TaskPatchPayload {

@@ -1,3 +1,4 @@
+import logoBrand from "@/assets/logo-brand.png";
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, User, Globe, ChevronDown } from "lucide-react";
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [isVneidLoading, setIsVneidLoading] = useState(false);
   const [showForgotForm, setShowForgotForm] = useState(false);
   const [forgotValue, setForgotValue] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuthStore();
@@ -30,12 +32,33 @@ export default function LoginPage() {
   };
 
   const getErrorMessage = (error: unknown): string => {
-    const maybeAxiosError = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
-    return maybeAxiosError?.response?.data?.error?.message || maybeAxiosError?.message || "Đăng nhập thất bại.";
+    const maybeAxiosError = error as {
+      response?: {
+        data?: {
+          error?: { message?: string } | string;
+          message?: string;
+        };
+        status?: number;
+      };
+      message?: string;
+    };
+
+    const responseError = maybeAxiosError?.response?.data?.error;
+    if (typeof responseError === "string" && responseError.trim()) {
+      return responseError;
+    }
+
+    return (
+      (typeof responseError === "object" ? responseError?.message : undefined) ||
+      maybeAxiosError?.response?.data?.message ||
+      maybeAxiosError?.message ||
+      "Đăng nhập thất bại. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu."
+    );
   };
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoginError("");
     setIsLoading(true);
 
     try {
@@ -64,7 +87,9 @@ export default function LoginPage() {
       toast.success(`Đăng nhập thành công với quyền ${role}!`);
       navigate(getLoginRedirectPath(role), { replace: true });
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      const message = getErrorMessage(error);
+      setLoginError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -114,11 +139,11 @@ export default function LoginPage() {
         <div className="relative z-10 w-full space-y-12 px-16">
           {/* Government Logo Container */}
           <div className="flex items-center space-x-6">
-            <div className="flex size-20 items-center justify-center rounded-full bg-white/10 p-2 ring-1 ring-white/20 backdrop-blur-md">
+            <div className="flex size-20 items-center justify-center rounded-full bg-white/10 p-2 backdrop-blur-md">
               <img 
                 className="size-14 object-contain" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA78iF6rVKRwAlnSpF-nsDDtPdwxd3iLf8ia10TYNd6CovRi9ziKmTSgaJPXQ5wnihvrWQljSiraLcJL2HVitPrVbDs4VDN14hJyUkPIA-hLA2oMkRmQLNAjGLRN_z1bmM6YSJNacswUUGclhIzKI-LWqVZ8whVEHyM2pmoNPd7vAr6ctf6lQVE9p1IA_LRppuK9gD_MVpsJsy22oU3P-x8H7v60RnXSHlAK3Hd8JT1K6LjKBcUCeroLHDMtrg8tNB_RDp1pEh3B3Q" 
-                alt="Emblem of Vietnam" 
+                src={logoBrand} 
+                alt="Da Nang Emblem" 
               />
             </div>
             <div className="border-l border-white/20 pl-6 text-white">
@@ -184,7 +209,10 @@ export default function LoginPage() {
                     id="username" 
                     name="username" 
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (loginError) setLoginError("");
+                    }}
                     placeholder="Nhập email hoặc tên người dùng" 
                     type="text"
                     autoComplete="username"
@@ -217,7 +245,10 @@ export default function LoginPage() {
                     id="password" 
                     name="password" 
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (loginError) setLoginError("");
+                    }}
                     placeholder="••••••••" 
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
@@ -282,6 +313,12 @@ export default function LoginPage() {
                 {isSubmitting && <div className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
                 {isSubmitting ? "Đang xác thực..." : "Đăng nhập"}
               </button>
+
+              {loginError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert" aria-live="polite">
+                  {loginError}
+                </div>
+              )}
 
               {/* Social Divider */}
               <div className="relative py-4">

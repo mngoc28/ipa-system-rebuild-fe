@@ -91,3 +91,33 @@ export const useDeleteAdminUserMutation = () => {
     },
   });
 };
+
+/**
+ * Hook to retrieve all available system roles for user assignment.
+ */
+export const useAdminRolesQuery = () => {
+  return useQuery({
+    queryKey: ["admin-roles"],
+    queryFn: () => adminUsersApi.listRoles(),
+  });
+};
+
+/**
+ * Hook to retrieve all available organizational units.
+ */
+export const useAdminUnitsQuery = () => {
+  return useQuery({
+    queryKey: ["admin-units"],
+    queryFn: () => adminUsersApi.listUnits(),
+  });
+};
+
+export const useResetAdminPasswordMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => adminUsersApi.resetPassword(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+  });
+};

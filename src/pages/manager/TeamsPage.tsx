@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Mail, Shield, MessageSquare, UserPlus, Zap, ChevronLeft, ChevronRight } from "lucide-react";
+import { Mail, Shield, MessageSquare, UserPlus, Zap, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ const emptyForm = (): TeamCreateMemberPayload => ({
 
 export default function TeamsPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [lastAction, setLastAction] = React.useState<string | null>(null);
   const [page, setPage] = React.useState(1);
   const [createOpen, setCreateOpen] = React.useState(false);
@@ -192,6 +194,14 @@ export default function TeamsPage() {
             </div>
 
             <div className="flex items-center justify-center gap-2 border-t border-slate-50 pt-2">
+              <button
+                aria-label={`Giao việc cho ${member.name}`}
+                title={`Giao việc cho ${member.name}`}
+                onClick={() => navigate(`/tasks?openCreate=true&memberId=${member.id}`)}
+                className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary"
+              >
+                <ClipboardList size={16} />
+              </button>
               <button aria-label={`Gửi email cho ${member.name}`} title={`Gửi email cho ${member.name}`} onClick={() => setLastAction(`Đã tạo email cho ${member.name}`)} className="rounded-lg bg-slate-50 p-2 text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
                 <Mail size={16} />
               </button>

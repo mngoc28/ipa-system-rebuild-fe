@@ -32,8 +32,8 @@ export default function AdminDashboardPage() {
       title: "Tài khoản (Tổng)", 
       value: stats?.total_users ? String(stats.total_users) : "0", 
       icon: Users, 
-      color: "text-primary", 
-      bg: "bg-primary/5" 
+      color: "text-blue-500", 
+      bg: "bg-blue-50" 
     },
     { 
       title: "Tải Server (CPU)", 
@@ -54,7 +54,7 @@ export default function AdminDashboardPage() {
       value: stats?.security_alerts_count !== undefined ? String(stats.security_alerts_count) : "0", 
       icon: ShieldAlert, 
       color: stats?.security_alerts_count && stats.security_alerts_count > 0 ? "text-rose-500" : "text-brand-text-dark/40", 
-      bg: "bg-brand-dark/[0.02]" 
+      bg: "bg-rose-50" 
     },
   ];
 
@@ -67,10 +67,10 @@ export default function AdminDashboardPage() {
           <p className="mt-1 text-sm font-medium text-brand-text-dark/40">Giám sát tổng thể hoạt động hệ thống và máy chủ.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => void handleClearCache()} disabled={isClearingCache} className="rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60 shadow-sm transition-all hover:bg-brand-dark/[0.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
+          <button onClick={() => void handleClearCache()} disabled={isClearingCache} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
             {isClearingCache ? "ĐANG XÓA CACHE..." : "XÓA CACHE RAM"}
           </button>
-          <button onClick={handleBackup} className="rounded-lg bg-brand-dark/5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40 shadow-sm transition-all hover:bg-brand-dark/10 active:scale-95" aria-disabled="true">
+          <button onClick={handleBackup} className="rounded-lg bg-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm transition-all hover:bg-slate-300 active:scale-95" aria-disabled="true">
             BACKUP DATABASE
           </button>
         </div>

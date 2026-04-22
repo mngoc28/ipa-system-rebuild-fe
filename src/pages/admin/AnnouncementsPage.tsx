@@ -118,7 +118,7 @@ export default function AnnouncementsPage() {
             <Settings size={24} />
           </div>
           <div>
-            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Thông báo & Vận hành</h1>
+            <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Quản lý Thông báo</h1>
             <p className="mt-1 text-sm font-medium text-slate-500">Quản lý nội dung truyền thông nội bộ và giám sát trạng thái hệ thống.</p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function AnnouncementsPage() {
               <div className="relative w-full md:w-[350px]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input 
-                  placeholder="Tìm kiếm thông báo..." 
+                  placeholder="Tìm kiếm nội dung..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-xs font-medium shadow-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/5" 

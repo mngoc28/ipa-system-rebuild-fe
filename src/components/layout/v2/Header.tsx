@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Search, Menu, User, LogOut, ChevronDown, Globe, Plus } from "lucide-react";
+import logoBrand from "@/assets/logo-brand.png";
+import NotificationModal from "@/components/notifications/NotificationModal";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
-import NotificationModal from "@/components/notifications/NotificationModal";
+import { LogOut, Menu, Plus, Search, User } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import logoBrand from "@/assets/logo-brand.png";
+import { LogoutConfirmModal } from "./LogoutConfirmModal";
 
 /**
  * Shared application header component.
@@ -16,7 +17,7 @@ import logoBrand from "@/assets/logo-brand.png";
  */
 export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuthStore();
-  const [language, setLanguage] = useState<"VI" | "EN">("VI");
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/80 px-4 backdrop-blur-md">
@@ -42,6 +43,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
           <Search className="absolute left-3.5 text-brand-text-dark/40" size={16} />
           <input
             type="text"
+            aria-label="Tìm kiếm nội dung"
             placeholder="Tìm kiếm đoàn công tác, đối tác, tài liệu..."
             className="h-10 w-full rounded-xl border border-brand-dark/5 bg-brand-dark/[0.02] pl-10 pr-4 text-sm transition-all focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5"
           />
@@ -59,13 +61,6 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             Thêm đoàn công tác
           </Link>
         )}
-
-        {/* Language Toggle */}
-        <button onClick={() => setLanguage(language === "VI" ? "EN" : "VI")} className="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-brand-text-dark/60 transition-all hover:border-brand-dark/10 hover:bg-brand-dark/[0.02] hover:text-brand-text-dark">
-          <Globe size={16} />
-          <span className="text-[10px] font-black tracking-widest">{language}</span>
-          <ChevronDown size={12} className="text-brand-text-dark/20" />
-        </button>
 
         {/* Notifications */}
         <NotificationModal />
@@ -95,13 +90,21 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-brand-dark/[0.02]" />
-            <DropdownMenuItem onClick={logout} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold text-rose-600 transition-colors hover:bg-rose-50 focus:bg-rose-50 focus:text-rose-600">
+            <DropdownMenuItem 
+              onClick={() => setIsLogoutModalOpen(true)} 
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold text-rose-600 transition-colors hover:bg-rose-50 focus:bg-rose-50 focus:text-rose-600"
+            >
               <LogOut size={16} />
               Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen} 
+        onOpenChange={setIsLogoutModalOpen} 
+        onConfirm={logout} 
+      />
     </header>
   );
 }

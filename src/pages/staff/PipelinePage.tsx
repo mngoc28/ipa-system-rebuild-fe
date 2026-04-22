@@ -16,6 +16,8 @@ export default function StaffPipelinePage() {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [editingProject, setEditingProject] = React.useState<PipelineProject | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = React.useState(false);
+  const [projectToDelete, setProjectToDelete] = React.useState<PipelineProject | null>(null);
 
   const projectsQuery = useQuery({
     queryKey: ["pipeline-projects"],
@@ -58,12 +60,31 @@ export default function StaffPipelinePage() {
     }
   };
 
+  const handleDelete = (project: PipelineProject) => {
+    setProjectToDelete(project);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
+    
+    try {
+      await pipelineApi.deleteProject(projectToDelete.id);
+      toast.success("Đã xóa dự án thành công");
+      queryClient.invalidateQueries({ queryKey: ["pipeline-projects"] });
+      setIsDeleteConfirmOpen(false);
+      setProjectToDelete(null);
+    } catch {
+      toast.error("Không thể xóa dự án. Vui lòng thử lại sau.");
+    }
+  };
+
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 border-b border-brand-dark/5 pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">
+          <h1 className="text-2xl font-black tracking-tight text-brand-text-dark">
             Xúc tiến Đầu tư
           </h1>
           <p className="mt-1 text-sm font-medium text-brand-text-dark/60">
@@ -73,7 +94,7 @@ export default function StaffPipelinePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleCreate}
-            className="flex items-center gap-2 rounded-lg bg-brand-dark px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-brand-dark/20 transition-all hover:opacity-90 active:scale-95"
+            className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:opacity-90 active:scale-95"
           >
             <Plus size={14} /> TẠO DỰ ÁN
           </button>
@@ -82,7 +103,7 @@ export default function StaffPipelinePage() {
 
       <div className="rounded-xl border border-brand-dark/10 bg-white p-6 shadow-sm">
         <div className="mb-4 flex flex-col gap-4 border-b border-brand-dark/5 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="flex items-center gap-3 font-title text-lg font-black uppercase tracking-tight text-brand-text-dark">
+          <h2 className="flex items-center gap-3 text-lg font-black text-brand-text-dark">
             <Target size={20} className="text-primary" /> Dự án Pipeline
           </h2>
           <div className="relative w-full sm:w-64">
@@ -96,13 +117,13 @@ export default function StaffPipelinePage() {
           </div>
         </div>
 
-        {/* Staff list - no delete option by default in this shared view for staff */}
-        <SharedProjectList 
+        <SharedProjectList
           projects={filteredProjects}
+          isLoading={projectsQuery.isLoading}
           onEdit={handleEdit}
           onView={handleView}
           onPatchStage={handlePatchStage}
-          // onDelete disabled for staff
+          onDelete={handleDelete}
         />
       </div>
 
@@ -115,6 +136,7 @@ export default function StaffPipelinePage() {
             </DialogTitle>
           </DialogHeader>
           <SharedProjectForm 
+            key={editingProject?.id || "new"}
             initialData={editingProject}
             onSuccess={() => {
               setIsFormOpen(false);
@@ -133,6 +155,37 @@ export default function StaffPipelinePage() {
             </DialogTitle>
           </DialogHeader>
           {selectedProject && <SharedProjectDetail project={selectedProject} />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-600">
+              Xác nhận xóa dự án
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-brand-text-dark/80">
+              Bạn có chắc chắn muốn xóa dự án <strong className="text-brand-text-dark">{projectToDelete?.project_name}</strong>? 
+              Hành động này không thể hoàn tác.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              onClick={() => setIsDeleteConfirmOpen(false)}
+              className="rounded-lg border border-brand-dark/10 bg-white px-4 py-2 text-xs font-bold text-brand-text-dark/60 hover:bg-brand-dark/5"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 active:scale-95"
+            >
+              Xác nhận xóa
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

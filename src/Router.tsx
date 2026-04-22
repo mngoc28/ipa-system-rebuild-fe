@@ -150,6 +150,7 @@ export default function Router() {
             <Route path="partners/:id" element={<PartnerDetailPage />} />
             <Route path="documents" element={<DirectorDocumentListPage />} />
             <Route path="city-overview" element={<CityOverviewPage />} />
+            <Route path="approvals" element={<ApprovalsPage />} />
             <Route path="pipeline" element={<DirectorPipelinePage />} />
             <Route path="reports/city" element={<CityReportsPage />} />
             <Route path="notifications" element={<StaffNotificationsPage />} />

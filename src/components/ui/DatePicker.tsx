@@ -24,6 +24,7 @@ interface DatePickerProps {
     className?: string
     id?: string
     name?: string
+    hasError?: boolean
 }
 
 /**
@@ -38,7 +39,8 @@ export function DatePicker({
   placeholder = "Pick a date...",
   className,
   id,
-  name
+  name,
+  hasError = false
 }: DatePickerProps) {
   // Convert string to Date for react-day-picker
   const selectedDate = React.useMemo(() => {
@@ -57,6 +59,7 @@ export function DatePicker({
           className={cn(
             "h-auto w-full justify-start rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-4 py-3 text-left font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
             !date && "text-brand-text-dark/40",
+            hasError && "border-destructive ring-destructive/20 focus-visible:ring-destructive",
             className
           )}
         >

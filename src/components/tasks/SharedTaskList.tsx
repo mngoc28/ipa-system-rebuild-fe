@@ -2,7 +2,7 @@ import * as React from "react";
 import { useSearchParams } from "react-router-dom";
 import { 
   Plus, Clock, CheckCircle2, AlertCircle, 
-  MessageSquare, Paperclip, MoreVertical, Calendar, Zap, Save, Eye, Trash2
+  MessageSquare, Paperclip, MoreVertical, Calendar, Zap, Save, Eye, Trash2, Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -10,6 +10,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SelectField } from "@/components/ui/SelectField";
 import { MultiSelectField } from "@/components/ui/MultiSelectField";
+import { Input } from "@/components/ui/input";
+import { PlainTextarea } from "@/components/ui/textarea";
+import { useDraftUnsavedGuard } from "@/hooks/useDraftUnsavedGuard";
 import { 
   useTasksListQuery, 
   useCreateTaskMutation, 
@@ -21,6 +24,8 @@ import TaskDetailDrawer from "./TaskDetailDrawer";
 import { teamsApi } from "@/api/teamsApi";
 import { useQuery } from "@tanstack/react-query";
 import { useDelegationsQuery } from "@/hooks/useDelegationsQuery";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 
 const TASK_PRIORITY_OPTIONS = [
   { label: "THẤP", value: "0" },
@@ -60,13 +65,27 @@ export default function SharedTaskList() {
   const deleteMutation = useDeleteTaskMutation();
   const taskErrorMessage = tasksQuery.error instanceof Error ? tasksQuery.error.message : "Không thể tải danh sách nhiệm vụ.";
 
-  const [newTask, setNewTask] = React.useState({
+  const initialTaskState = React.useMemo(() => ({
     title: "",
     description: "",
     priority: 1, // Medium
     dueAt: "",
     assignee_ids: [] as string[],
     delegation_id: "",
+    notify_assignees: true,
+  }), []);
+
+  const [newTask, setNewTask] = React.useState(initialTaskState);
+  const [formErrors, setFormErrors] = React.useState<Set<string>>(new Set());
+
+  const { clearDraft } = useDraftUnsavedGuard({
+    enabled: isModalOpen,
+    storageKey: "task-creation-draft",
+    value: newTask,
+    initialValue: initialTaskState,
+    isSubmitting: createMutation.isPending,
+    restoreToastMessage: "Đã khôi phục bản nháp nhiệm vụ đang soạn dở.",
+    onRestore: (val) => setNewTask(val),
   });
 
   const memberOptions = (teamData?.data?.members || []).map(m => ({
@@ -74,8 +93,8 @@ export default function SharedTaskList() {
     value: String(m.id),
   }));
 
-  const delegationOptions = (delegationsQuery.data?.data?.items || []).map((d: { id: string | number; delegationName?: string; title?: string }) => ({
-    label: d.delegationName || d.title || "Đoàn không tên",
+  const delegationOptions = (delegationsQuery.data?.data?.items || []).map((d: DelegationApiItem) => ({
+    label: d.name || "Đoàn không tên",
     value: String(d.id),
   }));
 
@@ -94,27 +113,51 @@ export default function SharedTaskList() {
     };
   }, [tasksQuery.isLoading]);
 
-  // Handle URL taskId
+  // Handle URL taskId, openCreate, and memberId
   React.useEffect(() => {
+    const openCreate = searchParams.get("openCreate") === "true";
+    const memberId = searchParams.get("memberId");
+
+    if (openCreate && !isModalOpen) {
+      setIsModalOpen(true);
+      if (memberId) {
+        setNewTask(prev => ({
+          ...prev,
+          assignee_ids: [memberId]
+        }));
+      }
+      
+      // Clear params to avoid re-opening
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("openCreate");
+      newParams.delete("memberId");
+      setSearchParams(newParams, { replace: true });
+    }
+
     if (urlTaskId && tasks.length > 0 && !selectedTask) {
       const task = tasks.find(t => String(t.id) === urlTaskId);
       if (task) {
         setSelectedTask(task);
-        // Clear param to avoid re-opening on manual closure
         const newParams = new URLSearchParams(searchParams);
         newParams.delete("taskId");
         setSearchParams(newParams, { replace: true });
       }
     }
-  }, [urlTaskId, tasks, selectedTask, searchParams, setSearchParams]);
+  }, [urlTaskId, tasks, selectedTask, searchParams, setSearchParams, isModalOpen]);
 
   const handleCreateTask = (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
-    if (!newTask.title) {
-      toast.error("Vui lòng nhập tiêu đề nhiệm vụ!", { id: "tasks-required-title" });
+    const newErrors = new Set<string>();
+    if (!newTask.title) newErrors.add("title");
+    
+    setFormErrors(newErrors);
+
+    if (newErrors.size > 0) {
+      toast.error("Vui lòng nhập đầy đủ các trường bắt buộc!", { id: "tasks-required-fields" });
       return;
     }
+
     createMutation.mutate({
       title: newTask.title,
       description: newTask.description,
@@ -122,10 +165,13 @@ export default function SharedTaskList() {
       due_at: newTask.dueAt || undefined,
       assignee_ids: newTask.assignee_ids.map(Number),
       delegation_id: newTask.delegation_id ? Number(newTask.delegation_id) : undefined,
+      notify_assignees: newTask.notify_assignees,
     }, {
       onSuccess: () => {
         setIsModalOpen(false);
-        setNewTask({ title: "", description: "", priority: 1, dueAt: "", assignee_ids: [], delegation_id: "" });
+        setNewTask(initialTaskState);
+        setFormErrors(new Set());
+        clearDraft();
       }
     });
   };
@@ -183,7 +229,9 @@ export default function SharedTaskList() {
 
       {/* Content View */}
       {tasksQuery.isLoading && !loadingTimedOut ? (
-          <div className="flex h-40 items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Đang đồng bộ dữ liệu nhiệm vụ...</div>
+          <div className="flex h-40 items-center justify-center">
+            <LoadingSpinner label="Đang đồng bộ dữ liệu nhiệm vụ..." />
+          </div>
       ) : tasksQuery.isLoading && loadingTimedOut ? (
         <div className="flex min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-amber-100 bg-amber-50 p-8 text-center">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">Đã quá thời gian tải dữ liệu</p>
@@ -310,23 +358,33 @@ export default function SharedTaskList() {
 
           <form onSubmit={handleCreateTask} className="space-y-6 p-6">
             <div className="space-y-2">
-              <label htmlFor="task-title" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Tiêu đề nhiệm vụ</label>
-              <input
+              <label htmlFor="task-title" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                Tiêu đề nhiệm vụ <span className="text-rose-500">*</span>
+              </label>
+              <Input
                 id="task-title"
                 name="title"
                 autoFocus
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5"
+                hasError={formErrors.has("title")}
+                className="h-[50px] font-bold"
                 placeholder="Tiêu đề đầu việc cần xử lý..."
                 value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                onChange={(e) => {
+                  setNewTask({ ...newTask, title: e.target.value });
+                  if (formErrors.has("title")) {
+                    const next = new Set(formErrors);
+                    next.delete("title");
+                    setFormErrors(next);
+                  }
+                }}
               />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="task-desc" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Mô tả công việc</label>
-              <textarea
+              <PlainTextarea
                 id="task-desc"
-                className="min-h-[100px] w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-primary/30 focus:bg-white"
+                className="min-h-[120px] font-bold"
                 placeholder="Nội dung chi tiết hồ sơ, yêu cầu..."
                 value={newTask.description}
                 onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
@@ -346,11 +404,11 @@ export default function SharedTaskList() {
               </div>
               <div className="space-y-2">
                 <label htmlFor="task-due-at" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Hạn chót</label>
-                <input
+                <Input
                   id="task-due-at"
                   name="dueAt"
                   type="date"
-                  className="h-[50px] w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-primary/30 focus:bg-white"
+                  className="h-[50px] font-bold"
                   value={newTask.dueAt}
                   onChange={(e) => setNewTask({ ...newTask, dueAt: e.target.value })}
                 />
@@ -380,6 +438,29 @@ export default function SharedTaskList() {
                   triggerClassName="h-[50px] font-bold"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-xl border border-primary/10 bg-primary/5 p-4 transition-all hover:bg-primary/10">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white text-primary shadow-sm">
+                <Bell size={20} className={cn(newTask.notify_assignees && "animate-bounce")} />
+              </div>
+              <div className="flex-1 space-y-0.5">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Thông báo hệ thống</p>
+                <p className="text-[11px] font-medium text-slate-500">Gửi thông báo tức thời cho nhân sự được phân công.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewTask(prev => ({ ...prev, notify_assignees: !prev.notify_assignees }))}
+                className={cn(
+                  "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                  newTask.notify_assignees ? "bg-primary" : "bg-slate-200"
+                )}
+              >
+                <span className={cn(
+                  "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                  newTask.notify_assignees ? "translate-x-6" : "translate-x-1"
+                )} />
+              </button>
             </div>
 
             <div className="pt-4">

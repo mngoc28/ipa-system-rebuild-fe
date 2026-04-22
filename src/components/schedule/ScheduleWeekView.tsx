@@ -9,6 +9,7 @@ import {
   Check 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { UiEvent } from "./ScheduleHub";
@@ -91,8 +92,8 @@ export default function ScheduleWeekView({
     <div className="space-y-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm duration-300 animate-in slide-in-from-bottom-2">
       <div className="relative space-y-8 before:absolute before:inset-y-2 before:left-[105px] before:w-px before:bg-slate-100">
         {isLoading && (
-          <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-6 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Đang tải lịch công tác...
+          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/60 p-12 text-center">
+            <LoadingSpinner label="Đang tải lịch công tác..." size={32} />
           </div>
         )}
 

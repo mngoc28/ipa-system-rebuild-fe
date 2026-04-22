@@ -101,12 +101,12 @@ export const projectDataHelper = {
   getStageColor: (stageId: string) => {
     const normalizedStageId = projectDataHelper.normalizeStageId(stageId);
     const colors: Record<string, string> = {
-      lead: "bg-blue-600",
-      contacted: "bg-indigo-600",
-      proposal: "bg-violet-600",
-      negotiation: "bg-emerald-600",
-      "closed-won": "bg-rose-600",
-      "closed-lost": "bg-slate-600",
+      lead: "bg-primary/60",
+      contacted: "bg-primary/80",
+      proposal: "bg-primary",
+      negotiation: "bg-primary-500",
+      "closed-won": "bg-emerald-600",
+      "closed-lost": "bg-slate-500",
     };
     return colors[normalizedStageId] || "bg-slate-400";
   },

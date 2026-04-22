@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,12 @@ import { Loader2 } from "lucide-react";
 const projectSchema = z.object({
   project_name: z.string().min(1, "Tên dự án là bắt buộc"),
   project_code: z.string().optional(),
-  country_id: z.string().min(1, "Quốc gia là bắt buộc"),
-  sector_id: z.string().min(1, "Lĩnh vực là bắt buộc"),
+  country_id: z.preprocess((val) => String(val), z.string().min(1, "Quốc gia là bắt buộc")),
+  sector_id: z.preprocess((val) => String(val), z.string().min(1, "Lĩnh vực là bắt buộc")),
   stage_id: z.string().min(1, "Giai đoạn là bắt buộc"),
-  delegation_id: z.string().nullable().optional(),
-  estimated_value: z.number().nullable().optional(),
-  success_probability: z.number().min(0).max(100).nullable().optional(),
+  delegation_id: z.preprocess((val) => (val ? String(val) : null), z.string().nullable().optional()),
+  estimated_value: z.preprocess((val) => (val === "" || val === null || isNaN(Number(val)) ? null : Number(val)), z.number().nullable().optional()),
+  success_probability: z.preprocess((val) => (val === "" || val === null || isNaN(Number(val)) ? null : Number(val)), z.number().min(0, "Tối thiểu 0%").max(100, "Tối đa 100%").nullable().optional()),
   expected_close_date: z.string().nullable().optional(),
   status: z.enum(["active", "hidden"]),
 });
@@ -56,12 +56,12 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
     defaultValues: {
       project_name: initialData?.project_name || "",
       project_code: initialData?.project_code || "",
-      country_id: initialData?.country_id || "VN",
-      sector_id: initialData?.sector_id || "energy",
-      stage_id: initialData?.stage_id || "lead",
+      country_id: initialData?.country_id ? String(initialData.country_id) : "",
+      sector_id: initialData?.sector_id ? String(initialData.sector_id) : "",
+      stage_id: initialData?.stage_id || "",
       delegation_id: initialData?.delegation_id || null,
-      estimated_value: initialData?.estimated_value || 0,
-      success_probability: initialData?.success_probability || 50,
+      estimated_value: initialData?.estimated_value ?? null,
+      success_probability: initialData?.success_probability ?? null,
       expected_close_date: initialData?.expected_close_date || "",
       status: initialData?.status || "active",
     },
@@ -99,7 +99,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
       } else {
         await pipelineApi.createProject({
           ...values,
-          owner_user_id: currentUser?.data?.id || "unknown",
+          owner_user_id: String(currentUser?.data?.id || "unknown"),
         });
         toast.success("Tạo dự án mới thành công");
       }
@@ -111,8 +111,23 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
     }
   };
 
+  const onError = (errors: FieldErrors<ProjectFormValues>) => {
+    console.error("Form Validation Errors:", errors);
+    const errorFields = Object.keys(errors).map(key => {
+      const fieldLabels: Record<string, string> = {
+        project_name: "Tên dự án",
+        country_id: "Quốc gia",
+        sector_id: "Lĩnh vực",
+        stage_id: "Giai đoạn",
+        success_probability: "Xác suất",
+      };
+      return fieldLabels[key] || key;
+    });
+    toast.error(`Vui lòng kiểm tra: ${errorFields.join(", ")}`);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4 py-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="project_name">Tên dự án *</Label>
@@ -123,6 +138,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
         <div className="space-y-2">
           <Label htmlFor="project_code">Mã dự án</Label>
           <Input id="project_code" {...register("project_code")} placeholder="Mã tự sinh nếu để trống" />
+          {errors.project_code && <p className="text-xs text-rose-500">{errors.project_code.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -132,12 +148,12 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
             name="country_id"
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={errors.country_id ? "border-rose-500" : ""}>
                   <SelectValue placeholder="Chọn quốc gia" />
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((c) => (
-                    <SelectItem key={c.id} value={c.code}>
+                    <SelectItem key={c.id} value={String(c.id)}>
                       {c.name_vi}
                     </SelectItem>
                   ))}
@@ -145,6 +161,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
               </Select>
             )}
           />
+          {errors.country_id && <p className="text-xs text-rose-500">{errors.country_id.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -154,12 +171,12 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
             name="sector_id"
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={errors.sector_id ? "border-rose-500" : ""}>
                   <SelectValue placeholder="Chọn lĩnh vực" />
                 </SelectTrigger>
                 <SelectContent>
                   {sectors.map((s) => (
-                    <SelectItem key={s.id} value={s.code}>
+                    <SelectItem key={s.id} value={String(s.id)}>
                       {s.name_vi}
                     </SelectItem>
                   ))}
@@ -167,6 +184,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
               </Select>
             )}
           />
+          {errors.sector_id && <p className="text-xs text-rose-500">{errors.sector_id.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -176,7 +194,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
             name="stage_id"
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={errors.stage_id ? "border-rose-500" : ""}>
                   <SelectValue placeholder="Chọn giai đoạn" />
                 </SelectTrigger>
                 <SelectContent>
@@ -190,6 +208,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
               </Select>
             )}
           />
+          {errors.stage_id && <p className="text-xs text-rose-500">{errors.stage_id.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -208,29 +227,33 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
               />
             )}
           />
+          {errors.delegation_id && <p className="text-xs text-rose-500">{errors.delegation_id.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="estimated_value">Giá trị ước tính (VND)</Label>
           <Input
             id="estimated_value"
-            type="number"
-            {...register("estimated_value", { valueAsNumber: true })}
+            {...register("estimated_value")}
+            placeholder="Ví dụ: 1000000"
           />
+          {errors.estimated_value && <p className="text-xs text-rose-500">{errors.estimated_value.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="success_probability">Xác suất thành công (%)</Label>
           <Input
             id="success_probability"
-            type="number"
-            {...register("success_probability", { valueAsNumber: true })}
+            {...register("success_probability")}
+            placeholder="0-100"
           />
+          {errors.success_probability && <p className="text-xs text-rose-500">{errors.success_probability.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="expected_close_date">Ngày dự kiến kết thúc</Label>
           <Input id="expected_close_date" type="date" {...register("expected_close_date")} />
+          {errors.expected_close_date && <p className="text-xs text-rose-500">{errors.expected_close_date.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -250,6 +273,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
               </Select>
             )}
           />
+          {errors.status && <p className="text-xs text-rose-500">{errors.status.message}</p>}
         </div>
       </div>
 

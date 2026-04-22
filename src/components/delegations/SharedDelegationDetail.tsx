@@ -192,9 +192,11 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
   // Form States
   const [editingItem, setEditingItem] = useState<DelegationEditingItem | null>(null);
+  const [formErrors, setFormErrors] = useState<Set<string>>(new Set());
 
   const handleOpenAddModal = (type: typeof modalType) => {
     setModalType(type);
+    setFormErrors(new Set());
     if (type === "add-member") {
       setEditingItem({ fullName: "", role: "", organizationName: "", gender: "male", identityNumber: "", isVip: false });
     } else if (type === "add-schedule") {
@@ -206,14 +208,35 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
   const handleOpenEditModal = (type: typeof modalType, item: DelegationEditingItem, index: number) => {
     setModalType(type);
+    setFormErrors(new Set());
     setEditingItem({ ...item, _index: index });
   };
 
   const handleSaveSubItem = async () => {
     if (!d || !editingItem) return;
 
-    const payload: Record<string, unknown> = {};
+    const errors = new Set<string>();
     const { _index, ...itemProps } = editingItem;
+
+    // Validation
+    if (modalType?.includes("member")) {
+      if (!itemProps.fullName?.trim()) errors.add("fullName");
+    } else if (modalType?.includes("schedule")) {
+      if (!itemProps.title?.trim()) errors.add("title");
+      if (!itemProps.date?.trim()) errors.add("date");
+    } else if (modalType?.includes("checklist")) {
+      if (!itemProps.itemName?.trim()) errors.add("itemName");
+    } else if (modalType === "edit-outcome") {
+      if (!itemProps.summary?.trim()) errors.add("summary");
+    }
+
+    if (errors.size > 0) {
+      setFormErrors(errors);
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc.");
+      return;
+    }
+
+    const payload: Record<string, unknown> = {};
 
     if (modalType?.includes("member")) {
       const members = (d.members || []).map<DelegationMemberPayload>((m) => ({
@@ -357,8 +380,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
     }
     else if (deleteTarget.type === "checklist") {
       const checklist_items = (d.checklist || []).filter((_, i: number) => i !== idx).map((c) => ({
-        itemName: c.item_name,
-        assigneeId: c.assignee_user_id,
+        item_name: c.item_name || "",
+        assignee_user_id: typeof c.assignee_user_id === "string" ? Number(c.assignee_user_id) : c.assignee_user_id,
         status: c.status
       }));
       payload.checklist_items = checklist_items;
@@ -392,7 +415,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
           onClick={() => navigate(-1)}
           className="rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-700"
         >
-          Go Back
+          Quay lại
         </button>
       </div>
     );
@@ -406,7 +429,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
     <div className="mx-auto max-w-5xl space-y-8 pb-10 duration-500 animate-in fade-in">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} title="Go back" aria-label="Go back" className="rounded-lg border border-brand-dark/10 bg-white p-3 text-brand-text-dark/40 transition-all hover:text-primary">
+          <button onClick={() => navigate(-1)} title="Quay lại" aria-label="Quay lại" className="rounded-lg border border-brand-dark/10 bg-white p-3 text-brand-text-dark/40 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -437,7 +460,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")} label="TỔNG QUAN" icon={<Info size={14} />} />
         <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} label="THÀNH VIÊN" icon={<Users size={14} />} />
         <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} label="LỊCH TRÌNH" icon={<Calendar size={14} />} />
-        <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} label="CHECKLIST" icon={<CheckSquare size={14} />} />
+        <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} label="Danh sách công việc" icon={<CheckSquare size={14} />} />
         <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} label="THEO DÕI" icon={<FileText size={14} />} />
         <TabButton active={activeTab === "discussion"} onClick={() => setActiveTab("discussion")} label="THẢO LUẬN" icon={<MessageSquare size={14} />} />
       </div>
@@ -517,7 +540,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                       </div>
                     )) : (
                       <div className="col-span-full py-4 text-center">
-                        <p className="text-xs italic text-brand-text-dark/40">No contact information available.</p>
+                        <p className="text-xs italic text-brand-text-dark/40">Chưa có thông tin liên hệ.</p>
                       </div>
                     )}
                   </div>
@@ -596,7 +619,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                           </div>
                         </div>
                      </div>
-                   )) || <p className="text-center text-brand-text-dark/40">No members found.</p>}
+                   )) || <p className="text-center text-brand-text-dark/40">Không tìm thấy thành viên.</p>}
                 </div>
               </div>
            )}
@@ -645,7 +668,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                logistics_note: event.logistics_note
                              }, i)}
                              className="rounded-lg p-2 text-slate-300 transition-all hover:bg-slate-100 hover:text-primary"
-                             title="Edit schedule"
+                             title="Chỉnh sửa lịch trình"
                            >
                              <Edit2 size={14} />
                            </button>
@@ -655,7 +678,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                setIsConfirmDeleteOpen(true);
                              }}
                              className="rounded-lg p-2 text-slate-300 transition-all hover:bg-rose-50 hover:text-rose-500"
-                             title="Delete schedule"
+                             title="Xóa lịch trình"
                            >
                              <Trash2 size={14} />
                            </button>
@@ -673,7 +696,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <div className="space-y-6">
                 <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-brand-text-dark">Checklist</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-brand-text-dark">Danh sách công việc</h3>
                     <button 
                       onClick={() => handleOpenAddModal("add-checklist")}
                       className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 transition-all hover:bg-emerald-100"
@@ -697,7 +720,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                       status: item.status
                                     }, index)}
                                     className="rounded-md p-1 text-slate-300 hover:bg-white hover:text-primary"
-                                    title="Edit item"
+                                    title="Chỉnh sửa mục"
                                   >
                                     <Edit2 size={12} />
                                   </button>
@@ -707,7 +730,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                                       setIsConfirmDeleteOpen(true);
                                     }}
                                     className="rounded-md p-1 text-slate-300 hover:bg-rose-50 hover:text-rose-500"
-                                    title="Delete item"
+                                    title="Xóa mục"
                                   >
                                     <Trash2 size={12} />
                                   </button>
@@ -763,7 +786,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                           <div key={outcome.id ?? index} className="rounded-xl border border-slate-100 bg-slate-50 p-5">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                                Outcome Assessment
+                                Đánh giá kết quả
                               </span>
                               {rating !== undefined && rating !== null ? (
                                 <div className="flex items-center gap-1">
@@ -808,7 +831,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
         <div className="space-y-6">
            <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-6">
-              <h4 className="mb-4 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60">Person in Charge</h4>
+              <h4 className="mb-4 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60">Cán bộ phụ trách</h4>
               <div className="flex items-center gap-3">
                  {ownerUser?.avatar || d.owner?.avatar_url ? (
                    <img 
@@ -822,8 +845,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                    </div>
                  )}
                  <div>
-                    <p className="text-sm font-bold text-brand-text-dark">{ownerUser?.fullName || d.owner?.full_name || "System Admin"}</p>
-                    <p className="text-[10px] font-medium text-brand-text-dark/60">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Investment Department"}</p>
+                    <p className="text-sm font-bold text-brand-text-dark">{ownerUser?.fullName || d.owner?.full_name || "Quản trị hệ thống"}</p>
+                    <p className="text-[10px] font-medium text-brand-text-dark/60">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Phòng đầu tư"}</p>
                  </div>
               </div>
            </div>
@@ -835,7 +858,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
-              {modalType === "add-member" ? "Add Member" : "Edit Member"}
+              {modalType === "add-member" ? "Thêm thành viên" : "Chỉnh sửa thành viên"}
             </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
@@ -844,7 +867,17 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
               <Input 
                 id="member-fullname"
                 value={editingItem?.fullName}
-                onChange={(e) => setEditingItem({...editingItem, fullName: e.target.value})}
+                onChange={(e) => {
+                  setEditingItem({...editingItem, fullName: e.target.value});
+                  if (e.target.value.trim()) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("fullName");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("fullName")}
                 placeholder="John Doe" 
               />
             </div>
@@ -901,9 +934,9 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setModalType(null)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setModalType(null)}>Hủy</Button>
             <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? "Saving..." : "Save Changes"}
+              {updateMutation.isPending ? "Đang lưu..." : "Lưu thay đổi"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -914,69 +947,89 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
-              {modalType === "add-schedule" ? "Add Schedule Milestone" : "Edit Schedule"}
+              {modalType === "add-schedule" ? "Thêm mốc lịch trình" : "Chỉnh sửa lịch trình"}
             </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="space-y-1">
-              <label htmlFor="edit-sched-date" className="text-[10px] font-black uppercase text-slate-400">Date *</label>
+              <label htmlFor="edit-sched-date" className="text-[10px] font-black uppercase text-slate-400">Ngày *</label>
               <DatePicker 
                 id="edit-sched-date" date={editingItem?.date}
-                setDate={(v) => setEditingItem({...editingItem, date: v})}
+                setDate={(v) => {
+                  setEditingItem({...editingItem, date: v});
+                  if (v) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("date");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("date")}
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <label htmlFor="edit-sched-title" className="text-[10px] font-black uppercase text-slate-400">Main Content *</label>
+              <label htmlFor="edit-sched-title" className="text-[10px] font-black uppercase text-slate-400">Nội dung chính *</label>
               <Input 
                 id="edit-sched-title"
                 value={editingItem?.title}
-                onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
-                placeholder="Meeting at..." 
+                onChange={(e) => {
+                  setEditingItem({...editingItem, title: e.target.value});
+                  if (e.target.value.trim()) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("title");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("title")}
+                placeholder="VD: Họp tại..." 
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <label htmlFor="edit-sched-note" className="text-[10px] font-black uppercase text-slate-400">Detailed Notes</label>
+              <label htmlFor="edit-sched-note" className="text-[10px] font-black uppercase text-slate-400">Ghi chú chi tiết</label>
               <Textarea 
                 id="edit-sched-note"
                 value={editingItem?.note}
                 onChange={(e) => setEditingItem({...editingItem, note: e.target.value})}
                 rows={3}
-                placeholder="Describe work content..."
+                placeholder="Mô tả nội dung hoạt động..."
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-sched-loc" className="text-[10px] font-black uppercase text-slate-400">Location</label>
+              <label htmlFor="edit-sched-loc" className="text-[10px] font-black uppercase text-slate-400">Địa điểm</label>
               <SelectField 
                 id="edit-sched-loc"
                 value={String(editingItem?.location_id || "")}
                 onValueChange={(v) => setEditingItem({...editingItem, location_id: Number(v)})}
                 options={locationOptions}
-                placeholder="Select location..."
+                placeholder="Chọn địa điểm..."
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-sched-staff" className="text-[10px] font-black uppercase text-slate-400">Person in Charge</label>
+              <label htmlFor="edit-sched-staff" className="text-[10px] font-black uppercase text-slate-400">Cán bộ phụ trách</label>
               <SelectField 
                 id="edit-sched-staff"
                 value={String(editingItem?.staff_id || "")}
                 onValueChange={(v) => setEditingItem({...editingItem, staff_id: Number(v)})}
                 options={userOptions}
-                placeholder="Select staff..."
+                placeholder="Chọn cán bộ..."
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <label htmlFor="edit-sched-logistics" className="text-[10px] font-black uppercase text-slate-400">Logistics</label>
+              <label htmlFor="edit-sched-logistics" className="text-[10px] font-black uppercase text-slate-400">Hậu cần</label>
               <Input 
                 id="edit-sched-logistics"
                 value={editingItem?.logistics_note}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingItem({...editingItem, logistics_note: e.target.value})}
-                placeholder="Transport, pick-up..." 
+                placeholder="Xe, đón tiễn..." 
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setModalType(null)}>Cancel</Button>
-            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Save Changes</Button>
+            <Button variant="ghost" onClick={() => setModalType(null)}>Hủy</Button>
+            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Lưu thay đổi</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -986,45 +1039,55 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <DialogContent className="sm:max-w-[440px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
-              {modalType === "add-checklist" ? "Add Task" : "Edit Task"}
+              {modalType === "add-checklist" ? "Thêm đầu việc" : "Chỉnh sửa đầu việc"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-4">
             <div className="space-y-1">
-              <label htmlFor="edit-checklist-name" className="text-[10px] font-black uppercase text-slate-400">Task Name *</label>
+              <label htmlFor="edit-checklist-name" className="text-[10px] font-black uppercase text-slate-400">Tên đầu việc *</label>
               <Input 
                 id="edit-checklist-name"
                 value={editingItem?.itemName}
-                onChange={(e) => setEditingItem({...editingItem, itemName: e.target.value})}
-                placeholder="Prepare documents..." 
+                onChange={(e) => {
+                  setEditingItem({...editingItem, itemName: e.target.value});
+                  if (e.target.value.trim()) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("itemName");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("itemName")}
+                placeholder="Chuẩn bị tài liệu..." 
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-checklist-assignee" className="text-[10px] font-black uppercase text-slate-400">Person in Charge</label>
+              <label htmlFor="edit-checklist-assignee" className="text-[10px] font-black uppercase text-slate-400">Cán bộ phụ trách</label>
               <SelectField 
                 id="edit-checklist-assignee"
                 value={String(editingItem?.assigneeId || "")}
                 onValueChange={(v) => setEditingItem({...editingItem, assigneeId: Number(v)})}
                 options={userOptions}
-                placeholder="Select person..."
+                placeholder="Chọn cán bộ..."
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-checklist-status" className="text-[10px] font-black uppercase text-slate-400">Status</label>
+              <label htmlFor="edit-checklist-status" className="text-[10px] font-black uppercase text-slate-400">Trạng thái</label>
               <SelectField 
                 id="edit-checklist-status"
                 value={String(editingItem?.status)}
                 onValueChange={(v) => setEditingItem({...editingItem, status: Number(v)})}
                 options={[
-                  { label: "In Progress", value: "0" },
-                  { label: "Completed", value: "2" },
+                  { label: "Đang thực hiện", value: "0" },
+                  { label: "Hoàn thành", value: "2" },
                 ]}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setModalType(null)}>Cancel</Button>
-            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Save</Button>
+            <Button variant="ghost" onClick={() => setModalType(null)}>Hủy</Button>
+            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Lưu</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1033,11 +1096,11 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
       <Dialog open={modalType === "edit-outcome"} onOpenChange={() => setModalType(null)}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Update Outcome & Monitoring</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Cập nhật kết quả & theo dõi</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <span id="outcome-rating-label" className="text-[10px] font-black uppercase text-slate-400">General Rating (1-5 stars)</span>
+              <span id="outcome-rating-label" className="text-[10px] font-black uppercase text-slate-400">Đánh giá chung (1-5 sao)</span>
               <div className="flex gap-2" role="group" aria-labelledby="outcome-rating-label">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -1058,30 +1121,40 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
             </div>
             
             <div className="space-y-1">
-              <label htmlFor="edit-outcome-summary" className="text-[10px] font-black uppercase text-slate-400">Achieved Results</label>
+              <label htmlFor="edit-outcome-summary" className="text-[10px] font-black uppercase text-slate-400">Kết quả đạt được</label>
               <Textarea 
                 id="edit-outcome-summary"
                 value={editingItem?.summary}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditingItem({...editingItem, summary: e.target.value})}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  setEditingItem({...editingItem, summary: e.target.value});
+                  if (e.target.value.trim()) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("summary");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("summary")}
                 rows={4}
-                placeholder="Summarize key results..."
+                placeholder="Tóm tắt kết quả chính..."
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="edit-outcome-nextsteps" className="text-[10px] font-black uppercase text-slate-400">Next Tasks</label>
+              <label htmlFor="edit-outcome-nextsteps" className="text-[10px] font-black uppercase text-slate-400">Nhiệm vụ tiếp theo</label>
               <Textarea 
                 id="edit-outcome-nextsteps"
                 value={editingItem?.next_steps}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditingItem({...editingItem, next_steps: e.target.value})}
                 rows={4}
-                placeholder="Tasks to follow up after the delegation..."
+                placeholder="Các nhiệm vụ cần theo dõi sau đoàn..."
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setModalType(null)}>Cancel</Button>
-            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Save Outcome</Button>
+            <Button variant="ghost" onClick={() => setModalType(null)}>Hủy</Button>
+            <Button onClick={handleSaveSubItem} disabled={updateMutation.isPending}>Lưu kết quả</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1094,8 +1167,8 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
           setDeleteTarget(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Confirm Delete"
-        description="This action cannot be undone. Are you sure you want to delete this item from the list?"
+        title="Xác nhận xóa"
+        description="Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa mục này khỏi danh sách không?"
       />
     </div>
   );
@@ -1158,7 +1231,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
           approval_remark: remark
         }
       });
-      toast.success("Approval status updated successfully.");
+      toast.success("Đã cập nhật trạng thái phê duyệt.");
       onUpdate();
     } catch {
       // Error handled by mutation
@@ -1173,8 +1246,8 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
             <CheckSquare size={24} />
           </div>
           <div>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Approve Portfolio</h4>
-            <p className="text-sm font-bold text-brand-text-dark">Please review the portfolio and make a decision.</p>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Duyệt hồ sơ</h4>
+            <p className="text-sm font-bold text-brand-text-dark">Vui lòng xem xét hồ sơ và đưa ra quyết định.</p>
           </div>
         </div>
 
@@ -1185,7 +1258,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
             className="group flex items-center gap-3 rounded-xl bg-accent px-6 py-3 text-[11px] font-black uppercase tracking-widest text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 hover:bg-accent/90"
           >
             <Check size={16} />
-            APPROVE
+            PHÊ DUYỆT
           </button>
           
           <button
@@ -1194,7 +1267,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
             className="group flex items-center gap-3 rounded-xl bg-amber-500 px-6 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-amber-600"
           >
             <RotateCcw size={16} />
-            REQUEST EDIT
+            YÊU CẦU CHỈNH SỬA
           </button>
 
           <button
@@ -1203,7 +1276,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
             className="group flex items-center gap-3 rounded-xl bg-rose-500 px-6 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-rose-600"
           >
             <X size={16} />
-            REJECT
+            TỪ CHỐI
           </button>
         </div>
       </div>
@@ -1213,12 +1286,12 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2 text-primary">
               <MessageSquare size={14} />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Feedback Remark (Required)</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Ghi chú phản hồi (bắt buộc)</span>
             </div>
             <textarea
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
-              placeholder="Enter specific reasons for the rejection or edit request..."
+              placeholder="Nhập lý do cụ thể cho yêu cầu từ chối hoặc chỉnh sửa..."
               className="min-h-[100px] w-full rounded-xl border border-brand-dark/10 bg-white p-4 text-sm ring-primary/20 transition-all focus:border-primary focus:outline-none focus:ring-4"
             />
             <div className="flex justify-end gap-3 pt-2">
@@ -1226,7 +1299,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
                 onClick={() => setIsExpanding(false)}
                 className="rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40 hover:text-brand-text-dark/60"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={() => handleAction(pendingStatus!)}
@@ -1234,7 +1307,7 @@ function ApprovalActionBar({ role, delegation, onUpdate }: { role: string; deleg
                 className="flex items-center gap-3 rounded-lg bg-accent px-8 py-3 text-[10px] font-black uppercase tracking-widest text-accent-foreground shadow-xl shadow-accent/20 transition-all hover:bg-accent/90 disabled:opacity-50"
               >
                 <Send size={14} />
-                CONFIRM SUBMIT
+                XÁC NHẬN GỬI
               </button>
             </div>
           </div>

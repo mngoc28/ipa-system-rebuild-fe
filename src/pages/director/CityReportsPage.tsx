@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { reportsApi } from "@/api/reportsApi";
 import { SelectField } from "@/components/ui/SelectField";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const currencyFormatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -69,7 +70,11 @@ export default function CityReportsPage() {
   };
 
   if (isLoading) {
-    return <CityReportsSkeleton />;
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <LoadingSpinner label="Đang tổng hợp dữ liệu chiến lược..." />
+      </div>
+    );
   }
 
   if (isError || !summary) {
@@ -339,27 +344,6 @@ function EmptyState({ label }: { label: string }) {
   return <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-5 text-sm font-medium text-slate-500">{label}</div>;
 }
 
-function CityReportsSkeleton() {
-  return (
-    <div className="animate-pulse space-y-6">
-      <div className="flex items-center justify-between gap-6">
-        <div className="h-14 w-2/3 rounded-2xl bg-slate-200" />
-        <div className="h-10 w-56 rounded-2xl bg-slate-200" />
-      </div>
-      <div className="h-16 rounded-2xl bg-slate-100" />
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        <div className="h-32 rounded-2xl bg-slate-100" />
-        <div className="h-32 rounded-2xl bg-slate-100" />
-        <div className="h-32 rounded-2xl bg-slate-100" />
-        <div className="h-32 rounded-2xl bg-slate-100" />
-      </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="h-[420px] rounded-2xl bg-slate-100 lg:col-span-2" />
-        <div className="h-[420px] rounded-2xl bg-slate-100" />
-      </div>
-    </div>
-  );
-}
 
 function formatCompactNumber(value: number): string {
   return new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);

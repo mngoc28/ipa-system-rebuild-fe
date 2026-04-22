@@ -29,6 +29,7 @@ interface SelectFieldProps {
     className?: string;
     triggerClassName?: string;
     disabled?: boolean;
+    hasError?: boolean;
 }
 
 /**
@@ -45,6 +46,7 @@ export function SelectField({
   className,
   triggerClassName,
   disabled = false,
+  hasError = false,
 }: SelectFieldProps) {
   return (
     <div className={cn("w-full", className)}>
@@ -54,6 +56,7 @@ export function SelectField({
           name={name}
           className={cn(
             "h-auto w-full rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-5 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5",
+            hasError && "border-destructive ring-destructive/20 focus:ring-destructive",
             triggerClassName
           )}
         >

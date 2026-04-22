@@ -28,7 +28,7 @@ export const SharedProjectDetail: React.FC<SharedProjectDetailProps> = ({ projec
           <div className="flex items-start gap-3">
             <Globe className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Khu vực / Quốc gia</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Khu vực / Quốc gia</p>
               <p className="text-sm font-bold text-brand-text-dark/80">{project.country_id}</p>
             </div>
           </div>
@@ -36,7 +36,7 @@ export const SharedProjectDetail: React.FC<SharedProjectDetailProps> = ({ projec
           <div className="flex items-start gap-3">
             <Briefcase className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Lĩnh vực</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Lĩnh vực</p>
               <p className="text-sm font-bold text-brand-text-dark/80">{project.sector_id}</p>
             </div>
           </div>
@@ -44,7 +44,7 @@ export const SharedProjectDetail: React.FC<SharedProjectDetailProps> = ({ projec
           <div className="flex items-start gap-3">
             <DollarSign className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Giá trị ước tính</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Giá trị ước tính</p>
               <p className="text-sm font-black text-brand-text-dark">
                 {projectDataHelper.formatVND(project.estimated_value)}
               </p>
@@ -56,15 +56,15 @@ export const SharedProjectDetail: React.FC<SharedProjectDetailProps> = ({ projec
           <div className="flex items-start gap-3">
             <Target className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Xác suất thành công</p>
-              <p className="text-sm font-bold text-emerald-600">{project.success_probability}%</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Xác suất thành công</p>
+              <p className="text-sm font-bold text-primary">{project.success_probability}%</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
             <Calendar className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Ngày dự kiến kết thúc</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Ngày dự kiến kết thúc</p>
               <p className="text-sm font-bold text-brand-text-dark/80">
                 {project.expected_close_date || "Chưa xác định"}
               </p>
@@ -74,7 +74,7 @@ export const SharedProjectDetail: React.FC<SharedProjectDetailProps> = ({ projec
           <div className="flex items-start gap-3">
             <User className="mt-1 size-4 text-brand-text-dark/40" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Người sở hữu</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark/40">Người sở hữu</p>
               <p className="text-sm font-bold text-brand-text-dark/80">{project.owner_user_id}</p>
             </div>
           </div>

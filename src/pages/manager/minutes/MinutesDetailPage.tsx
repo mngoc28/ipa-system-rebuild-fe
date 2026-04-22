@@ -8,6 +8,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 import { minutesAttachments, minutesTasks } from "@/dataHelper/minutesDetail.dataHelper";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Input } from "@/components/ui/input";
+import { useDraftUnsavedGuard } from "@/hooks/useDraftUnsavedGuard";
+
+const COMMENT_DRAFT_KEY = "ipa_minutes_comment_draft_manager";
 
 export default function MinutesDetailPage() {
   const queryClient = useQueryClient();
@@ -15,9 +19,18 @@ export default function MinutesDetailPage() {
   const navigate = useNavigate();
   const [activeRightTab, setActiveRightTab] = useState<"tasks" | "comments" | "history">("tasks");
   const [comment, setComment] = useState("");
+  const [formErrors, setFormErrors] = useState<Set<string>>(new Set());
   const [isEditing, setIsEditing] = useState(false);
   const [tasks, setTasks] = useState(minutesTasks);
   const [attachments, setAttachments] = useState(minutesAttachments);
+
+  const { clearDraft } = useDraftUnsavedGuard({
+    enabled: true,
+    storageKey: `${COMMENT_DRAFT_KEY}_${id}`,
+    value: { comment },
+    initialValue: { comment: "" },
+    onRestore: (data) => setComment(data.comment),
+  });
 
   const detailQuery = useQuery({
     queryKey: ["minutes", "detail", id],
@@ -132,10 +145,14 @@ export default function MinutesDetailPage() {
 
   const handleSendComment = () => {
     if (!comment.trim()) {
+      setFormErrors(new Set(["comment"]));
       toast.error("Vui lòng nhập nội dung phản hồi.");
       return;
     }
-    addCommentMutation.mutate(comment.trim());
+    setFormErrors(new Set());
+    addCommentMutation.mutate(comment.trim(), {
+      onSuccess: () => clearDraft(),
+    });
   };
 
   const handleAttachmentUpload = () => {
@@ -394,8 +411,28 @@ export default function MinutesDetailPage() {
             {activeRightTab === "comments" && (
               <div className="border-t border-brand-dark/5 bg-brand-dark/[0.02] p-4">
                 <div className="group relative">
-                  <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Viết phản hồi..." className="w-full rounded-2xl border border-brand-dark/10 bg-white py-3 pl-4 pr-12 text-xs outline-none transition-all focus:border-primary" />
-                  <button onClick={handleSendComment} title="Gửi phản hồi" aria-label="Gửi phản hồi" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-primary p-2 text-white shadow-md">
+                  <Input 
+                    value={comment} 
+                    onChange={(e) => {
+                      setComment(e.target.value);
+                      if (e.target.value.trim()) {
+                        setFormErrors(prev => {
+                          const next = new Set(prev);
+                          next.delete("comment");
+                          return next;
+                        });
+                      }
+                    }} 
+                    hasError={formErrors.has("comment")}
+                    placeholder="Viết phản hồi..." 
+                    className="w-full rounded-2xl border-brand-dark/10 bg-white py-3 pl-4 pr-12 text-xs" 
+                  />
+                  <button 
+                    onClick={handleSendComment} 
+                    title="Gửi phản hồi" 
+                    aria-label="Gửi phản hồi" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-primary p-2 text-white shadow-md transition-all hover:scale-105 active:scale-95"
+                  >
                     <ArrowRight size={16} />
                   </button>
                 </div>

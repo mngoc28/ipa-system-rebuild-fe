@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { UiEvent } from "./ScheduleHub";
 
 interface ScheduleMonthViewProps {
   events: UiEvent[];
+  isLoading?: boolean;
   currentMonth: {
     month: number;
     year: number;
@@ -16,7 +18,8 @@ interface ScheduleMonthViewProps {
 }
 
 export default function ScheduleMonthView({ 
-  events, 
+  events,
+  isLoading,
   currentMonth, 
   selectedDay, 
   setSelectedDay,
@@ -64,7 +67,12 @@ export default function ScheduleMonthView({
         ))}
       </div>
 
-      <div className="grid grid-cols-7">
+      {isLoading ? (
+        <div className="flex h-[400px] items-center justify-center bg-white/50 backdrop-blur-[2px]">
+          <LoadingSpinner label="Đang cập nhật lịch tháng..." size={32} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-7">
         {calendarDays.map((cell, idx) => {
           const dayEvents = getDayEvents(cell.day);
           const isToday = cell.day === new Date().getDate() && currentMonth.month === new Date().getMonth();
@@ -86,8 +94,8 @@ export default function ScheduleMonthView({
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                    <span className={cn(
-                    "flex h-6 w-6 items-center justify-center text-[11px] font-black transition-all",
-                    isSelected ? "rounded-lg bg-primary text-white shadow-md shadow-primary/20 scale-110" : "text-slate-500",
+                    "flex h-6 w-6 items-center justify-center text-xs font-black transition-all",
+                    isSelected ? "rounded-lg bg-primary text-white shadow-md shadow-primary/20 scale-110" : "text-slate-400",
                     isToday && !isSelected && "rounded-lg border-2 border-primary text-primary",
                     !cell.isCurrentMonth && "text-slate-300 shadow-none bg-transparent"
                   )}>
@@ -111,7 +119,7 @@ export default function ScheduleMonthView({
                       onEventClick?.(event);
                     }}
                     className={cn(
-                      "group/event relative flex cursor-pointer flex-col gap-0.5 rounded-md border border-slate-100 bg-white p-2 transition-all hover:border-primary/30 hover:shadow-lg active:scale-95",
+                      "group/event relative flex cursor-pointer flex-col gap-0.5 rounded-md border border-primary/10 bg-primary/5 p-2 transition-all hover:border-primary/30 hover:shadow-lg active:scale-95",
                       event.type === "MEETING" ? "border-l-4 border-l-blue-500" : "border-l-4 border-l-primary"
                     )}
                   >
@@ -135,7 +143,8 @@ export default function ScheduleMonthView({
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,11 +12,13 @@ import { usePartnerOptionsQuery, usePartnersListQuery } from "@/hooks/usePartner
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/dateUtils";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Building2, Calendar, FileText, Save, Send, Users, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { PlainTextarea } from "@/components/ui/textarea";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
+import { ArrowLeft, Building2, Calendar, FileText, Save, Send, Users, X } from "lucide-react";
 
 /** Represents a member of a delegation as received from or sent to the API. */
 type DelegationMemberApi = {
@@ -207,6 +209,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     contact_phone: "",
     contact_email: "",
   });
+  const [formErrors, setFormErrors] = useState<Set<string>>(new Set());
   const [tempChecklistPic, setTempChecklistPic] = useState<string>("");
   const [scheduleItems, setScheduleItems] = useState<FormScheduleItem[]>([]);
   const [scheduleDraft, setScheduleDraft] = useState({ 
@@ -339,17 +342,29 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
    * @param overrideStatus - Optional status ID to override the current form status (e.g., submitting for approval).
    */
   const handleSave = async (overrideStatus?: number) => {
-    if (isSubmitting) {
-      return;
-    }
+    const newErrors = new Set<string>();
+    if (!formData.name) newErrors.add("name");
+    if (!formData.start_date) newErrors.add("start_date");
+    if (!formData.end_date) newErrors.add("end_date");
+    if (!formData.host_unit_id) newErrors.add("host_unit_id");
+    if (!formData.country_id) newErrors.add("country_id");
+    if (!formData.direction) newErrors.add("direction");
 
-    if (!formData.name || !formData.start_date || !formData.end_date) {
-      toast.error("Please fill in all required fields (*).", { id: "delegation-required-fields" });
+    setFormErrors(newErrors);
+
+    if (newErrors.size > 0) {
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc (*).", { id: "delegation-required-fields" });
+      // If error in basic info, switch to basic tab
+      if (newErrors.has("name") || newErrors.has("start_date") || newErrors.has("end_date") || newErrors.has("host_unit_id") || newErrors.has("country_id")) {
+        setActiveTab("basic");
+      }
       return;
     }
 
     if (formData.start_date > formData.end_date) {
-      toast.error("End date must be greater than or equal to start date.", { id: "delegation-date-range" });
+      toast.error("Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.", { id: "delegation-date-range" });
+      setFormErrors(prev => new Set([...prev, "start_date", "end_date"]));
+      setActiveTab("basic");
       return;
     }
 
@@ -421,7 +436,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   if (isEdit && isDetailLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LoadingSpinner label="Loading delegation data..." />
+        <LoadingSpinner label="Đang tải dữ liệu đoàn công tác..." />
       </div>
     );
   }
@@ -429,13 +444,13 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   if (formError) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-rose-100 bg-rose-50 p-8 text-center">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Load Error</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Lỗi tải dữ liệu</p>
         <p className="max-w-md text-sm font-medium text-rose-700">{formError}</p>
         <button
           onClick={() => navigate(-1)}
           className="rounded-lg bg-rose-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-rose-700"
         >
-          Go Back
+          Quay lại
         </button>
       </div>
     );
@@ -445,7 +460,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     <div className="mx-auto max-w-5xl pb-20 duration-500 animate-in slide-in-from-bottom-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} title="Go Back" aria-label="Go Back" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
+          <button onClick={() => navigate(-1)} title="Quay lại" aria-label="Quay lại" className="rounded-lg border border-slate-200 bg-white p-3 text-slate-400 transition-all hover:text-primary">
             <ArrowLeft size={20} />
           </button>
           <h1 className="font-title text-2xl font-black text-brand-text-dark">
@@ -457,7 +472,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
           {isDirty && (
             <span className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500">
               <span className="size-1.5 animate-pulse rounded-full bg-blue-500"></span>
-              DRAFT SAVED
+              ĐÃ LƯU NHÁP
             </span>
           )}
           {(!isEdit || formData.status === 0) && (
@@ -495,7 +510,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
         <TabButton active={activeTab === "basic"} onClick={() => setActiveTab("basic")} icon={<Building2 size={16} />} label="Thông tin chung" />
         <TabButton active={activeTab === "members"} onClick={() => setActiveTab("members")} icon={<Users size={16} />} label="Thành viên" />
         <TabButton active={activeTab === "schedule"} onClick={() => setActiveTab("schedule")} icon={<Calendar size={16} />} label="Lịch trình" />
-        <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} icon={<Send size={16} />} label="Checklist" />
+        <TabButton active={activeTab === "checklist"} onClick={() => setActiveTab("checklist")} icon={<Send size={16} />} label="Danh sách công việc" />
         {isEdit && <TabButton active={activeTab === "followup"} onClick={() => setActiveTab("followup")} icon={<FileText size={16} />} label="Theo dõi sau đoàn" />}
       </div>
 
@@ -503,13 +518,23 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
         {activeTab === "basic" && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
-               <label htmlFor="delegation-name" className="text-xs font-bold uppercase text-slate-500">Tên đoàn công tác *</label>
-               <input 
+               <label htmlFor="delegation-name" className="text-xs font-bold uppercase text-slate-500">
+                 Tên đoàn công tác <span className="text-rose-500">*</span>
+               </label>
+               <Input 
                  id="delegation-name"
                  name="name"
-                 className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-primary focus:bg-white"
+                 hasError={formErrors.has("name")}
+                 className="h-[48px] border-slate-200 bg-slate-50 font-bold focus:bg-white"
                  value={formData.name}
-                 onChange={(e) => setFormData({...formData, name: e.target.value})}
+                 onChange={(e) => {
+                   setFormData({...formData, name: e.target.value});
+                   if (formErrors.has("name")) {
+                     const next = new Set(formErrors);
+                     next.delete("name");
+                     setFormErrors(next);
+                   }
+                 }}
                />
             </div>
             <div className="space-y-2">
@@ -517,8 +542,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                <SelectField 
                  id="delegation-direction"
                  name="direction"
+                 hasError={formErrors.has("direction")}
                  value={formData.direction === 1 ? "inbound" : "outbound"}
-                 onValueChange={(v) => setFormData({...formData, direction: v === "inbound" ? 1 : 2})}
+                 onValueChange={(v) => {
+                   setFormData({...formData, direction: v === "inbound" ? 1 : 2});
+                   if (formErrors.has("direction")) {
+                     const next = new Set(formErrors);
+                     next.delete("direction");
+                     setFormErrors(next);
+                   }
+                 }}
                  options={[{label: "Inbound (Arrival)", value: "inbound"}, {label: "Outbound (Departure)", value: "outbound"}]}
                />
             </div>
@@ -527,8 +560,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 <SelectField 
                   id="delegation-country"
                   name="country_id"
+                  hasError={formErrors.has("country_id")}
                   value={String(formData.country_id)}
-                  onValueChange={(v) => setFormData({...formData, country_id: Number(v)})}
+                  onValueChange={(v) => {
+                    setFormData({...formData, country_id: Number(v)});
+                    if (formErrors.has("country_id")) {
+                      const next = new Set(formErrors);
+                      next.delete("country_id");
+                      setFormErrors(next);
+                    }
+                  }}
                   options={countries.map(c => ({ label: c.label, value: String(c.id) }))}
                   placeholder="Chọn quốc gia..."
                 />
@@ -538,8 +579,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 <SelectField 
                   id="delegation-unit"
                   name="host_unit_id"
+                  hasError={formErrors.has("host_unit_id")}
                   value={String(formData.host_unit_id)}
-                  onValueChange={(v) => setFormData({...formData, host_unit_id: Number(v)})}
+                  onValueChange={(v) => {
+                    setFormData({...formData, host_unit_id: Number(v)});
+                    if (formErrors.has("host_unit_id")) {
+                      const next = new Set(formErrors);
+                      next.delete("host_unit_id");
+                      setFormErrors(next);
+                    }
+                  }}
                   options={unitOptions}
                   placeholder="Chọn đơn vị..."
                 />
@@ -628,8 +677,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                <DatePicker 
                  id="delegation-start-date"
                  name="start_date"
+                 hasError={formErrors.has("start_date")}
                  date={formData.start_date}
-                 setDate={(v) => setFormData({...formData, start_date: v})}
+                 setDate={(v) => {
+                   setFormData({...formData, start_date: v});
+                   if (formErrors.has("start_date")) {
+                     const next = new Set(formErrors);
+                     next.delete("start_date");
+                     setFormErrors(next);
+                   }
+                 }}
                />
             </div>
             <div className="space-y-2">
@@ -637,8 +694,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                <DatePicker 
                  id="delegation-end-date"
                  name="end_date"
+                 hasError={formErrors.has("end_date")}
                  date={formData.end_date}
-                 setDate={(v) => setFormData({...formData, end_date: v})}
+                 setDate={(v) => {
+                   setFormData({...formData, end_date: v});
+                   if (formErrors.has("end_date")) {
+                     const next = new Set(formErrors);
+                     next.delete("end_date");
+                     setFormErrors(next);
+                   }
+                 }}
                />
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -654,11 +719,10 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
             </div>
             <div className="space-y-2 md:col-span-2">
               <label htmlFor="delegation-description" className="text-xs font-bold uppercase text-slate-500">Nội dung chi tiết</label>
-               <textarea 
+               <PlainTextarea 
                  id="delegation-description"
                  name="description"
-                 rows={4}
-                 className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-primary focus:bg-white"
+                 className="min-h-[120px] bg-slate-50 font-bold focus:bg-white"
                  value={formData.description}
                  onChange={(e) => setFormData({...formData, description: e.target.value})}
                />
@@ -736,7 +800,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                     checked={newMember.isVip}
                     onChange={(e) => setNewMember({...newMember, isVip: e.target.checked})}
                   />
-                  <span className="text-xs font-bold text-slate-600">Vé VIP</span>
+                  <span className="text-xs font-bold text-slate-600">Thành viên VIP</span>
                 </label>
               </div>
               <button 
@@ -764,7 +828,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 }}
                 className="rounded-lg bg-brand-dark-900 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-slate-800 active:scale-95 lg:col-span-4"
               >
-                Add Member to List
+                Thêm thành viên vào danh sách
               </button>
             </div>
 
@@ -784,7 +848,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                     <tr key={idx} className="group hover:bg-slate-50/50">
                       <td className="px-6 py-4">
                         <div className="font-bold text-slate-700">{m.fullName}</div>
-                        <div className="text-xs text-slate-400">{m.role || "Role not set"}</div>
+                        <div className="text-xs text-slate-400">{m.role || "Chưa có chức vụ"}</div>
                       </td>
                       <td className="px-6 py-4 text-slate-600">{m.organizationName || "-"}</td>
                       <td className="px-6 py-4 font-mono text-xs text-slate-500">{m.identityNumber || "-"}</td>
@@ -901,7 +965,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                         {item.note ? <p className="text-sm text-slate-600">{item.note}</p> : null}
                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                           {item.location_id && <span>📍 {locationOptions.find(l => l.value === String(item.location_id))?.label}</span>}
-                          {item.staff_id && <span>👤 PIC: {userOptions.find(u => u.value === String(item.staff_id))?.label}</span>}
+                          {item.staff_id && <span>👤 Cán bộ phụ trách: {userOptions.find(u => u.value === String(item.staff_id))?.label}</span>}
                           {item.logistics_note && <span>🚚 {item.logistics_note}</span>}
                        </div>
                     </div>
@@ -952,7 +1016,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                </div>
 
                <div className="space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Tổng hợp Checklist</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Tổng hợp danh sách công việc</h3>
                   <div className="space-y-2">
                      {formData.checklist_items.map((item, idx) => (
                        <div key={idx} className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white p-3 shadow-sm">

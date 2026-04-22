@@ -15,6 +15,7 @@ interface KanbanBoardProps {
     onUpdateStatus?: (id: string | number, status: string) => void;
     onDelete?: (id: string | number) => void;
     onViewList?: () => void;
+    role?: string;
 }
 
 /**
@@ -51,7 +52,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
  * 
  * @param props - Component props following KanbanBoardProps interface.
  */
-export default function KanbanBoard({ delegations: initialDelegations, onUpdateStatus, onDelete, onViewList }: KanbanBoardProps) {
+export default function KanbanBoard({ delegations: initialDelegations, onUpdateStatus, onDelete, onViewList, role }: KanbanBoardProps) {
   const [items, setItems] = useState(initialDelegations);
   const [activeItem, setActiveItem] = useState<DelegationItem | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
@@ -184,16 +185,16 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         <div className="flex min-w-max gap-4">
           {COLUMNS.map((column) => {
-            const columnItems = items.filter((item) => item.status === column.id);
             return (
-              <KanbanColumn 
-                key={column.id} 
-                id={column.id} 
-                label={column.label} 
-                color={column.color} 
-                items={columnItems} 
+              <KanbanColumn
+                key={column.id}
+                id={column.id}
+                label={column.label}
+                color={column.color}
+                items={items.filter((i) => i.status === column.id)}
                 onDelete={onDelete}
                 onViewList={onViewList}
+                role={role}
               />
             );
           })}
@@ -212,7 +213,7 @@ export default function KanbanBoard({ delegations: initialDelegations, onUpdateS
             }),
           }}
         >
-          {activeItem ? <KanbanCard item={activeItem} isOverlay onDelete={onDelete} /> : null}
+          {activeItem ? <KanbanCard item={activeItem} isOverlay role={role} onDelete={onDelete} /> : null}
         </DragOverlay>
       </DndContext>
 

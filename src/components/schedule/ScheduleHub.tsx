@@ -143,7 +143,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
 
   const locationsQuery = useQuery({
     queryKey: ["master-data-locations"],
-    queryFn: () => masterDataApi.list("location"),
+    queryFn: () => masterDataApi.list("locations"),
   });
 
   const locationsData = locationsQuery.data;

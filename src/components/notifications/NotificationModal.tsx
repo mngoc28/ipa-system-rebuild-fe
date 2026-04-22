@@ -16,67 +16,36 @@ import {
   PopoverTrigger 
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { notificationsApi, NotificationItem } from "@/api/notificationsApi";
+import { NotificationItem } from "@/api/notificationsApi";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { 
+  useNotificationsQuery, 
+  useMarkNotificationReadMutation, 
+  useMarkAllNotificationsReadMutation, 
+  useDeleteReadNotificationsMutation 
+} from "@/hooks/useNotificationsQuery";
 
 export default function NotificationModal() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { unreadCount, setUnreadCount } = useNotificationStore();
+  const { unreadCount } = useNotificationStore();
   const navigate = useNavigate();
 
-  const fetchNotifications = async () => {
-    setIsLoading(true);
-    try {
-      const response = await notificationsApi.list({ pageSize: 15 });
-      if (response.success && response.data) {
-        setNotifications(response.data.items);
-        setUnreadCount(response.data.unreadCount);
-      }
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Queries and Mutations
+  const { data, isLoading, isFetching } = useNotificationsQuery({ pageSize: 15 });
+  const readMutation = useMarkNotificationReadMutation();
+  const readAllMutation = useMarkAllNotificationsReadMutation();
+  const deleteReadMutation = useDeleteReadNotificationsMutation();
 
-  const handleReadAll = async () => {
-    try {
-      await notificationsApi.readAll();
-      setNotifications(prev => prev.map(n => ({ ...n, readAt: new Date().toISOString() })));
-      setUnreadCount(0);
-      toast.success("Đã đánh dấu tất cả là đã đọc");
-    } catch {
-      toast.error("Không thể đánh dấu tất cả đã đọc");
-    }
-  };
-
-  const handleDeleteRead = async () => {
-    try {
-      await notificationsApi.deleteRead();
-      setNotifications(prev => prev.filter(n => !n.readAt));
-      toast.success("Đã xóa các thông báo đã đọc");
-    } catch {
-      toast.error("Không thể xóa thông báo");
-    }
-  };
+  const notifications = data?.items || [];
 
   const handleRead = async (notification: NotificationItem) => {
     if (!notification.readAt) {
-      try {
-        await notificationsApi.read(notification.id);
-        setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, readAt: new Date().toISOString() } : n));
-        setUnreadCount(Math.max(0, unreadCount - 1));
-      } catch (error) {
-        console.error("Failed to mark as read:", error);
-      }
+      readMutation.mutate(notification.id);
     }
 
     // Close modal
@@ -114,10 +83,7 @@ export default function NotificationModal() {
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (open) fetchNotifications();
-    }}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <button 
           className="group relative rounded-lg border border-transparent p-2.5 text-slate-400 transition-all hover:border-slate-100 hover:bg-slate-50 hover:text-primary"
@@ -133,14 +99,18 @@ export default function NotificationModal() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[380px] overflow-hidden rounded-xl border-slate-200 p-0 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 py-3">
-          <h3 className="text-xs font-black uppercase tracking-widest text-brand-text-dark">Thông báo</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-black uppercase tracking-widest text-brand-text-dark">Thông báo</h3>
+            {isFetching && <LoadingSpinner size={12} />}
+          </div>
           <div className="flex gap-1">
             <Button 
               variant="ghost" 
               size="icon" 
               className="size-8 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary" 
               title="Đọc tất cả"
-              onClick={handleReadAll}
+              onClick={() => readAllMutation.mutate()}
+              disabled={readAllMutation.isPending}
             >
               <CheckCheck size={16} />
             </Button>
@@ -149,7 +119,8 @@ export default function NotificationModal() {
               size="icon" 
               className="size-8 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600" 
               title="Xóa đã đọc"
-              onClick={handleDeleteRead}
+              onClick={() => deleteReadMutation.mutate()}
+              disabled={deleteReadMutation.isPending}
             >
               <Trash2 size={16} />
             </Button>

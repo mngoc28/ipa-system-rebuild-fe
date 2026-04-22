@@ -123,7 +123,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
               <div className="flex items-center gap-2">
                 <span className={cn(
                   "rounded px-2 py-0.5 text-[10px] font-black uppercase tracking-widest border",
-                  task.priority === "Urgent" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-100"
+                  task.priority === "Khẩn cấp" ? "bg-rose-500 text-white border-rose-600" : "bg-slate-50 text-slate-400 border-slate-100"
                 )}>
                   {task.priority}
                 </span>
@@ -147,7 +147,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</p>
                   <select 
                     className="w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs font-bold"
-                    value={task.status === "Todo" ? 0 : task.status === "In-progress" ? 1 : task.status === "Done" ? 2 : 3}
+                    value={task.status === "Cần làm" ? 0 : task.status === "Đang xử lý" ? 1 : task.status === "Hoàn thành" ? 2 : 3}
                     onChange={(e) => handleStatusChange(Number(e.target.value))}
                   >
                     <option value={0}>CẦN XỬ LÝ</option>

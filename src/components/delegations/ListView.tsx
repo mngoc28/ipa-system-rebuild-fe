@@ -13,6 +13,7 @@ import { CountryFlag } from "@/components/ui/CountryFlag";
 interface ListViewProps {
     delegations: DelegationItem[];
     onDelete?: (id: string | number) => Promise<void> | void;
+    role?: string;
 }
 
 /**
@@ -32,7 +33,7 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
  * A tabular view for displaying delegations with sorting, pagination, 
  * and row-level actions (view, edit, delete).
  */
-export default function ListView({ delegations, onDelete }: ListViewProps) {
+export default function ListView({ delegations, onDelete, role }: ListViewProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{ key: keyof DelegationItem | null; direction: "asc" | "desc" }>({ key: null, direction: "asc" });
@@ -170,9 +171,11 @@ export default function ListView({ delegations, onDelete }: ListViewProps) {
                     <button onClick={(e) => handleView(e, item.id)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Xem chi tiết">
                       <Eye size={14} />
                     </button>
-                    <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Chỉnh sửa đoàn công tác">
-                      <Edit2 size={14} />
-                    </button>
+                    {role !== "manager" && !(role === "staff" && item.status === "pendingApproval") && (
+                      <button onClick={(e) => handleEdit(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.04] hover:text-brand-text-dark" title="Chỉnh sửa đoàn công tác">
+                        <Edit2 size={14} />
+                      </button>
+                    )}
                     <button onClick={(e) => handleDelete(e, item)} className="rounded-lg p-2 text-brand-text-dark/40 transition-all hover:bg-rose-50 hover:text-rose-600" title="Xóa hồ sơ">
                       <Trash2 size={14} />
                     </button>

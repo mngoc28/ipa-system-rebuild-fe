@@ -22,9 +22,9 @@ import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const PARTNER_STATUS_OPTIONS = [
-  { label: "Lead", value: "0" },
-  { label: "Partner", value: "1" },
-  { label: "Active", value: "2" },
+  { label: "Tiềm năng", value: "0" },
+  { label: "Đối tác", value: "1" },
+  { label: "Đang hoạt động", value: "2" },
 ];
 
 type PartnerFormState = {
@@ -314,7 +314,7 @@ export default function SharedPartnerList() {
                     </div>
                     <div className="flex flex-col items-center justify-center rounded-lg border border-brand-dark/5 bg-white p-3 text-center shadow-sm">
                     <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-brand-text-dark/40">Vị thế</p>
-                    <span className={cn("inline-block rounded px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest", partner.status === "Active" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-primary/5 text-primary border border-primary/10")}>
+                    <span className={cn("inline-block rounded px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest", partner.status === "Đang hoạt động" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-primary/5 text-primary border border-primary/10")}>
                         {partner.status}
                     </span>
                     </div>

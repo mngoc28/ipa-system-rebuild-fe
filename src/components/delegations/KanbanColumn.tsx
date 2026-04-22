@@ -28,6 +28,7 @@ interface KanbanColumnProps {
   onDelete?: (id: string | number) => void;
   /** Callback to switch back to list view. */
   onViewList?: () => void;
+  role?: string;
 }
 
 /**
@@ -37,7 +38,7 @@ interface KanbanColumnProps {
  * 
  * @param props - Component props following KanbanColumnProps interface.
  */
-export default function KanbanColumn({ id, label, color, items, onDelete, onViewList }: KanbanColumnProps) {
+export default function KanbanColumn({ id, label, color, items, onDelete, onViewList, role }: KanbanColumnProps) {
   const navigate = useNavigate();
 
   const { setNodeRef } = useDroppable({
@@ -104,7 +105,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
       <div ref={setNodeRef} className="scrollbar-thin flex-1 space-y-3 overflow-y-auto rounded-b-2xl p-1 pb-4 transition-colors">
         <SortableContext id={id} items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {items.map((item) => (
-            <KanbanCard key={item.id} item={item} onDelete={onDelete} color={color} />
+            <KanbanCard key={item.id} item={item} onDelete={onDelete} color={color} role={role} />
           ))}
 
           {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-brand-dark/10 bg-brand-dark/[0.02] text-xs font-medium text-brand-text-dark/20">Kéo thả vào đây</div>}

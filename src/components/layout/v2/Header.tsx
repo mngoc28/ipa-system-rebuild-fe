@@ -76,7 +76,18 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                 <p className="mt-0.5 text-[9px] font-black uppercase tracking-widest text-brand-text-dark/40">{user?.role || "Khách"}</p>
               </div>
               <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg border-2 border-white bg-brand-dark/[0.02] shadow-sm transition-all hover:border-primary/20">
-                {user?.avatar ? <img src={user.avatar} alt="Avatar" className="size-full object-cover" /> : <User size={20} className="text-brand-text-dark/40" />}
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt="Avatar"
+                    className="size-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+                    }}
+                  />
+                ) : (
+                  <User size={20} className="text-brand-text-dark/40" />
+                )}
               </div>
             </button>
           </DropdownMenuTrigger>

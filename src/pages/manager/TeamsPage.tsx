@@ -110,7 +110,7 @@ export default function TeamsPage() {
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 rounded-lg bg-brand-dark-900 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-brand-dark-900/10 transition-all hover:bg-slate-800 active:scale-95"
+          className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
         >
           <UserPlus size={16} /> THÊM THÀNH VIÊN
         </button>
@@ -121,7 +121,7 @@ export default function TeamsPage() {
       {summary && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <TeamStat label="Tổng nhân sự" value={summary.totalMembers} accent="slate" />
-          <TeamStat label="Đang văn phòng" value={summary.inOffice} accent="emerald" />
+          <TeamStat label="Tại văn phòng" value={summary.inOffice} accent="emerald" />
           <TeamStat label="Đang công tác" value={summary.onField} accent="amber" />
           <TeamStat label="Nghỉ phép" value={summary.onLeave} accent="rose" />
         </div>
@@ -158,7 +158,14 @@ export default function TeamsPage() {
           <div key={member.id} className="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
             <div className="relative mb-4 inline-block">
               <div className="flex size-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md">
-                <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.id}`} alt={member.name} className="size-full object-cover" />
+                <img
+                  src={member.avatarUrl || undefined}
+                  alt={member.name}
+                  className="size-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+                  }}
+                />
               </div>
               <div
                 className={cn(
@@ -263,7 +270,7 @@ export default function TeamsPage() {
             <div className="flex gap-3">
               <div className="rounded-lg border border-white/10 bg-white/5 px-5 py-2.5">
                 <p className="text-xl font-black">{summary?.inOffice ?? 0}</p>
-                <p className="text-[9px] font-black uppercase text-slate-500">Đang văn phòng</p>
+                <p className="text-[9px] font-black uppercase text-slate-500">Tại văn phòng</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 px-5 py-2.5">
                 <p className="text-xl font-black">{summary?.onField ?? 0}</p>

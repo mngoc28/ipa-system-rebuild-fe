@@ -174,14 +174,14 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   const d = detailData?.data as DelegationDetailView | undefined;
 
   // Master Data & Users for forms
-  const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 });
+  const { data: usersData, isLoading: isUsersLoading } = useAdminUsersListQuery({ pageSize: 100 });
   const userOptions = usersData?.data?.items?.map(u => ({ label: u.fullName, value: String(u.id) })) || [];
   
   const ownerUser = usersData?.data?.items?.find(u => String(u.id) === String(d?.owner_user_id));
 
   const { data: locationsData } = useQuery({
     queryKey: ["master-data-locations"],
-    queryFn: () => masterDataApi.list("location"),
+    queryFn: () => masterDataApi.list("locations"),
   });
   const locationOptions = (locationsData?.data?.items ?? []).map(l => ({ label: l.name_vi, value: String(l.id) }));
 
@@ -341,7 +341,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
     try {
       await updateMutation.mutateAsync({ id: d.id, data: payload });
-      toast.success("Data updated successfully");
+      toast.success("Cập nhật dữ liệu thành công");
       setModalType(null);
       setEditingItem(null);
       refetch();
@@ -389,7 +389,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
 
     try {
       await updateMutation.mutateAsync({ id: d.id, data: payload });
-      toast.success("Item deleted successfully");
+      toast.success("Đã xóa mục thành công");
       setIsConfirmDeleteOpen(false);
       setDeleteTarget(null);
       refetch();
@@ -409,7 +409,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   if (detailError) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-rose-100 bg-rose-50 p-8 text-center">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Failed to load details</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">LỖI TẢI DỮ LIỆU</p>
         <p className="max-w-md text-sm font-medium text-rose-700">{detailError}</p>
         <button
           onClick={() => navigate(-1)}
@@ -445,16 +445,22 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
           </div>
         </div>
 
-        <button 
-          onClick={() => navigate(`/delegations/${id}/edit`)}
-          className="flex items-center gap-2 rounded-lg bg-brand-dark px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-brand-dark/90"
-        >
-          <Edit size={16} />
-          CHỈNH SỬA HỒ SƠ
-        </button>
+        {role !== "manager" && !(role === "staff" && d?.status === 1) && (
+          <button 
+            onClick={() => navigate(`/delegations/${id}/edit`)}
+            className="flex items-center gap-2 rounded-lg bg-brand-dark px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-brand-dark/90"
+          >
+            <Edit size={16} />
+            CHỈNH SỬA HỒ SƠ
+          </button>
+        )}
       </div>
 
       <ApprovalActionBar role={role} delegation={d} onUpdate={() => navigate(0)} />
+
+      {d.approval_remark && (d.status === 2 || d.status === 6) && (
+        <FeedbackCard remark={d.approval_remark} status={d.status} />
+      )}
 
       <div ref={tabRef} className="flex gap-4 border-b border-brand-dark/10">
         <TabButton active={activeTab === "overview"} onClick={() => setActiveTab("overview")} label="TỔNG QUAN" icon={<Info size={14} />} />
@@ -832,23 +838,33 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
         <div className="space-y-6">
            <div className="rounded-xl border border-brand-dark/10 bg-brand-dark/[0.02] p-6">
               <h4 className="mb-4 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60">Cán bộ phụ trách</h4>
-              <div className="flex items-center gap-3">
-                 {ownerUser?.avatar || d.owner?.avatar_url ? (
-                   <img 
-                     src={ownerUser?.avatar || d.owner?.avatar_url} 
-                     alt={ownerUser?.fullName || d.owner?.full_name} 
-                     className="size-10 rounded-full object-cover ring-2 ring-white"
-                   />
-                 ) : (
-                   <div className="flex size-10 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
-                     {(ownerUser?.fullName || d.owner?.full_name || "A").charAt(0)}
+              {isUsersLoading ? (
+                 <div className="flex animate-pulse items-center gap-3">
+                   <div className="size-10 rounded-full bg-brand-dark/10" />
+                   <div className="space-y-2">
+                     <div className="h-4 w-24 rounded bg-brand-dark/10" />
+                     <div className="h-3 w-32 rounded bg-brand-dark/5" />
                    </div>
-                 )}
-                 <div>
-                    <p className="text-sm font-bold text-brand-text-dark">{ownerUser?.fullName || d.owner?.full_name || "Quản trị hệ thống"}</p>
-                    <p className="text-[10px] font-medium text-brand-text-dark/60">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Phòng đầu tư"}</p>
                  </div>
-              </div>
+               ) : (
+                 <div className="flex items-center gap-3">
+                    {ownerUser?.avatar || d.owner?.avatar_url ? (
+                      <img 
+                        src={ownerUser?.avatar || d.owner?.avatar_url} 
+                        alt={ownerUser?.fullName || d.owner?.full_name} 
+                        className="size-10 rounded-full object-cover ring-2 ring-white"
+                      />
+                    ) : (
+                      <div className="flex size-10 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+                        {(ownerUser?.fullName || d.owner?.full_name || "N").charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                       <p className="text-sm font-bold text-brand-text-dark">{ownerUser?.fullName || d.owner?.full_name || "Chưa xác định"}</p>
+                       <p className="text-[10px] font-medium text-brand-text-dark/60">{d.host_unit?.unit_name || ownerUser?.unit?.unit_name || "Chưa xác định đơn vị"}</p>
+                    </div>
+                 </div>
+               )}
            </div>
         </div>
       </div>
@@ -863,7 +879,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="col-span-2 space-y-1">
-              <label htmlFor="member-fullname" className="text-[10px] font-black uppercase text-slate-400">Full Name *</label>
+              <label htmlFor="member-fullname" className="text-[10px] font-black uppercase text-slate-400">Họ và tên *</label>
               <Input 
                 id="member-fullname"
                 value={editingItem?.fullName}
@@ -878,47 +894,47 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                   }
                 }}
                 hasError={formErrors.has("fullName")}
-                placeholder="John Doe" 
+                placeholder="VD: Nguyễn Văn A" 
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="member-gender" className="text-[10px] font-black uppercase text-slate-400">Gender</label>
+              <label htmlFor="member-gender" className="text-[10px] font-black uppercase text-slate-400">Giới tính</label>
               <SelectField 
                 id="member-gender"
                 value={editingItem?.gender || ""}
                 onValueChange={(v) => setEditingItem({...editingItem, gender: v})}
                 options={[
-                  { label: "Male", value: "male" },
-                  { label: "Female", value: "female" },
-                  { label: "Other", value: "other" }
+                  { label: "Nam", value: "male" },
+                  { label: "Nữ", value: "female" },
+                  { label: "Khác", value: "other" }
                 ]}
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="member-role" className="text-[10px] font-black uppercase text-slate-400">Role</label>
+              <label htmlFor="member-role" className="text-[10px] font-black uppercase text-slate-400">Chức vụ / Vị trí</label>
               <Input 
                 id="member-role"
                 value={editingItem?.role}
                 onChange={(e) => setEditingItem({...editingItem, role: e.target.value})}
-                placeholder="Manager" 
+                placeholder="VD: Giám đốc..." 
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <label htmlFor="member-org" className="text-[10px] font-black uppercase text-slate-400">Organization/Enterprise</label>
+              <label htmlFor="member-org" className="text-[10px] font-black uppercase text-slate-400">Cơ quan / Doanh nghiệp</label>
               <Input 
                 id="member-org"
                 value={editingItem?.organizationName}
                 onChange={(e) => setEditingItem({...editingItem, organizationName: e.target.value})}
-                placeholder="Samsung Electronics" 
+                placeholder="VD: Công ty TNHH..." 
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="member-identity" className="text-[10px] font-black uppercase text-slate-400">ID/Passport</label>
+              <label htmlFor="member-identity" className="text-[10px] font-black uppercase text-slate-400">CMND / Hộ chiếu</label>
               <Input 
                 id="member-identity"
                 value={editingItem?.identityNumber}
                 onChange={(e) => setEditingItem({...editingItem, identityNumber: e.target.value})}
-                placeholder="B1234567" 
+                placeholder="Số định danh..." 
               />
             </div>
             <div className="flex items-end pb-2">
@@ -929,7 +945,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                   checked={editingItem?.isVip}
                   onChange={(e) => setEditingItem({...editingItem, isVip: e.target.checked})}
                 />
-                <span className="text-xs font-bold text-slate-600">VIP Card</span>
+                <span className="text-xs font-bold text-slate-600">Thành viên VIP</span>
               </label>
             </div>
           </div>
@@ -1197,6 +1213,44 @@ function TabButton({ active, onClick, label, icon }: { active: boolean; onClick:
       {icon}
       {label}
     </button>
+  );
+}
+
+/**
+ * Displays feedback/remarks from managers for rejected or revision-required delegations.
+ */
+function FeedbackCard({ remark, status }: { remark: string; status: number }) {
+  const isRevision = status === 2;
+  const isRejected = status === 6;
+
+  return (
+    <div className={cn(
+      "mb-8 overflow-hidden rounded-2xl border p-1 duration-500 animate-in slide-in-from-top-4",
+      isRevision ? "border-amber-200 bg-amber-50" : isRejected ? "border-rose-200 bg-rose-50" : "border-brand-dark/10 bg-white"
+    )}>
+      <div className="flex items-start gap-4 p-5">
+        <div className={cn(
+          "flex size-12 shrink-0 items-center justify-center rounded-xl shadow-sm",
+          isRevision ? "bg-amber-500 text-white" : isRejected ? "bg-rose-500 text-white" : "bg-brand-dark/40 text-white"
+        )}>
+          <MessageSquare size={24} />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center justify-between">
+            <h4 className={cn(
+              "text-[10px] font-black uppercase tracking-[0.2em]",
+              isRevision ? "text-amber-600" : "text-rose-600"
+            )}>
+              {isRevision ? "Yêu cầu chỉnh sửa" : "Ý kiến từ chối"}
+            </h4>
+            <span className="text-[10px] font-bold opacity-40">Phản hồi từ Manager</span>
+          </div>
+          <p className="whitespace-pre-wrap text-sm font-bold leading-relaxed text-brand-text-dark">
+            {remark}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -1,7 +1,7 @@
 /** Typical priority levels for a task. */
-export type TaskPriority = "Low" | "Medium" | "High" | "Urgent";
+export type TaskPriority = "Thấp" | "Trung bình" | "Cao" | "Khẩn cấp";
 /** Valid lifecycle statuses for a task. */
-export type TaskStatus = "Todo" | "In-progress" | "Done" | "Canceled";
+export type TaskStatus = "Cần làm" | "Đang xử lý" | "Hoàn thành" | "Đã hủy";
 
 /**
  * Interface representing a task object received from the API.
@@ -85,10 +85,10 @@ export interface TaskUiItem {
  * @returns Human-readable status string.
  */
 export const mapTaskStatus = (status: number): TaskStatus => {
-  if (status === 1) return "In-progress";
-  if (status === 2) return "Done";
-  if (status === 3) return "Canceled";
-  return "Todo";
+  if (status === 1) return "Đang xử lý";
+  if (status === 2) return "Hoàn thành";
+  if (status === 3) return "Đã hủy";
+  return "Cần làm";
 };
 
 /**
@@ -97,10 +97,10 @@ export const mapTaskStatus = (status: number): TaskStatus => {
  * @returns Human-readable priority string.
  */
 export const mapTaskPriority = (priority: number): TaskPriority => {
-  if (priority === 0) return "Low";
-  if (priority === 2) return "High";
-  if (priority === 3) return "Urgent";
-  return "Medium";
+  if (priority === 0) return "Thấp";
+  if (priority === 2) return "Cao";
+  if (priority === 3) return "Khẩn cấp";
+  return "Trung bình";
 };
 
 export const mapTaskToUi = (item: TaskApiItem): TaskUiItem => {

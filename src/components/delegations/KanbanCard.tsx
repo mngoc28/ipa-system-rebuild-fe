@@ -28,6 +28,7 @@ interface KanbanCardProps {
     isOverlay?: boolean;
     onDelete?: (id: string | number) => void;
     color?: string;
+    role?: string;
 }
 
 
@@ -37,7 +38,7 @@ interface KanbanCardProps {
  * 
  * @param props - Component props following KanbanCardProps interface.
  */
-export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanCardProps) {
+export default function KanbanCard({ item, isOverlay, onDelete, color, role }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
   const navigate = useNavigate();
@@ -109,9 +110,11 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
                 <DropdownMenuItem onClick={(e) => handleAction(e, "view")}>
                   <Eye size={14} className="mr-2" /> Xem chi tiết
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => handleAction(e, "edit")}>
-                  <Edit2 size={14} className="mr-2" /> Chỉnh sửa đoàn
-                </DropdownMenuItem>
+                {role !== "manager" && !(role === "staff" && item.status === "pendingApproval") && (
+                  <DropdownMenuItem onClick={(e) => handleAction(e, "edit")}>
+                    <Edit2 size={14} className="mr-2" /> Chỉnh sửa đoàn
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={(e) => handleAction(e, "delete")}

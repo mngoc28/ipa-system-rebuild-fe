@@ -404,11 +404,13 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
               onUpdateStatus={handleUpdateStatus} 
               onDelete={handleDelete}
               onViewList={() => setViewMode("list")}
+              role={role}
             />
           ) : (
             <ListView 
               delegations={uiDelegations} 
               onDelete={handleDelete}
+              role={role}
             />
           )
         )}

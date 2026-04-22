@@ -115,6 +115,7 @@ export default function ManagerPipelinePage() {
 
         <SharedProjectList 
           projects={filteredProjects}
+          isLoading={projectsQuery.isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onView={handleView}

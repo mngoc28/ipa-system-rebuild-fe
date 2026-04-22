@@ -45,7 +45,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
   });
 
   const handleExportColumn = () => {
-    const headers = ["Delegation Code", "Delegation Name", "Country", "Status"];
+    const headers = ["Mã đoàn", "Tên đoàn", "Quốc gia", "Trạng thái"];
     const rows = items.map((item) => [item.code, item.name, item.country, item.status]);
     const csv = [headers, ...rows]
       .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
@@ -59,7 +59,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
     link.click();
     window.URL.revokeObjectURL(url);
 
-    toast.success(`Exported ${label} list.`);
+    toast.success(`Đã xuất danh sách ${label}.`);
   };
 
   return (
@@ -80,10 +80,10 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleExportColumn}>
-              <Download size={14} className="mr-2" /> Export to CSV
+              <Download size={14} className="mr-2" /> Xuất CSV
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/delegations/create")}>
-              <Plus size={14} className="mr-2" /> Create New Delegation
+              <Plus size={14} className="mr-2" /> Tạo đoàn công tác mới
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => {
@@ -94,7 +94,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
                 }
               }}
             >
-              <List size={14} className="mr-2" /> View All Delegations
+              <List size={14} className="mr-2" /> Xem tất cả đoàn công tác
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -107,7 +107,7 @@ export default function KanbanColumn({ id, label, color, items, onDelete, onView
             <KanbanCard key={item.id} item={item} onDelete={onDelete} color={color} />
           ))}
 
-          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-brand-dark/10 bg-brand-dark/[0.02] text-xs font-medium text-brand-text-dark/20">Drop here</div>}
+          {items.length === 0 && <div className="flex h-32 items-center justify-center rounded-2xl border-2 border-dashed border-brand-dark/10 bg-brand-dark/[0.02] text-xs font-medium text-brand-text-dark/20">Kéo thả vào đây</div>}
         </SortableContext>
       </div>
     </div>

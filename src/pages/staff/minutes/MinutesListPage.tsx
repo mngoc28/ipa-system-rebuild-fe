@@ -9,6 +9,11 @@ import { delegationsApi } from "@/api/delegationsApi";
 import { SEARCH_DEBOUNCE_DELAY_MS } from "@/constant";
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useDraftUnsavedGuard } from "@/hooks/useDraftUnsavedGuard";
+
+const MINUTES_DRAFT_KEY = "ipa_minutes_creation_draft";
 
 export default function MinutesListPage() {
   const queryClient = useQueryClient();
@@ -19,6 +24,22 @@ export default function MinutesListPage() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [showSignedOnly, setShowSignedOnly] = useState(false);
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+
+  // Creation Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newMinutesData, setNewMinutesData] = useState({ title: "" });
+  const [formErrors, setFormErrors] = useState<Set<string>>(new Set());
+
+  const { clearDraft } = useDraftUnsavedGuard({
+    enabled: isCreateModalOpen,
+    storageKey: MINUTES_DRAFT_KEY,
+    value: newMinutesData,
+    initialValue: { title: "" },
+    onRestore: (data) => {
+      setNewMinutesData(data);
+      setIsCreateModalOpen(true);
+    },
+  });
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -119,19 +140,33 @@ export default function MinutesListPage() {
       toast.error("Không tìm thấy đoàn để tạo biên bản.");
       return;
     }
+    setNewMinutesData({ title: `Biên bản làm việc #${minutes.length + 1}` });
+    setFormErrors(new Set());
+    setIsCreateModalOpen(true);
+  };
+
+  const handleConfirmCreate = () => {
+    if (!newMinutesData.title.trim()) {
+      setFormErrors(new Set(["title"]));
+      toast.error("Vui lòng nhập tiêu đề biên bản.");
+      return;
+    }
+
     createMinutesMutation.mutate(
       {
-        title: `Biên bản mới #${minutes.length + 1}`,
+        title: newMinutesData.title,
         delegationId: String(firstDelegationId),
       },
       {
         onSuccess: (response) => {
+          clearDraft();
           const newId = response.data?.id;
           if (newId) {
             navigate(`${newId}`);
             return;
           }
           toast.success("Đã tạo bản nháp biên bản mới.");
+          setIsCreateModalOpen(false);
         },
         onError: () => {
           toast.error("Tạo biên bản thất bại.");
@@ -372,6 +407,66 @@ export default function MinutesListPage() {
           </div>
         )}
       </div>
+
+      <Dialog open={isCreateModalOpen} onOpenChange={(open) => {
+        setIsCreateModalOpen(open);
+        if (!open) setFormErrors(new Set());
+      }}>
+        <DialogContent className="max-w-md rounded-[32px] border-none bg-white p-0 shadow-2xl">
+          <DialogHeader className="p-8 pb-4">
+            <DialogTitle className="font-title text-xl font-black uppercase tracking-tight text-brand-text-dark">Tạo Biên bản mới</DialogTitle>
+            <DialogDescription className="text-xs font-semibold text-brand-text-dark/40">
+              Nhập tiêu đề cho biên bản làm việc mới. Dữ liệu sẽ được tự động lưu nháp.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 px-8 pb-8">
+            <div className="space-y-2">
+              <label htmlFor="new-minutes-title" className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/60">Tiêu đề biên bản *</label>
+              <Input 
+                id="new-minutes-title"
+                value={newMinutesData.title}
+                onChange={(e) => {
+                  setNewMinutesData({ title: e.target.value });
+                  if (e.target.value.trim()) {
+                    setFormErrors(prev => {
+                      const next = new Set(prev);
+                      next.delete("title");
+                      return next;
+                    });
+                  }
+                }}
+                hasError={formErrors.has("title")}
+                placeholder="VD: Biên bản họp khởi động dự án..."
+                className="h-12 border-brand-dark/10 bg-brand-dark/[0.02] text-sm font-bold focus:bg-white"
+              />
+            </div>
+            
+            <div className="rounded-2xl bg-brand-dark/[0.02] p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Ghi chú</p>
+              <p className="mt-1 text-[11px] font-medium leading-relaxed text-brand-text-dark/60">
+                Biên bản sẽ được liên kết với đoàn công tác hiện tại. Sau khi tạo, bạn có thể chỉnh sửa nội dung chi tiết.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-3 rounded-b-[32px] bg-brand-dark/[0.02] p-6">
+            <button 
+              onClick={() => setIsCreateModalOpen(false)}
+              className="flex-1 rounded-2xl border border-brand-dark/10 py-3 text-xs font-black uppercase tracking-widest text-brand-text-dark/60 transition-all hover:bg-white"
+            >
+              Hủy
+            </button>
+            <button 
+              onClick={handleConfirmCreate}
+              disabled={createMinutesMutation.isPending}
+              className="flex-1 rounded-2xl bg-primary py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+            >
+              {createMinutesMutation.isPending ? "Đang tạo..." : "Tạo biên bản"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

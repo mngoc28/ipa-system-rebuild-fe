@@ -139,7 +139,7 @@ export default function DirectorPipelinePage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Director Pipeline</p>
-          <h1 className="font-title text-2xl font-black uppercase tracking-tight text-brand-text-dark">Pipeline Xúc tiến Đầu tư</h1>
+          <h1 className="text-2xl font-black uppercase tracking-tight text-brand-text-dark">Pipeline Xúc tiến Đầu tư</h1>
           <p className="mt-1 text-sm font-medium text-slate-500">Theo dõi và quản lý phễu dòng vốn đầu tư chiến lược bằng dữ liệu thật từ backend.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -293,6 +293,13 @@ function StatCard({ title, value, note, icon, color }: { title: string; value: s
     purple: "text-purple-600 bg-white border-purple-100",
   };
 
+  const valueColors = {
+    blue: "text-blue-600",
+    emerald: "text-emerald-600",
+    amber: "text-amber-600",
+    purple: "text-purple-600",
+  };
+
   return (
     <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-slate-200/40 active:scale-[0.98]">
       <div className="absolute right-[-10px] top-[-10px] size-20 rounded-full bg-slate-50 opacity-40 transition-all group-hover:scale-110 group-hover:bg-primary/10" />
@@ -300,7 +307,7 @@ function StatCard({ title, value, note, icon, color }: { title: string; value: s
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}>{icon}</div>
         <div>
           <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-          <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
+          <p className={cn("text-3xl font-black tracking-tighter", valueColors[color])}>{value}</p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <TrendingUp size={14} className="animate-pulse" /> {note}

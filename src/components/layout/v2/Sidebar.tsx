@@ -1,32 +1,32 @@
-import * as React from "react";
-import { ElementType, useEffect, useMemo } from "react";
-import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Briefcase,
-  Calendar,
-  CheckSquare,
-  FileText,
-  Bell,
-  Users,
-  FileStack,
-  UserCircle,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  Building2,
-  PieChart,
-  ShieldCheck,
-  ClipboardList,
-  Database,
-  Activity,
-  BarChart3,
-  Settings,
-} from "lucide-react";
+import logoBrand from "@/assets/logo-brand.png";
+import { cn } from "@/lib/utils";
 import { useAuthStore, UserRole } from "@/store/useAuthStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { cn } from "@/lib/utils";
-import logoBrand from "@/assets/logo-brand.png";
+import {
+  Activity,
+  BarChart3,
+  Bell,
+  Briefcase,
+  Building2,
+  Calendar,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Database,
+  FileStack,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  PieChart,
+  Settings,
+  ShieldCheck,
+  UserCircle,
+  Users,
+} from "lucide-react";
+import { ElementType, useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { LogoutConfirmModal } from "./LogoutConfirmModal";
 
 /**
  * Structure for a single sidebar navigation item.
@@ -99,10 +99,10 @@ const menuGroups: MenuGroup[] = [
     ]
   },
   {
-    group: "RESOURCES",
+    group: "TÀI NGUYÊN",
     items: [
-      { title: "Partner CRM", path: "/partners", icon: Users, roles: ["Staff", "Manager", "Director", "Admin"] },
-      { title: "Documents", path: "/documents", icon: FileStack, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "CRM ĐỐI TÁC", path: "/partners", icon: Users, roles: ["Staff", "Manager", "Director", "Admin"] },
+      { title: "TÀI LIỆU", path: "/documents", icon: FileStack, roles: ["Staff", "Manager", "Director", "Admin"] },
     ]
   }
 ];
@@ -120,6 +120,7 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuthStore();
   const { unreadCount, pendingApprovalsCount, fetchCounts } = useNotificationStore();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     fetchCounts();
@@ -221,7 +222,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
 
       {/* Bottom Profile */}
       <div className="space-y-1 border-t border-white/10 bg-brand-dark-900/50 p-2">
-        <NavLink to="/profile" onClick={onMobileClose} className={cn("flex h-12 items-center rounded-md px-2 transition-all hover:bg-white/5", isCollapsed ? "justify-center" : "")}> 
+        <NavLink to="/profile" aria-label="Hồ sơ cá nhân" onClick={onMobileClose} className={cn("flex h-12 items-center rounded-md px-2 transition-all hover:bg-white/5", isCollapsed ? "justify-center" : "")}> 
           <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-brand-dark-900/50">
             {user?.avatar ? <img src={user.avatar} alt="Avatar" className="size-full object-cover" /> : <UserCircle size={20} className="text-white/20" />}
           </div>
@@ -234,7 +235,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
         </NavLink>
 
         <div className="flex flex-col gap-px">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="flex h-10 w-full items-center rounded-md px-3 text-white/40 transition-all hover:bg-white/5 hover:text-white">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? "Mở rộng" : "Thu gọn"} aria-label={isCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"} className="flex h-10 w-full items-center rounded-md px-3 text-white/40 transition-all hover:bg-white/5 hover:text-white">
             {isCollapsed ? (
               <ChevronRight size={20} />
             ) : (
@@ -248,10 +249,10 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
           <button
             onClick={() => {
               onMobileClose?.();
-              logout();
+              setIsLogoutModalOpen(true);
             }}
-            title="Logout"
-            aria-label="Logout"
+            title="Đăng xuất"
+            aria-label="Đăng xuất khỏi hệ thống"
             className="flex h-10 w-full items-center rounded-md px-3 text-white/40 shadow-sm transition-all hover:bg-destructive hover:text-white"
           >
             <LogOut size={20} />
@@ -259,6 +260,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = fa
           </button>
         </div>
       </div>
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen} 
+        onOpenChange={setIsLogoutModalOpen} 
+        onConfirm={logout} 
+      />
     </aside>
   );
 }

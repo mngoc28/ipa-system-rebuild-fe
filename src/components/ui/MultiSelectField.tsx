@@ -30,6 +30,7 @@ interface MultiSelectFieldProps {
     className?: string;
     triggerClassName?: string;
     disabled?: boolean;
+    hasError?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export function MultiSelectField({
   className,
   triggerClassName,
   disabled = false,
+  hasError = false,
 }: MultiSelectFieldProps) {
   const [search, setSearch] = React.useState("");
 
@@ -73,6 +75,7 @@ export function MultiSelectField({
             disabled={disabled}
             className={cn(
               "flex min-h-[48px] w-full items-center justify-between rounded-lg border border-brand-dark/10 bg-brand-dark/[0.02] px-4 py-2 text-sm transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50",
+              hasError && "border-destructive ring-destructive/20 focus:ring-destructive",
               triggerClassName
             )}
           >

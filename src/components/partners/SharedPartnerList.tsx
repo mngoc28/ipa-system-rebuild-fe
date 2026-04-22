@@ -265,7 +265,7 @@ export default function SharedPartnerList() {
                 >
                 <div className="mb-5 flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                    <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border border-brand-dark/10 bg-white text-primary shadow-sm transition-all group-hover:border-brand-dark group-hover:bg-brand-dark group-hover:text-white">
+                    <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border border-primary/10 bg-white text-primary shadow-sm transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-white">
                         <Building2 size={24} />
                     </div>
                     <div>
@@ -330,7 +330,7 @@ export default function SharedPartnerList() {
                           onClick={() => contactMutation.mutate(partner.id)}
                           title={`Gửi email cho ${partner.name}`}
                           aria-label={`Gửi email cho ${partner.name}`}
-                          className="rounded-lg border border-brand-dark/10 bg-white p-2 text-brand-text-dark/40 shadow-sm transition-all hover:bg-brand-dark hover:text-white active:scale-90"
+                          className="rounded-lg border border-brand-dark/10 bg-white p-2 text-brand-text-dark/40 shadow-sm transition-all hover:bg-primary hover:text-white active:scale-90"
                         >
                             <Mail size={14} />
                         </button>

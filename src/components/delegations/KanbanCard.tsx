@@ -60,7 +60,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
       if (onDelete) {
         onDelete(item.id);
       } else {
-        toast.info("Request to delete delegation: " + item.name);
+        toast.info("Yêu cầu xóa đoàn công tác: " + item.name);
       }
     }
   };
@@ -107,17 +107,17 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem onClick={(e) => handleAction(e, "view")}>
-                  <Eye size={14} className="mr-2" /> View details
+                  <Eye size={14} className="mr-2" /> Xem chi tiết
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={(e) => handleAction(e, "edit")}>
-                  <Edit2 size={14} className="mr-2" /> Edit delegation
+                  <Edit2 size={14} className="mr-2" /> Chỉnh sửa đoàn
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={(e) => handleAction(e, "delete")}
                   className="text-rose-600 focus:bg-rose-50 focus:text-rose-600"
                 >
-                  <Trash2 size={14} className="mr-2" /> Delete record
+                  <Trash2 size={14} className="mr-2" /> Xóa hồ sơ
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -160,7 +160,7 @@ export default function KanbanCard({ item, isOverlay, onDelete, color }: KanbanC
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-[10px] font-bold uppercase tracking-widest">
-                  {item.actionItems.total} Checklist items
+                  {item.actionItems.total} đầu việc
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

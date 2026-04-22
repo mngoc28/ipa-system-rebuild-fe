@@ -13,9 +13,20 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SelectField } from "@/components/ui/SelectField";
 
 const currencyFormatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -45,13 +56,20 @@ export default function CityOverviewPage() {
   const isLoading = summaryQuery.isLoading || tasksQuery.isLoading;
   const isError = summaryQuery.isError || tasksQuery.isError;
 
+  const [timeFilter, setTimeFilter] = React.useState("ALL");
+  const [typeFilter, setTypeFilter] = React.useState("ALL");
+
   const handleRefresh = () => {
     void summaryQuery.refetch();
     void tasksQuery.refetch();
   };
 
   if (isLoading) {
-    return <CityOverviewSkeleton />;
+    return (
+      <div className="flex h-[600px] items-center justify-center">
+        <LoadingSpinner label="Đang tổng hợp dữ liệu thành phố..." />
+      </div>
+    );
   }
 
   if (isError) {
@@ -90,6 +108,8 @@ export default function CityOverviewPage() {
     topPartner: topPartners[0],
   };
 
+  const stageColors = ["#3b82f6", "#2dd4bf", "#fbbf24", "#8b5cf6", "#10b981", "#6366f1", "#f43f5e"];
+
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
       <section
@@ -119,20 +139,46 @@ export default function CityOverviewPage() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
+                <SelectField
+                  value={timeFilter}
+                  onValueChange={setTimeFilter}
+                  options={[
+                    { label: "Toàn thời gian", value: "ALL" },
+                    { label: "Quý I / 2026", value: "Q1_2026" },
+                    { label: "Quý II / 2026", value: "Q2_2026" },
+                  ]}
+                  triggerClassName="bg-transparent border-0 hover:bg-white/10 text-white h-9 px-3 text-[10px] uppercase font-black tracking-[0.2em] w-[160px] focus:ring-0 focus:bg-transparent"
+                />
+                <div className="h-4 w-px bg-white/10" />
+                <SelectField
+                  value={typeFilter}
+                  onValueChange={setTypeFilter}
+                  options={[
+                    { label: "Mọi loại dự án", value: "ALL" },
+                    { label: "Vốn ngoại (FDI)", value: "FDI" },
+                    { label: "Vốn nội địa", value: "DOMESTIC" },
+                  ]}
+                  triggerClassName="bg-transparent border-0 hover:bg-white/10 text-white h-9 px-3 text-[10px] uppercase font-black tracking-[0.2em] w-[160px] focus:ring-0 focus:bg-transparent"
+                />
+              </div>
+
+              <div className="h-6 w-px bg-white/10" />
+
               <button
                 onClick={handleRefresh}
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-dark transition hover:bg-slate-100"
               >
                 <RefreshCw size={14} />
-                Tải dữ liệu
+                Làm mới
               </button>
               <button
                 onClick={() => navigate("/reports/city")}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-white/10"
               >
                 <ArrowUpRight size={14} />
-                Xem báo cáo
+                Báo cáo
               </button>
             </div>
 
@@ -166,26 +212,38 @@ export default function CityOverviewPage() {
                   <span>Pipeline stages</span>
                   <span>{totalStages} dự án</span>
                 </div>
-                <div className="mt-4 space-y-3">
+                <div className="mt-4 h-[220px] w-full">
                   {stageBreakdown.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-white/10 bg-white/5 p-4 text-xs font-medium text-white/60">
+                    <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/5 p-4 text-xs font-medium text-white/60">
                       Chưa có dữ liệu pipeline.
                     </div>
                   ) : (
-                    stageBreakdown.map((item) => (
-                      <div key={item.stageId} className="space-y-2">
-                        <div className="flex items-center justify-between gap-4 text-sm">
-                          <span className="font-bold text-white/90">{formatDisplayLabel(item.stageName, "Chưa có giai đoạn")}</span>
-                          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">{item.projectCount} / {formatCurrency(item.totalValue)}</span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-amber-300 via-primary to-cyan-300"
-                            style={{ width: `${Math.max(8, (item.projectCount / totalStages) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={stageBreakdown} layout="vertical" margin={{ left: -20, right: 20 }}>
+                        <XAxis type="number" hide />
+                        <YAxis type="category" dataKey="stageName" hide />
+                        <Tooltip
+                          cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="rounded-xl border border-white/10 bg-brand-dark/90 p-3 shadow-2xl backdrop-blur-md">
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-white/50">{payload[0].payload.stageName}</p>
+                                  <p className="mt-1 text-sm font-black text-white">{payload[0].value} dự án</p>
+                                  <p className="text-[10px] font-bold text-amber-300">{formatCurrency(payload[0].payload.totalValue)}</p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar dataKey="projectCount" radius={[0, 4, 4, 0]} barSize={12}>
+                          {stageBreakdown.map((_entry, index) => (
+                            <Cell key={`cell-${index}`} fill={stageColors[index % stageColors.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                   )}
                 </div>
               </div>
@@ -261,8 +319,11 @@ export default function CityOverviewPage() {
                   </div>
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-brand-dark via-primary to-amber-400"
-                      style={{ width: `${Math.max(6, (item.projectCount / totalStages) * 100)}%` }}
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.max(6, (item.projectCount / totalStages) * 100)}%`,
+                        backgroundColor: stageColors[stageBreakdown.indexOf(item) % stageColors.length]
+                      }}
                     />
                   </div>
                   <div className="mt-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -471,21 +532,6 @@ function InsightCard({ title, value, detail }: { title: string; value: string; d
   );
 }
 
-function CityOverviewSkeleton() {
-  return (
-    <div className="animate-pulse space-y-6">
-      <div className="h-[360px] rounded-[2rem] bg-slate-200/80" />
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div className="h-[420px] rounded-[1.75rem] bg-slate-100" />
-        <div className="h-[420px] rounded-[1.75rem] bg-slate-100" />
-      </div>
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div className="h-[360px] rounded-[1.75rem] bg-slate-100" />
-        <div className="h-[360px] rounded-[1.75rem] bg-slate-100" />
-      </div>
-    </div>
-  );
-}
 
 function formatCurrency(value: number | null | undefined): string {
   if (value === null || value === undefined) {

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import { ElementType } from "react";
 import { NavLink } from "react-router-dom";
 import {
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
+import { LogoutConfirmModal } from "./LogoutConfirmModal";
 
 /**
  * Structure for a single sidebar navigation item.
@@ -52,6 +54,7 @@ interface AdminSidebarProps {
  */
 export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: AdminSidebarProps) {
   const { user, logout } = useAuthStore();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <aside
@@ -150,7 +153,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
           <button
             onClick={() => {
               onMobileClose?.();
-              logout();
+              setIsLogoutModalOpen(true);
             }}
             title="Logout"
             aria-label="Logout"
@@ -161,6 +164,11 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
           </button>
         </div>
       </div>
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen} 
+        onOpenChange={setIsLogoutModalOpen} 
+        onConfirm={logout} 
+      />
     </aside>
   );
 }

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { documentsApi, toDocumentType, toSizeLabel } from "@/api/documentsApi";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface UiDoc {
   id: string;
@@ -152,6 +153,14 @@ export default function DocumentListPage() {
   });
 
   const activeFolderName = activeFolderId ? folders.find((item) => item.id === activeFolderId)?.folderName : null;
+
+  if (foldersQuery.isLoading || filesQuery.isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <LoadingSpinner label="Đang tải tài liệu..." />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">

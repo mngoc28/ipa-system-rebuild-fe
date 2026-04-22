@@ -1,8 +1,11 @@
 import { forwardRef, TextareaHTMLAttributes } from "react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
-type PlainTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { disableResize?: boolean };
-const PlainTextarea = forwardRef<HTMLTextAreaElement, PlainTextareaProps>(({ className, disableResize = false, ...props }, ref) => (
+type PlainTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { 
+  disableResize?: boolean;
+  hasError?: boolean;
+};
+const PlainTextarea = forwardRef<HTMLTextAreaElement, PlainTextareaProps>(({ className, disableResize = false, hasError, ...props }, ref) => (
   <textarea
     ref={ref}
     className={cn(
@@ -10,6 +13,7 @@ const PlainTextarea = forwardRef<HTMLTextAreaElement, PlainTextareaProps>(({ cla
       "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
       "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
       disableResize ? "resize-none" : "resize-y",
+      hasError && "border-destructive ring-destructive/20 focus-visible:ring-destructive",
       className,
     )}
     {...props}

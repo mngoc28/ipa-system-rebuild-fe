@@ -1,6 +1,6 @@
 import * as React from "react";
 import { toast } from "sonner";
-import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, Edit2, Trash2, Lock, AlertTriangle, Camera, UserCircle } from "lucide-react";
+import { Users, UserPlus, Search, Filter, MoreVertical, ShieldCheck, Mail, Building, UserCheck, Edit2, Trash2, Lock, AlertTriangle, Camera, UserCircle, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SelectField } from "@/components/ui/SelectField";
@@ -13,7 +13,11 @@ import {
   useCreateAdminUserMutation,
   useLockAdminUserMutation,
   usePatchAdminUserMutation,
+  useAdminRolesQuery,
+  useAdminUnitsQuery,
+  useResetAdminPasswordMutation,
 } from "@/hooks/useAdminUsersQuery";
+import { MultiSelectField } from "@/components/ui/MultiSelectField";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -30,6 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 const USER_STATUS_OPTIONS = [
   { label: "Hoạt động", value: "active" },
@@ -53,8 +58,10 @@ interface UserFormState {
   email: string;
   phone: string;
   unitId: string;
-  roleIds: string;
+  roleIds: string[];
   status: "active" | "inactive";
+  password?: string;
+  confirmPassword?: string;
 }
 
 const defaultCreateForm = (): UserFormState => {
@@ -65,9 +72,11 @@ const defaultCreateForm = (): UserFormState => {
     fullName: `Người dùng mới #${String(timestamp).slice(-4)}`,
     email: `user${timestamp}@danang.gov.vn`,
     phone: "0900000000",
-    unitId: "UNIT-ROOT",
-    roleIds: "staff",
+    unitId: "1", // Default to first unit if possible
+    roleIds: ["staff"],
     status: "active",
+    password: "",
+    confirmPassword: "",
   };
 };
 
@@ -76,8 +85,8 @@ const buildEditForm = (user: DisplayUser): UserFormState => ({
   fullName: user.name,
   email: user.email,
   phone: "0900000000",
-  unitId: user.unit === "UNIT-UNKNOWN" ? "UNIT-ROOT" : user.unit,
-  roleIds: user.role ? user.role.toLowerCase() : "staff",
+  unitId: user.unit === "UNIT-UNKNOWN" ? "1" : user.unit,
+  roleIds: user.role ? [user.role.toLowerCase()] : ["staff"],
   status: user.status,
 });
 
@@ -95,8 +104,8 @@ const buildEditFormFromApi = (user: {
   fullName: user.fullName,
   email: user.email,
   phone: user.phone || "",
-  unitId: user.unit?.unit_code || user.unit?.unit_name || user.unit?.id || "UNIT-ROOT",
-  roleIds: user.role_codes?.join(",") || "staff",
+  unitId: user.unit?.id ? String(user.unit.id) : "1",
+  roleIds: user.role_codes || ["staff"],
   status: user.status === "active" && !user.locked ? "active" : "inactive",
 });
 
@@ -109,8 +118,10 @@ export default function UserManagementPage() {
   const [editOpen, setEditOpen] = React.useState(false);
   const [lockOpen, setLockOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [resetOpen, setResetOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<DisplayUser | null>(null);
   const [deleteTargetUser, setDeleteTargetUser] = React.useState<DisplayUser | null>(null);
+  const [resetTargetUser, setResetTargetUser] = React.useState<DisplayUser | null>(null);
   const [createForm, setCreateForm] = React.useState<UserFormState>(defaultCreateForm());
   const [editForm, setEditForm] = React.useState<UserFormState>(defaultCreateForm());
   const [loadingTimedOut, setLoadingTimedOut] = React.useState(false);
@@ -118,6 +129,18 @@ export default function UserManagementPage() {
   const [cropImage, setCropImage] = React.useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { data: rolesData, isLoading: rolesLoading } = useAdminRolesQuery();
+  const { data: unitsData, isLoading: unitsLoading } = useAdminUnitsQuery();
+
+  const roleOptions = React.useMemo(() => {
+    const items = rolesData?.data?.items || (Array.isArray(rolesData?.data) ? rolesData.data : []);
+    return items.map((r: { name: string; code?: string; id: string | number }) => ({ label: r.name, value: r.code || String(r.id) }));
+  }, [rolesData]);
+
+  const unitOptions = React.useMemo(() => {
+    const items = unitsData?.data?.items || (Array.isArray(unitsData?.data) ? unitsData.data : []);
+    return items.map((u: { unitName?: string; unit_name?: string; id: string | number }) => ({ label: u.unitName || u.unit_name || "Unknown", value: String(u.id) }));
+  }, [unitsData]);
   const pageSize = 5;
 
   const usersQuery = useAdminUsersListQuery({
@@ -131,6 +154,7 @@ export default function UserManagementPage() {
   const patchMutation = usePatchAdminUserMutation();
   const lockMutation = useLockAdminUserMutation();
   const deleteMutation = useDeleteAdminUserMutation();
+  const resetMutation = useResetAdminPasswordMutation();
   const adminUserQuery = useAdminUserQuery(editingUserId ?? undefined, editOpen);
 
   const users: DisplayUser[] = React.useMemo(() => {
@@ -158,7 +182,7 @@ export default function UserManagementPage() {
   const activeUsers = users.filter((user) => user.status === "active").length;
   const inactiveUsers = users.length - activeUsers;
   const units = new Set(users.map((user) => user.unit)).size;
-  const isBusy = createMutation.isPending || patchMutation.isPending || lockMutation.isPending || deleteMutation.isPending;
+  const isBusy = createMutation.isPending || patchMutation.isPending || lockMutation.isPending || deleteMutation.isPending || resetMutation.isPending;
 
   React.useEffect(() => {
     if (!usersQuery.isLoading) {
@@ -205,6 +229,12 @@ export default function UserManagementPage() {
   }, [deleteOpen]);
 
   React.useEffect(() => {
+    if (!resetOpen) {
+      setResetTargetUser(null);
+    }
+  }, [resetOpen]);
+
+  React.useEffect(() => {
     if (editOpen && adminUserQuery.data?.data) {
       setEditForm(buildEditFormFromApi(adminUserQuery.data.data));
     }
@@ -216,6 +246,11 @@ export default function UserManagementPage() {
   };
 
   const handleAddUser = async () => {
+    if (createForm.password && createForm.password !== createForm.confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
     try {
       await createMutation.mutateAsync({
         username: createForm.username,
@@ -223,7 +258,8 @@ export default function UserManagementPage() {
         email: createForm.email,
         phone: createForm.phone,
         unitId: createForm.unitId,
-        roleIds: createForm.roleIds.split(",").map((item) => item.trim()).filter(Boolean),
+        roleIds: createForm.roleIds,
+        password: createForm.password || undefined,
       });
       setPage(1);
       setCreateOpen(false);
@@ -254,7 +290,7 @@ export default function UserManagementPage() {
           fullName: editForm.fullName,
           phone: editForm.phone,
           unitId: editForm.unitId,
-          roleIds: editForm.roleIds.split(",").map((item) => item.trim()).filter(Boolean),
+          roleIds: editForm.roleIds,
           status: editForm.status,
           username: editForm.username,
           email: editForm.email,
@@ -277,6 +313,22 @@ export default function UserManagementPage() {
   const handleOpenDelete = (user: DisplayUser) => {
     setDeleteTargetUser(user);
     setDeleteOpen(true);
+  };
+
+  const handleOpenReset = (user: DisplayUser) => {
+    setResetTargetUser(user);
+    setResetOpen(true);
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetTargetUser) return;
+    try {
+      await resetMutation.mutateAsync(resetTargetUser.id);
+      setResetOpen(false);
+      toast.success(`Đã đặt lại mật khẩu cho ${resetTargetUser.name}.`);
+    } catch {
+      toast.error("Không thể đặt lại mật khẩu.");
+    }
   };
 
   const handleToggleLock = async () => {
@@ -508,9 +560,12 @@ export default function UserManagementPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
-                      <button type="button" title="Chỉnh sửa người dùng" aria-label="Chỉnh sửa người dùng" onClick={() => handleOpenEdit(user)} className={cn("rounded-lg p-2 transition-all active:scale-90 border border-transparent", editingUserId === user.id ? "text-primary bg-primary/5 border-primary/10" : "text-slate-400 hover:bg-primary/5 hover:text-primary hover:border-primary/10") }>
-                        <Edit2 size={14} />
-                      </button>
+                      <Button variant="ghost" size="icon" className="text-brand-text-dark/40 hover:bg-primary/10 hover:text-primary" onClick={() => handleOpenReset(user)} title="Cấp lại mật khẩu">
+                        <Key size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-brand-text-dark/40 hover:bg-primary/10 hover:text-primary" onClick={() => handleOpenEdit(user)}>
+                        <Edit2 size={16} />
+                      </Button>
                       <button type="button" title={user.locked ? "Mở khóa người dùng" : "Khóa người dùng"} aria-label={user.locked ? "Mở khóa người dùng" : "Khóa người dùng"} onClick={() => handleOpenLock(user)} className="rounded-lg border border-transparent p-2 text-slate-400 transition-all hover:border-amber-100 hover:bg-amber-50 hover:text-amber-600 active:scale-90">
                         <Lock size={14} />
                       </button>
@@ -546,22 +601,64 @@ export default function UserManagementPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Username" htmlFor="create-username">
-              <input id="create-username" value={createForm.username} onChange={(event) => setCreateForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="create-username" value={createForm.username} onChange={(event) => setCreateForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Họ và tên" htmlFor="create-fullName">
-              <input id="create-fullName" value={createForm.fullName} onChange={(event) => setCreateForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="create-fullName" value={createForm.fullName} onChange={(event) => setCreateForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Email" htmlFor="create-email">
-              <input id="create-email" value={createForm.email} onChange={(event) => setCreateForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="create-email" value={createForm.email} onChange={(event) => setCreateForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Số điện thoại" htmlFor="create-phone">
               <input id="create-phone" value={createForm.phone} onChange={(event) => setCreateForm((prev) => ({ ...prev, phone: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
             </Field>
             <Field label="Đơn vị" htmlFor="create-unitId">
-              <input id="create-unitId" value={createForm.unitId} onChange={(event) => setCreateForm((prev) => ({ ...prev, unitId: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <SelectField
+                id="create-unitId"
+                value={createForm.unitId}
+                onValueChange={(v) => setCreateForm((prev) => ({ ...prev, unitId: v }))}
+                options={unitOptions}
+                placeholder={unitsLoading ? "Đang tải đơn vị..." : "Chọn đơn vị"}
+                disabled={unitsLoading}
+              />
             </Field>
-            <Field label="Role IDs" htmlFor="create-roleIds">
-              <input id="create-roleIds" value={createForm.roleIds} onChange={(event) => setCreateForm((prev) => ({ ...prev, roleIds: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            <Field label="Vai trò" htmlFor="create-roleIds">
+              <MultiSelectField
+                id="create-roleIds"
+                values={createForm.roleIds}
+                onValuesChange={(v) => setCreateForm((prev) => ({ ...prev, roleIds: v }))}
+                options={roleOptions}
+                placeholder={rolesLoading ? "Đang tải vai trò..." : "Chọn vai trò"}
+                disabled={rolesLoading}
+              />
+            </Field>
+            <Field label="Mật khẩu (Mặc định: 111111)" htmlFor="create-password">
+              <input 
+                id="create-password" 
+                type="password"
+                value={createForm.password} 
+                onChange={(event) => setCreateForm((prev) => ({ ...prev, password: event.target.value }))} 
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" 
+                placeholder="Để trống để dùng mật khẩu mặc định"
+              />
+            </Field>
+            <Field label="Xác nhận mật khẩu" htmlFor="create-confirmPassword">
+              <input 
+                id="create-confirmPassword" 
+                type="password"
+                value={createForm.confirmPassword} 
+                onChange={(event) => setCreateForm((prev) => ({ ...prev, confirmPassword: event.target.value }))} 
+                className={cn(
+                  "w-full rounded-md border px-3 py-2 text-sm outline-none transition-all focus:ring-4",
+                  createForm.password && createForm.confirmPassword && createForm.password !== createForm.confirmPassword 
+                    ? "border-rose-500 bg-rose-50 focus:ring-rose-500/10" 
+                    : "border-slate-200 focus:border-primary focus:ring-primary/5"
+                )} 
+                placeholder="Nhập lại mật khẩu"
+              />
+              {createForm.password && createForm.confirmPassword && createForm.password !== createForm.confirmPassword && (
+                <p className="mt-1 text-[9px] font-bold uppercase text-rose-500">Mật khẩu không khớp</p>
+              )}
             </Field>
           </div>
 
@@ -616,22 +713,36 @@ export default function UserManagementPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Username" htmlFor="edit-username">
-              <input id="edit-username" value={editForm.username} onChange={(event) => setEditForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="edit-username" value={editForm.username} onChange={(event) => setEditForm((prev) => ({ ...prev, username: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Họ và tên" htmlFor="edit-fullName">
-              <input id="edit-fullName" value={editForm.fullName} onChange={(event) => setEditForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="edit-fullName" value={editForm.fullName} onChange={(event) => setEditForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Email" htmlFor="edit-email">
-              <input id="edit-email" value={editForm.email} onChange={(event) => setEditForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <input id="edit-email" value={editForm.email} onChange={(event) => setEditForm((prev) => ({ ...prev, email: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" required />
             </Field>
             <Field label="Số điện thoại" htmlFor="edit-phone">
               <input id="edit-phone" value={editForm.phone} onChange={(event) => setEditForm((prev) => ({ ...prev, phone: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
             </Field>
             <Field label="Đơn vị" htmlFor="edit-unitId">
-              <input id="edit-unitId" value={editForm.unitId} onChange={(event) => setEditForm((prev) => ({ ...prev, unitId: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+              <SelectField
+                id="edit-unitId"
+                value={editForm.unitId}
+                onValueChange={(v) => setEditForm((prev) => ({ ...prev, unitId: v }))}
+                options={unitOptions}
+                placeholder={unitsLoading ? "Đang tải đơn vị..." : "Chọn đơn vị"}
+                disabled={unitsLoading}
+              />
             </Field>
-            <Field label="Role IDs" htmlFor="edit-roleIds">
-              <input id="edit-roleIds" value={editForm.roleIds} onChange={(event) => setEditForm((prev) => ({ ...prev, roleIds: event.target.value }))} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm" />
+            <Field label="Vai trò" htmlFor="edit-roleIds">
+              <MultiSelectField
+                id="edit-roleIds"
+                values={editForm.roleIds}
+                onValuesChange={(v) => setEditForm((prev) => ({ ...prev, roleIds: v }))}
+                options={roleOptions}
+                placeholder={rolesLoading ? "Đang tải vai trò..." : "Chọn vai trò"}
+                disabled={rolesLoading}
+              />
             </Field>
             <Field label="Trạng thái" htmlFor="edit-status" className="md:col-span-2">
               <SelectField
@@ -707,6 +818,23 @@ export default function UserManagementPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Reset Password Confirmation */}
+      <ConfirmModal
+        isOpen={resetOpen}
+        onClose={() => setResetOpen(false)}
+        onConfirm={handleResetPassword}
+        title="Cấp lại mật khẩu?"
+        description={
+          <span>
+            Mật khẩu của người dùng <strong>{resetTargetUser?.name}</strong> sẽ được đặt về mặc định là <strong>111111</strong>.
+            Họ có thể thay đổi sau khi đăng nhập.
+          </span>
+        }
+        confirmText="Cấp lại mật khẩu"
+        cancelText="Hủy bỏ"
+        variant="warning"
+      />
     </div>
   );
 }

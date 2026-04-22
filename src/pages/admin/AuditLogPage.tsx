@@ -142,7 +142,7 @@ export default function AuditLogPage() {
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-dark/40" size={14} />
               <input 
-                placeholder="Tìm kiếm hành động, người dùng hoặc sự kiện..." 
+                placeholder="Tìm kiếm hành động, người dùng..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-transparent py-2 pl-11 pr-4 text-xs font-medium text-brand-text-dark outline-none placeholder:text-brand-text-dark/40" 

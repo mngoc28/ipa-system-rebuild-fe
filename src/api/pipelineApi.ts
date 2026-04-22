@@ -124,7 +124,7 @@ export const pipelineApi = {
    * @returns Updated project record.
    */
   updateProject: async (id: string, payload: Partial<PipelineProject>) => {
-    const response = await axiosClient.patch<ApiEnvelope<PipelineProject>>(`${getPrefix()}/${id}`, payload);
+    const response = await axiosClient.patch<ApiEnvelope<PipelineProject>>(`${getPrefix()}/projects/${id}`, payload);
     return response.data;
   },
 

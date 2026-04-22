@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { approvalsApi, mapApprovalStatus } from "@/api/approvalsApi";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface ApprovalUi {
   id: string;
@@ -166,7 +167,9 @@ export default function ApprovalsPage() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {isLoading && !loadingTimedOut ? (
-          <div className="col-span-full rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Đang tải yêu cầu phê duyệt...</div>
+          <div className="col-span-full flex items-center justify-center py-12">
+            <LoadingSpinner label="Đang tải yêu cầu phê duyệt..." />
+          </div>
         ) : isLoading && loadingTimedOut ? (
           <div className="col-span-full flex min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-amber-100 bg-amber-50 p-8 text-center">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">Đã quá thời gian tải danh sách phê duyệt</p>
@@ -293,10 +296,8 @@ export default function ApprovalsPage() {
               Không tải được chi tiết yêu cầu. Vui lòng thử lại.
             </div>
           ) : approvalDetailQuery.isLoading ? (
-            <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
-              <div className="h-4 w-1/3 rounded bg-slate-200" />
-              <div className="h-3 w-full rounded bg-slate-200" />
-              <div className="h-3 w-5/6 rounded bg-slate-200" />
+            <div className="flex items-center justify-center py-12">
+              <LoadingSpinner label="Đang tải chi tiết..." />
             </div>
           ) : (
             <div className="space-y-6">

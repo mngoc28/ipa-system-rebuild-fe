@@ -100,7 +100,14 @@ export default function AppShell() {
       </div>
 
       {/* Mobile Drawer Overlay */}
-      {isMobileMenuOpen && <div data-testid="mobile-drawer-overlay" className="fixed inset-0 z-40 bg-brand-dark-900/50 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
+      {isMobileMenuOpen && (
+        <button 
+          type="button"
+          aria-label="Đóng menu di động"
+          className="fixed inset-0 z-40 bg-brand-dark-900/50 backdrop-blur-sm lg:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)} 
+        />
+      )}
 
       {/* Sonner Toasts */}
       <Toaster richColors position="top-right" />

@@ -207,7 +207,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-400">Loading...</div>;
+    return <div className="p-8 text-center text-slate-400">Đang tải...</div>;
   }
 
   return (
@@ -231,7 +231,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                   <div className={`relative flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[80%]`}>
                     <div className="mb-1 flex items-center gap-2">
                       <span className="text-[11px] font-black uppercase tracking-tight text-brand-text-dark">
-                        {comment.commenter?.full_name || "UnknownUser"}
+                        {comment.commenter?.full_name || "Người dùng"}
                       </span>
                       <span className="text-[9px] font-medium text-slate-400">
                         {format(new Date(comment.created_at), "HH:mm, dd/MM")}
@@ -297,14 +297,14 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                             <DropdownMenuContent align="end" className="w-24">
                               <DropdownMenuItem onClick={() => handleStartEdit(comment)} className="cursor-pointer">
                                 <Pencil className="mr-2 size-3.5" />
-                                <span>Edit</span>
+                                <span>Chỉnh sửa</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => handleDeleteComment(Number(comment.id))} 
                                 className="cursor-pointer text-destructive focus:text-destructive"
                               >
                                 <Trash2 className="mr-2 size-3.5" />
-                                <span>Delete</span>
+                                <span>Xóa</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -320,8 +320,8 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         ) : (
           <div className="flex h-full flex-col items-center justify-center py-10 text-slate-400 opacity-50">
             <Send size={32} className="mb-2" />
-            <p className="text-sm font-bold">No discussions yet.</p>
-            <p className="text-xs">Be the first to leave a message!</p>
+            <p className="text-sm font-bold">Chưa có thảo luận nào.</p>
+            <p className="text-xs">Hãy là người đầu tiên để lại tin nhắn.</p>
           </div>
         )}
       </div>
@@ -331,7 +331,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         {showMentions && filteredMembers.length > 0 && (
           <div className="absolute bottom-full left-4 z-50 mb-2 w-64 rounded-xl border border-slate-100 bg-white p-1 shadow-2xl duration-200 animate-in fade-in slide-in-from-bottom-2">
             <p className="border-b border-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Mention Member
+              Nhắc đến thành viên
             </p>
             <div className="max-h-48 overflow-auto">
               {filteredMembers.map((member) => (
@@ -356,7 +356,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
         <form onSubmit={handleAddComment} className="relative flex flex-col gap-2">
           <PlainTextarea
             ref={inputRef}
-            placeholder="Type a message... (Use @ to mention someone)"
+            placeholder="Nhập tin nhắn... (Dùng @ để nhắc đến người khác)"
             className="max-h-[150px] min-h-[60px] w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 pr-12 text-sm font-medium outline-none transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             value={commentContent}
             onChange={handleCommentChange}

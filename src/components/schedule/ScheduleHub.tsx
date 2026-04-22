@@ -336,7 +336,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
       <div className="flex flex-col gap-6 border-b border-slate-100 pb-8 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <h1 className="font-title text-3xl font-black uppercase tracking-tight text-brand-text-dark">
+            <h1 className="text-3xl font-black tracking-tight text-brand-text-dark">
               {managementView === "TEAM" ? (role === "Director" || role === "Admin" ? "Quản trị Lịch IPA" : "Quản trị Lịch Đơn vị") : "Lịch làm việc của tôi"}
             </h1>
             {isManagement && (
@@ -425,7 +425,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
               <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Hình thức</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 text-left text-[10px] font-black text-slate-700 outline-none transition-colors hover:text-primary">
+                  <button className="flex items-center gap-1.5 text-left text-xs font-bold text-slate-600 outline-none transition-colors hover:text-primary">
                     {eventTypeFilter === "ALL" && "Tất cả"}
                     {eventTypeFilter === "MEETING" && "Cuộc họp"}
                     {eventTypeFilter === "VISIT" && "Tham quan"}
@@ -460,7 +460,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
               <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Trạng thái</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 text-left text-[10px] font-black text-slate-700 outline-none transition-colors hover:text-primary">
+                  <button className="flex items-center gap-1.5 text-left text-xs font-bold text-slate-600 outline-none transition-colors hover:text-primary">
                     {statusFilter === "ALL" && "Tất cả"}
                     {statusFilter === "PLANNED" && "Đã lên lịch"}
                     {statusFilter === "CONFIRMED" && "Đã xác nhận"}
@@ -503,7 +503,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             {isManagement && (
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                    <button className="flex items-center gap-2 rounded-xl bg-brand-dark px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-brand-dark-900/10 transition-all hover:bg-slate-800 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
+                    <button className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-primary/10 transition-all hover:bg-primary/90 active:scale-95" title="Tạo lịch mới" aria-label="Tạo lịch mới">
                     <Plus size={14} />
                     TẠO LỊCH
                   </button>
@@ -643,17 +643,17 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             <div className="flex rounded-xl bg-slate-100 p-1 shadow-inner">
               <button 
                 onClick={() => setViewMode("week")} 
-                className={cn("rounded-lg px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all", 
+                className={cn("rounded-lg px-6 py-2 text-xs font-bold transition-all", 
                 viewMode === "week" ? "bg-white text-primary shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-700")}
               >
-                TUẦN
+                Tuần
               </button>
               <button 
                 onClick={() => setViewMode("month")} 
-                className={cn("rounded-lg px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all", 
+                className={cn("rounded-lg px-6 py-2 text-xs font-bold transition-all", 
                 viewMode === "month" ? "bg-white text-primary shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-700")}
               >
-                THÁNG
+                Tháng
               </button>
             </div>
           </div>
@@ -674,6 +674,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
             ) : (
               <ScheduleMonthView 
                 events={filteredEvents}
+                isLoading={eventsQuery.isLoading}
                 currentMonth={currentMonth}
                 selectedDay={selectedDay}
                 setSelectedDay={setSelectedDay}

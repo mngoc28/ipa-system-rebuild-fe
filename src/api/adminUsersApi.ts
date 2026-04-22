@@ -32,6 +32,7 @@ export interface CreateAdminUserPayload {
   phone: string;
   unitId: string;
   roleIds: string[];
+  password?: string;
 }
 
 export interface UpdateAdminUserPayload {
@@ -56,7 +57,8 @@ export interface PatchAdminUserPayload {
 
 const getPrefix = () => {
   const role = useAuthStore.getState().user?.role || "staff";
-  const mappedRole = role.toLowerCase() === "admin" ? "director" : role.toLowerCase();
+  const roleStr = role.toLowerCase();
+  const mappedRole = roleStr === "admin" ? "admin" : roleStr;
   return `/api/v1/${mappedRole}/users`;
 };
 
@@ -127,6 +129,35 @@ export const adminUsersApi = {
    */
   delete: async (userId: string) => {
     const response = await axiosClient.delete<ApiEnvelope<{ deleted: boolean }>>(`${getPrefix()}/${userId}`);
+    return response.data;
+  },
+
+  /**
+   * Fetches all available system roles.
+   */
+  listRoles: async () => {
+    const response = await axiosClient.get<ApiEnvelope<{ items: Array<{ id: string; code: string; name: string }> }>>(
+      `${getPrefix()}/roles`
+    );
+    return response.data;
+  },
+
+  /**
+   * Fetches all available organizational units.
+   */
+  listUnits: async () => {
+    const response = await axiosClient.get<ApiEnvelope<{ items: Array<{ id: string; unitCode: string; unitName: string }> }>>(
+      `${getPrefix()}/units`
+    );
+    return response.data;
+  },
+
+  /**
+   * Resets a user's password to the default system password.
+   * @param userId - ID of the user to reset.
+   */
+  resetPassword: async (userId: string) => {
+    const response = await axiosClient.post<ApiEnvelope<null>>(`${getPrefix()}/${userId}/reset-password`);
     return response.data;
   },
 };

@@ -46,9 +46,9 @@ export const useCreateTaskMutation = () => {
     mutationFn: (payload: TaskCreatePayload) => tasksApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("New task created successfully.");
+      toast.success("Tạo nhiệm vụ mới thành công.");
     },
-    onError: () => toast.error("Failed to create task."),
+    onError: () => toast.error("Lỗi khi tạo nhiệm vụ."),
   });
 };
 
@@ -62,9 +62,9 @@ export const useUpdateTaskMutation = () => {
     mutationFn: ({ id, payload }: { id: string; payload: TaskPatchPayload }) => tasksApi.update(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task updated successfully.");
+      toast.success("Cập nhật nhiệm vụ thành công.");
     },
-    onError: () => toast.error("Failed to update task."),
+    onError: () => toast.error("Lỗi khi cập nhật nhiệm vụ."),
   });
 };
 
@@ -78,9 +78,9 @@ export const useDeleteTaskMutation = () => {
     mutationFn: (id: string) => tasksApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task deleted successfully.");
+      toast.success("Xóa nhiệm vụ thành công.");
     },
-    onError: () => toast.error("Failed to delete task."),
+    onError: () => toast.error("Lỗi khi xóa nhiệm vụ."),
   });
 };
 
@@ -112,7 +112,7 @@ export const useAddCommentMutation = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["task-comments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Comment posted successfully.");
+      toast.success("Đã đăng bình luận thành công.");
     },
   });
 };
@@ -141,7 +141,7 @@ export const useUploadAttachmentMutation = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["task-attachments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Attachment uploaded successfully.");
+      toast.success("Tải tệp đính kèm lên thành công.");
     },
   });
 };
@@ -158,7 +158,7 @@ export const useDeleteAttachmentMutation = () => {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["task-attachments", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Attachment removed successfully.");
+      toast.success("Đã xóa tệp đính kèm.");
     },
   });
 };

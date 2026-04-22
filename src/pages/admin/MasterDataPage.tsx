@@ -2,6 +2,7 @@ import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Settings2, Map, Flag, Briefcase, Tags, Plus, Search, Edit3, Trash2, ChevronRight, Database } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { cn } from "@/lib/utils";
 import { MasterDataItem, masterDataApi } from "@/api/masterDataApi";
 import { Button } from "@/components/ui/button";
@@ -362,32 +363,46 @@ export default function MasterDataPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-dark/5">
-              {pagedRecords.map((item) => (
-                <tr key={item.id} className="group transition-all hover:bg-brand-dark/[0.02]">
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span className="text-xs font-bold text-brand-text-dark transition-colors group-hover:text-primary">{item.name_vi}</span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <code className="rounded border border-brand-dark/10 bg-brand-dark/[0.02] px-2 py-0.5 font-mono text-[10px] font-black uppercase text-brand-text-dark/40">{item.code}</code>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                      <div className="size-1.5 rounded-full bg-emerald-500" />
-                      {item.is_active === false ? "Không hoạt động" : "Hoạt động"}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
-                      <button aria-label={`Chỉnh sửa ${item.name_vi}`} title={`Chỉnh sửa ${item.name_vi}`} onClick={() => handleEditRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-primary/10 hover:bg-primary/5 hover:text-primary">
-                        <Edit3 size={14} />
-                      </button>
-                      <button aria-label={`Xóa ${item.name_vi}`} title={`Xóa ${item.name_vi}`} onClick={() => handleDeleteRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+              {listQuery.isLoading ? (
+                <tr>
+                  <td colSpan={4} className="py-20 text-center">
+                    <LoadingSpinner label="Đang tải dữ liệu danh mục..." size={32} />
                   </td>
                 </tr>
-              ))}
+              ) : pagedRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-20 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-text-dark/20">Không có dữ liệu phù hợp</p>
+                  </td>
+                </tr>
+              ) : (
+                pagedRecords.map((item) => (
+                  <tr key={item.id} className="group transition-all hover:bg-brand-dark/[0.02]">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <span className="text-xs font-bold text-brand-text-dark transition-colors group-hover:text-primary">{item.name_vi}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <code className="rounded border border-brand-dark/10 bg-brand-dark/[0.02] px-2 py-0.5 font-mono text-[10px] font-black uppercase text-brand-text-dark/40">{item.code}</code>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                        <div className="size-1.5 rounded-full bg-emerald-500" />
+                        {item.is_active === false ? "Không hoạt động" : "Hoạt động"}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1 opacity-10 transition-opacity group-hover:opacity-100 md:opacity-0">
+                        <button aria-label={`Chỉnh sửa ${item.name_vi}`} title={`Chỉnh sửa ${item.name_vi}`} onClick={() => handleEditRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-primary/10 hover:bg-primary/5 hover:text-primary">
+                          <Edit3 size={14} />
+                        </button>
+                        <button aria-label={`Xóa ${item.name_vi}`} title={`Xóa ${item.name_vi}`} onClick={() => handleDeleteRecord(item)} className="rounded-lg border border-transparent p-2 text-brand-text-dark/40 transition-all hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -453,7 +468,7 @@ export default function MasterDataPage() {
               />
               {formErrors.name_vi && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_vi}</p>}
             </label>
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-create-name-en" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Anh</span>
               <input
                 id="master-data-create-name-en"
@@ -542,7 +557,7 @@ export default function MasterDataPage() {
               />
               {formErrors.name_vi && <p className="text-[11px] normal-case tracking-normal text-rose-600">{formErrors.name_vi}</p>}
             </label>
-            <label className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            <label htmlFor="master-data-edit-name-en" className="space-y-2 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span>Tên tiếng Anh</span>
               <input
                 id="master-data-edit-name-en"

@@ -380,16 +380,8 @@ export default function NotificationsPage() {
 
       <div className="space-y-3">
         {isInitialLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex animate-pulse gap-5 rounded-xl border border-brand-dark/5 p-5">
-                <div className="size-10 rounded bg-brand-dark/5" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-1/4 rounded bg-brand-dark/5" />
-                  <div className="h-3 w-3/4 rounded bg-brand-dark/5" />
-                </div>
-              </div>
-            ))}
+          <div className="flex h-64 items-center justify-center">
+            <LoadingSpinner label="Đang tải thông báo..." />
           </div>
         ) : isError ? (
           <div className="space-y-4 rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center">

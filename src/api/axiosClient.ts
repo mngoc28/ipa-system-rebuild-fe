@@ -2,6 +2,7 @@ import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
 import { getAuthToken, useAuthStore } from "@/store/useAuthStore";
 import { getAccessToken, getRefreshToken } from "@/utils/storage";
 import { decodeToken, refreshAccessToken } from "@/utils/tokenUtils";
+import { toast } from "sonner";
 
 /**
  * Configured Axios instance for all API communications.
@@ -9,7 +10,7 @@ import { decodeToken, refreshAccessToken } from "@/utils/tokenUtils";
  */
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8001",
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -47,20 +48,40 @@ axiosClient.interceptors.response.use(
     const status = error.response?.status;
     const originalRequest = error.config as RetryableRequestConfig | undefined;
     const requestUrl = originalRequest?.url || "";
+    const method = originalRequest?.method?.toLowerCase() || "";
     const currentToken = getAuthToken() || getAccessToken();
     const isJwtLikeToken = Boolean(currentToken && decodeToken(currentToken));
 
+    // 1. Handle Timeout / Network errors
+    if (error.code === "ECONNABORTED" || error.message.includes("timeout") || !error.response) {
+      console.error(`[Network/Timeout Error] ${method.toUpperCase()} ${requestUrl}:`, error.message);
+      
+      // Specifically show "Server starting" message for timeouts
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        toast.error("Server đang khởi động, vui lòng thử lại sau giây lát.");
+      } else {
+        toast.error("Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.");
+      }
+      return Promise.reject(error);
+    }
+
     const isAuthRoute = requestUrl.includes("/api/v1/auth/login") || requestUrl.includes("/api/v1/auth/refresh") || requestUrl.includes("/api/v1/auth/me");
 
+    // 2. Handle 401 Refresh Logic - Avoid auto-retry for POST to prevent duplicates
     if (status === 401 && originalRequest && !originalRequest._retry && !isAuthRoute && getRefreshToken()) {
-      originalRequest._retry = true;
+      // Avoid blind auto-retry for POST requests as per requirements
+      if (method === "post") {
+        console.warn(`[Auth] 401 encountered for POST ${requestUrl}. Avoiding auto-retry to prevent duplicates.`);
+        // For POST, we let it fail so the user can retry manually and controlled
+      } else {
+        originalRequest._retry = true;
+        const newAccessToken = await refreshAccessToken();
 
-      const newAccessToken = await refreshAccessToken();
-
-      if (newAccessToken) {
-        originalRequest.headers = originalRequest.headers ?? {};
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axiosClient(originalRequest);
+        if (newAccessToken) {
+          originalRequest.headers = originalRequest.headers ?? {};
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return axiosClient(originalRequest);
+        }
       }
     }
 

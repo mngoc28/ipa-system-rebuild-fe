@@ -6,7 +6,8 @@ import { useAuditLogsQuery } from "@/hooks/useAuditLogsQuery";
 import { useAdminOperationalStats } from "@/hooks/useAdminData";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SelectField } from "@/components/ui/SelectField";
-import type { AuditLogType } from "@/api/auditLogsApi";
+import type { AuditLogType, AuditLogItem } from "@/api/auditLogsApi";
+import type { ApiEnvelope, PaginatedData } from "@/types/api";
 
 const AUDIT_LOG_TYPE_OPTIONS = [
   { label: "Info", value: "info" },
@@ -35,7 +36,7 @@ export default function AuditLogPage() {
   });
 
   const logs = React.useMemo(
-    () => auditLogsQuery.data?.pages.flatMap((page) => page.data.items) || [],
+    () => auditLogsQuery.data?.pages.flatMap((page: ApiEnvelope<PaginatedData<AuditLogItem>>) => page.data?.items || []) || [],
     [auditLogsQuery.data],
   );
 

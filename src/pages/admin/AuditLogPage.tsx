@@ -36,7 +36,7 @@ export default function AuditLogPage() {
   });
 
   const logs = React.useMemo(
-    () => auditLogsQuery.data?.pages.flatMap((page: ApiEnvelope<PaginatedData<AuditLogItem>>) => page.data?.items || []) || [],
+    () => auditLogsQuery.data?.pages.flatMap((page: ApiEnvelope<PaginatedData<AuditLogItem>>) => page.items || []) || [],
     [auditLogsQuery.data],
   );
 

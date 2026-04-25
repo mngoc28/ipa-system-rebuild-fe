@@ -67,7 +67,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
     }),
     enabled: !!currentUser,
   });
-  const systemUsers = teamData?.data?.members || [];
+  const systemUsers = teamData?.members || [];
 
   const addCommentMutation = useAddDelegationCommentMutation();
   const updateCommentMutation = useUpdateDelegationCommentMutation();
@@ -76,10 +76,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
 
   // Auto-scroll to bottom of comments
   useEffect(() => {
-    if (scrollRef.current && commentsData?.data) {
+    if (scrollRef.current && commentsData) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [commentsData?.data]);
+  }, [commentsData]);
 
   // Mention filtering logic - exclude current user and avoid empty names
   const filteredMembers = systemUsers.filter((m: TeamMemberMention) => 
@@ -213,9 +213,9 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   return (
     <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto rounded-t-xl bg-slate-50/50 p-6">
-        {commentsData?.data && commentsData.data.length > 0 ? (
+        {commentsData && commentsData.length > 0 ? (
           <>
-            {commentsData.data.map((comment: DelegationCommentApiItem) => {
+            {commentsData.map((comment: DelegationCommentApiItem) => {
               const isMe = comment.commenter?.id === currentUser?.id;
               return (
                 <div key={comment.id} className={`group/msg flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>

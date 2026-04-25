@@ -108,7 +108,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
     const response = await authApi.refresh(refreshToken);
 
-    const newAccessToken = response?.data?.accessToken;
+    const newAccessToken = response?.accessToken;
 
     if (newAccessToken) {
       setAccessToken(newAccessToken);

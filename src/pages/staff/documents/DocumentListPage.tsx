@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { documentsApi, toDocumentType, toSizeLabel } from "@/api/documentsApi";
+import { documentsApi, toDocumentType, toSizeLabel, type FolderItem, type FileItem } from "@/api/documentsApi";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface UiDoc {
@@ -35,12 +35,12 @@ export default function DocumentListPage() {
     queryFn: () => documentsApi.listFiles(activeFolderId ? { folderId: activeFolderId } : undefined),
   });
 
-  const folders = foldersQuery.data?.data?.items ?? [];
-  const rawFiles = filesQuery.data?.data?.items ?? [];
+  const folders = foldersQuery.data?.items ?? [];
+  const rawFiles = filesQuery.data?.items ?? [];
 
   const documents: UiDoc[] = useMemo(
     () =>
-      rawFiles.map((file) => ({
+      rawFiles.map((file: FileItem) => ({
         id: file.id,
         name: file.fileName,
         type: toDocumentType(file.fileName),
@@ -152,7 +152,7 @@ export default function DocumentListPage() {
     return byType && bySearch;
   });
 
-  const activeFolderName = activeFolderId ? folders.find((item) => item.id === activeFolderId)?.folderName : null;
+  const activeFolderName = activeFolderId ? folders.find((item: FolderItem) => item.id === activeFolderId)?.folderName : null;
 
   if (foldersQuery.isLoading || filesQuery.isLoading) {
     return (
@@ -183,7 +183,7 @@ export default function DocumentListPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {folders.map((folder) => (
+        {folders.map((folder: FolderItem) => (
           <div
             key={folder.id}
             onClick={() => handleOpenFolder(folder.id)}
@@ -194,7 +194,7 @@ export default function DocumentListPage() {
             </div>
             <div>
               <h4 className="text-[11px] font-black uppercase tracking-widest text-brand-text-dark">{folder.folderName}</h4>
-              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-brand-text-dark/40">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
+              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-brand-text-dark/40">{rawFiles.filter((f: FileItem) => f.folderId === folder.id).length} tài liệu</p>
             </div>
             <ChevronRight className="ml-auto text-brand-text-dark/20 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
           </div>
@@ -313,7 +313,7 @@ export default function DocumentListPage() {
 
         <div className="mt-6 flex items-center justify-between border-t border-brand-dark/5 pt-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-text-dark/40">
           <p>
-            Dung lượng: {toSizeLabel(rawFiles.reduce((sum, item) => sum + item.sizeBytes, 0))} / 100GB
+            Dung lượng: {toSizeLabel(rawFiles.reduce((sum: number, item: FileItem) => sum + item.sizeBytes, 0))} / 100GB
           </p>
           <p className="flex items-center gap-2">
             <span className="size-1.5 animate-pulse rounded-full bg-brand-dark/10" />

@@ -157,7 +157,7 @@ export default function MasterDataPage() {
     onError: () => toast.error("Không thể xóa bản ghi."),
   });
 
-  const currentRecords = listQuery.data?.data?.items || [];
+  const currentRecords = listQuery.data?.items || [];
 
   const filteredRecords = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();

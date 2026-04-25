@@ -2,7 +2,13 @@ import * as React from "react";
 import { ArrowLeft, ExternalLink, Mail, MapPin, Star, Building2, Clock3 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { getNextPartnerStatus, getPartnerStatusValue, mapPartnerStatus } from "@/dataHelper/partners.dataHelper";
+import { 
+  getNextPartnerStatus, 
+  getPartnerStatusValue, 
+  mapPartnerStatus,
+  type PartnerContactItem,
+  type PartnerDetailInteractionItem
+} from "@/dataHelper/partners.dataHelper";
 import { usePartnerDetailQuery, usePromotePartnerStatusMutation } from "@/hooks/usePartnersQuery";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
@@ -11,7 +17,7 @@ export default function PartnerDetailPage() {
   const { id } = useParams();
   const detailQuery = usePartnerDetailQuery(id);
   const promoteMutation = usePromotePartnerStatusMutation();
-  const partner = detailQuery.data?.data;
+  const partner = detailQuery.data;
 
   if (detailQuery.isLoading) {
     return (
@@ -110,7 +116,7 @@ export default function PartnerDetailPage() {
               {(partner.contacts ?? []).length === 0 ? (
                 <p className="text-sm font-semibold text-brand-text-dark/40">Chưa có đầu mối liên hệ.</p>
               ) : (
-                partner.contacts!.map((contact) => (
+                partner.contacts!.map((contact: PartnerContactItem) => (
                   <div key={contact.id} className="rounded-xl border border-brand-dark/5 bg-brand-dark/[0.02] p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -139,7 +145,7 @@ export default function PartnerDetailPage() {
               {(partner.recentInteractions ?? []).length === 0 ? (
                 <p className="text-sm text-white/70">Chưa có lịch sử tương tác.</p>
               ) : (
-                partner.recentInteractions!.map((interaction) => (
+                partner.recentInteractions!.map((interaction: PartnerDetailInteractionItem) => (
                   <div key={interaction.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
                     <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Loại {interaction.interactionType}</p>
                     <p className="mt-2 text-sm font-bold text-white/90">{interaction.summary || "Không có mô tả."}</p>

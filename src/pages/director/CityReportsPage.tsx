@@ -39,14 +39,14 @@ export default function CityReportsPage() {
   const createRunMutation = useMutation({
     mutationFn: (reportCode: string) => reportsApi.createRun({ report_code: reportCode, params: { scope: "city" } }),
     onSuccess: async (data) => {
-      toast.success(`Đã tạo run ${data.data.run_id}.`);
+      toast.success(`Đã tạo run ${data.run_id}.`);
       await Promise.all([summaryQuery.refetch(), definitionsQuery.refetch()]);
     },
     onError: () => toast.error("Không thể tạo báo cáo chiến lược."),
   });
 
-  const summary = summaryQuery.data?.data;
-  const definitions = definitionsQuery.data?.data?.items ?? [];
+  const summary = summaryQuery.data;
+  const definitions = definitionsQuery.data?.items ?? [];
   const realDefinitions = React.useMemo(() => definitions.filter((definition) => !isPlaceholderDefinition(definition.report_code, definition.report_name)), [definitions]);
   const recentRuns = React.useMemo(() => (summary?.recentRuns ?? []).filter((run) => !isPlaceholderDefinition(run.reportCode, run.reportName)), [summary?.recentRuns]);
   const selectedDefinition = realDefinitions.find((definition) => definition.report_code === selectedCode) ?? realDefinitions[0] ?? null;

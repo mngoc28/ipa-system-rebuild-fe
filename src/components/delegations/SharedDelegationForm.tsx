@@ -1,5 +1,5 @@
-import { masterDataApi } from "@/api/masterDataApi";
-import { teamsApi } from "@/api/teamsApi";
+import { masterDataApi, MasterDataItem } from "@/api/masterDataApi";
+import { teamsApi, OrgUnitItem } from "@/api/teamsApi";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -19,6 +19,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 import { ArrowLeft, Building2, Calendar, FileText, Save, Send, Users, X } from "lucide-react";
+import type { AdminUser } from "@/api/adminUsersApi";
+import type { PartnerOptionItem } from "@/dataHelper/partners.dataHelper";
 
 /** Represents a member of a delegation as received from or sent to the API. */
 type DelegationMemberApi = {
@@ -144,7 +146,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   const unitOptions = React.useMemo(() => 
-    (unitsData?.data?.items ?? []).map(u => ({ label: u.unitName, value: String(u.id) })),
+    (unitsData?.items ?? []).map((u: OrgUnitItem) => ({ label: u.unitName, value: String(u.id) })),
     [unitsData]
   );
 
@@ -159,7 +161,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   const sectorOptions = React.useMemo(() => 
-    (sectorsData?.data?.items ?? []).map(s => ({ label: s.name_vi || s.name_en || "", value: String(s.id) })),
+    (sectorsData?.items ?? []).map((s: MasterDataItem) => ({ label: s.name_vi || s.name_en || "", value: String(s.id) })),
     [sectorsData]
   );
 
@@ -169,13 +171,13 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   const locationOptions = React.useMemo(() => 
-    (locationsData?.data?.items ?? []).map(l => ({ label: l.name_vi || l.name_en || "", value: String(l.id) })),
+    (locationsData?.items ?? []).map((l: MasterDataItem) => ({ label: l.name_vi || l.name_en || "", value: String(l.id) })),
     [locationsData]
   );
 
   const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 });
   const countries = options.countries;
-  const userOptions = usersData?.data?.items?.map(u => ({ label: u.fullName, value: String(u.id) })) || [];
+  const userOptions = usersData?.items?.map((u: AdminUser) => ({ label: u.fullName, value: String(u.id) })) || [];
   const formError = detailData === undefined && isEdit && !isDetailLoading && id ? "Unable to load delegation record for editing." : null;
 
   const [formData, setFormData] = useState({
@@ -280,8 +282,8 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   });
 
   useEffect(() => {
-    if (detailData?.data) {
-      const d = detailData.data as DelegationDetailView;
+    if (detailData) {
+      const d = detailData as DelegationDetailView;
       const contacts = Array.isArray(d.contacts) ? d.contacts : [];
       const primaryContact = contacts.find((c) => c?.is_primary) || contacts[0] || {};
       const nextFormData = {
@@ -570,7 +572,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                       setFormErrors(next);
                     }
                   }}
-                  options={countries.map(c => ({ label: c.label, value: String(c.id) }))}
+                  options={countries.map((c: PartnerOptionItem) => ({ label: c.label, value: String(c.id) }))}
                   placeholder="Chọn quốc gia..."
                 />
              </div>
@@ -844,7 +846,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {formData.members.map((m, idx) => (
+                  {formData.members.map((m: FormMemberItem, idx: number) => (
                     <tr key={idx} className="group hover:bg-slate-50/50">
                       <td className="px-6 py-4">
                         <div className="font-bold text-slate-700">{m.fullName}</div>
@@ -883,7 +885,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 <label htmlFor="sched-date" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngày *</label>
                 <DatePicker 
                   id="sched-date" name="d" date={scheduleDraft.date} 
-                  setDate={(v) => setScheduleDraft({...scheduleDraft, date: v})} 
+                  setDate={(v: string) => setScheduleDraft({...scheduleDraft, date: v})} 
                 />
               </div>
               <div className="space-y-1 lg:col-span-2">
@@ -911,7 +913,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 <SelectField 
                   id="sched-loc" name="l" 
                   value={String(scheduleDraft.location_id || "")}
-                  onValueChange={(v) => setScheduleDraft({...scheduleDraft, location_id: Number(v)})}
+                  onValueChange={(v: string) => setScheduleDraft({...scheduleDraft, location_id: Number(v)})}
                   options={locationOptions}
                   placeholder="Chọn địa điểm..."
                 />
@@ -921,7 +923,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                 <SelectField 
                    id="sched-staff" name="s" 
                    value={String(scheduleDraft.staff_id || "")}
-                   onValueChange={(v) => setScheduleDraft({...scheduleDraft, staff_id: Number(v)})}
+                   onValueChange={(v: string) => setScheduleDraft({...scheduleDraft, staff_id: Number(v)})}
                    options={userOptions}
                    placeholder="Chọn cán bộ..."
                 />
@@ -952,7 +954,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
             </div>
 
             <div className="space-y-3">
-               {scheduleItems.map(item => (
+               {scheduleItems.map((item: FormScheduleItem) => (
                  <div key={item.id} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center">
                     <div className="flex shrink-0 items-center justify-center rounded-lg bg-slate-50 px-4 py-2 text-center">
                        <div className="flex flex-col">
@@ -964,8 +966,8 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                        <h4 className="font-bold text-slate-800">{item.title}</h4>
                         {item.note ? <p className="text-sm text-slate-600">{item.note}</p> : null}
                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                          {item.location_id && <span>📍 {locationOptions.find(l => l.value === String(item.location_id))?.label}</span>}
-                          {item.staff_id && <span>👤 Cán bộ phụ trách: {userOptions.find(u => u.value === String(item.staff_id))?.label}</span>}
+                          {item.location_id && <span>📍 {locationOptions.find((l: { label: string; value: string }) => l.value === String(item.location_id))?.label}</span>}
+                          {item.staff_id && <span>👤 Cán bộ phụ trách: {userOptions.find((u: { label: string; value: string }) => u.value === String(item.staff_id))?.label}</span>}
                           {item.logistics_note && <span>🚚 {item.logistics_note}</span>}
                        </div>
                     </div>

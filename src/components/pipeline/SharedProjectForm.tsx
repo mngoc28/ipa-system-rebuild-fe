@@ -13,6 +13,7 @@ import { delegationsApi } from "@/api/delegationsApi";
 import { useCurrentUserQuery } from "@/hooks/useAuthQuery";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
 
 const projectSchema = z.object({
   project_name: z.string().min(1, "Tên dự án là bắt buộc"),
@@ -75,11 +76,11 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
           masterDataApi.list("sectors"),
           delegationsApi.list({ per_page: 100 }),
         ]);
-        setCountries(countryRes.data?.items || []);
-        setSectors(sectorRes.data?.items || []);
-        const delegationItems = delegationRes.data?.items || [];
+        setCountries(countryRes.items || []);
+        setSectors(sectorRes.items || []);
+        const delegationItems = delegationRes.items || [];
         setDelegations(
-          delegationItems.map((d) => ({
+          delegationItems.map((d: DelegationApiItem) => ({
             value: d.id,
             label: `${d.code} - ${d.name}`,
           }))
@@ -100,7 +101,7 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
       } else {
         await pipelineApi.createProject({
           ...values,
-          owner_user_id: String(currentUser?.data?.id || "unknown"),
+          owner_user_id: String(currentUser?.id || "unknown"),
         });
         toast.success("Tạo dự án mới thành công");
       }

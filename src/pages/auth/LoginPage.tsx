@@ -67,8 +67,8 @@ export default function LoginPage() {
         password,
       });
 
-      const payload = result.data;
-      const role = mapRole(payload.user.role_codes || []);
+      const payload = result;
+      const role = mapRole(payload.user?.role_codes || []);
       const normalizedUser = {
         id: payload.user.id,
         username: username.trim().toLowerCase(),

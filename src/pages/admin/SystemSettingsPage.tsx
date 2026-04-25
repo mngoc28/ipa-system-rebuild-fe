@@ -77,7 +77,7 @@ export default function SystemSettingsPage() {
   });
 
   React.useEffect(() => {
-    const items = settingsQuery.data?.data?.items;
+    const items = settingsQuery.data?.items;
 
     if (!items) {
       return;
@@ -109,7 +109,7 @@ export default function SystemSettingsPage() {
       await queryClient.invalidateQueries({ queryKey: ["system-settings"] });
       setInitialForm(form);
       setSavedAt(new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }));
-      toast.success(`Đã lưu ${result.data.updatedCount} cấu hình.`);
+      toast.success(`Đã lưu ${result.updatedCount} cấu hình.`);
     } catch (error) {
       const message = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
       toast.error(message || "Không thể lưu cấu hình hệ thống.");

@@ -53,32 +53,14 @@ export default function NotificationsPage() {
 
   const syncNotificationCache = React.useCallback(
     (updater: (item: DisplayNotification) => DisplayNotification | null) => {
-      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: unknown) => {
-        if (!oldData || typeof oldData !== "object" || !("data" in oldData)) {
+      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: { items: NotificationItem[]; unreadCount: number } | undefined) => {
+        if (!oldData || !Array.isArray(oldData.items)) {
           return oldData;
         }
 
-        const typedOldData = oldData as {
-          data?: {
-            items?: Array<{
-              id: string;
-              type?: string;
-              title?: string;
-              description?: string;
-              message?: string;
-              createdAt?: string;
-              readAt?: string | null;
-            }>;
-            unreadCount?: number;
-          };
-        };
+        const items = oldData.items;
 
-        const items = typedOldData.data?.items;
-        if (!items) {
-          return oldData;
-        }
-
-        const nextItems = items.flatMap((item) => {
+        const nextItems = items.flatMap((item: NotificationItem) => {
           const type = item.type === "assignment" || item.type === "approval" || item.type === "meeting" ? item.type : "system";
           const rawTime = item.createdAt || item.readAt || "";
           const baseNotification: DisplayNotification = {
@@ -105,15 +87,12 @@ export default function NotificationsPage() {
           ];
         });
 
-        const nextUnreadCount = nextItems.reduce((count, item) => count + (item.readAt ? 0 : 1), 0);
+        const nextUnreadCount = nextItems.reduce((count: number, item: NotificationItem) => count + (item.readAt ? 0 : 1), 0);
 
         return {
-          ...typedOldData,
-          data: {
-            ...typedOldData.data,
-            items: nextItems,
-            unreadCount: nextUnreadCount,
-          },
+          ...oldData,
+          items: nextItems,
+          unreadCount: nextUnreadCount,
         };
       });
     },
@@ -132,33 +111,20 @@ export default function NotificationsPage() {
           : item,
       );
 
-      const readAt = response.data?.readAt;
+      const readAt = response.readAt;
       if (readAt) {
-        queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: unknown) => {
-          if (!oldData || typeof oldData !== "object" || !("data" in oldData)) {
+        queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: { items: NotificationItem[]; unreadCount: number } | undefined) => {
+          if (!oldData || !Array.isArray(oldData.items)) {
             return oldData;
           }
 
-          const typedOldData = oldData as {
-            data?: {
-              items?: Array<{ id: string; readAt?: string | null }>;
-              unreadCount?: number;
-            };
-          };
+          const items = oldData.items;
 
-          const items = typedOldData.data?.items;
-          if (!items) {
-            return oldData;
-          }
-
-          const nextItems = items.map((item) => (item.id === id ? { ...item, readAt } : item));
+          const nextItems = items.map((item: NotificationItem) => (item.id === id ? { ...item, readAt } : item));
           return {
-            ...typedOldData,
-            data: {
-              ...typedOldData.data,
-              items: nextItems,
-              unreadCount: nextItems.reduce((count, item) => count + (item.readAt ? 0 : 1), 0),
-            },
+            ...oldData,
+            items: nextItems,
+            unreadCount: nextItems.reduce((count: number, item: NotificationItem) => count + (item.readAt ? 0 : 1), 0),
           };
         });
       }
@@ -170,31 +136,18 @@ export default function NotificationsPage() {
   const readAllMutation = useMutation({
     mutationFn: notificationsApi.readAll,
     onSuccess: () => {
-      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: unknown) => {
-        if (!oldData || typeof oldData !== "object" || !("data" in oldData)) {
+      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: { items: NotificationItem[]; unreadCount: number } | undefined) => {
+        if (!oldData || !Array.isArray(oldData.items)) {
           return oldData;
         }
 
-        const typedOldData = oldData as {
-          data?: {
-            items?: Array<{ readAt?: string | null }>;
-            unreadCount?: number;
-          };
-        };
-
-        const items = typedOldData.data?.items;
-        if (!items) {
-          return oldData;
-        }
+        const items = oldData.items;
 
         const readAt = new Date().toISOString();
         return {
-          ...typedOldData,
-          data: {
-            ...typedOldData.data,
-            items: items.map((item) => ({ ...item, readAt })),
-            unreadCount: 0,
-          },
+          ...oldData,
+          items: items.map((item: NotificationItem) => ({ ...item, readAt })),
+          unreadCount: 0,
         };
       });
 
@@ -205,31 +158,18 @@ export default function NotificationsPage() {
   const deleteReadMutation = useMutation({
     mutationFn: notificationsApi.deleteRead,
     onSuccess: () => {
-      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: unknown) => {
-        if (!oldData || typeof oldData !== "object" || !("data" in oldData)) {
+      queryClient.setQueriesData({ queryKey: ["notifications"] }, (oldData: { items: NotificationItem[]; unreadCount: number } | undefined) => {
+        if (!oldData || !Array.isArray(oldData.items)) {
           return oldData;
         }
 
-        const typedOldData = oldData as {
-          data?: {
-            items?: Array<{ readAt?: string | null }>;
-            unreadCount?: number;
-          };
-        };
+        const items = oldData.items;
 
-        const items = typedOldData.data?.items;
-        if (!items) {
-          return oldData;
-        }
-
-        const nextItems = items.filter((item) => !item.readAt);
+        const nextItems = items.filter((item: NotificationItem) => !item.readAt);
         return {
-          ...typedOldData,
-          data: {
-            ...typedOldData.data,
-            items: nextItems,
-            unreadCount: nextItems.length,
-          },
+          ...oldData,
+          items: nextItems,
+          unreadCount: nextItems.length,
         };
       });
 
@@ -242,7 +182,7 @@ export default function NotificationsPage() {
   const isFetching = notificationsQuery.isFetching;
 
   const notifications: DisplayNotification[] = React.useMemo(() => {
-    const items = notificationsQuery.data?.data?.items || [];
+    const items = notificationsQuery.data?.items || [];
     return items.map((item: NotificationItem) => {
       const type = (item.type === "assignment" || item.type === "approval" || item.type === "meeting" ? item.type : "system") as DisplayNotification["type"];
       const rawTime = item.createdAt || item.readAt || "";
@@ -261,7 +201,7 @@ export default function NotificationsPage() {
     });
   }, [notificationsQuery.data]);
 
-  const unreadCount = notificationsQuery.data?.data?.unreadCount ?? 0;
+  const unreadCount = notificationsQuery.data?.unreadCount ?? 0;
 
   const visibleNotifications = notifications
     .filter((item) => {

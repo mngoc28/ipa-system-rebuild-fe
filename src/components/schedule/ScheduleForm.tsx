@@ -3,7 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useQuery } from "@tanstack/react-query";
-import { adminUsersApi } from "@/api/adminUsersApi";
+import { adminUsersApi, AdminUser } from "@/api/adminUsersApi";
+import { MasterDataItem } from "@/api/masterDataApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,7 +81,7 @@ export default function ScheduleForm({
     queryFn: () => adminUsersApi.list({ pageSize: 100, status: "active" }),
   });
 
-  const userOptions = (usersData?.data?.items || []).map((u) => ({
+  const userOptions = (usersData?.items || []).map((u: AdminUser) => ({
     value: u.id,
     label: `${u.fullName} (${u.email})`,
   }));
@@ -99,7 +100,7 @@ export default function ScheduleForm({
   }, [locationOptions]);
 
   const eventTypeItems = useMemo(() => {
-    const items = eventTypesData?.data?.items || [];
+    const items = eventTypesData?.items || [];
     if (items.length > 0) return items;
     // Fallback to original values if API fails/loading
     return [
@@ -187,7 +188,7 @@ export default function ScheduleForm({
                     <SelectValue placeholder="Chọn loại hình" />
                   </SelectTrigger>
                   <SelectContent>
-                    {eventTypeItems.map((item) => (
+                    {eventTypeItems.map((item: MasterDataItem | { code: string; name_vi: string }) => (
                       <SelectItem key={item.code} value={item.code}>
                         {item.name_vi}
                       </SelectItem>
@@ -322,7 +323,7 @@ export default function ScheduleForm({
                 <>
                   {field.value.map((id: string) => {
                     const pid = String(id);
-                    const user = userOptions.find(u => u.value === pid);
+                    const user = userOptions.find((u: { value: string; label: string }) => u.value === pid);
                     return user ? (
                         <span key={pid} className="group inline-flex items-center gap-2 rounded bg-slate-100 py-1.5 pl-2.5 pr-1.5 text-[9px] font-bold uppercase text-slate-700 shadow-sm transition-colors hover:bg-slate-200">
                             <UsersIcon size={12} className="text-slate-400" />

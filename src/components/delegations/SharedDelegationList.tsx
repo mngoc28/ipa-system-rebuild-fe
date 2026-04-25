@@ -70,15 +70,15 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
     staleTime: 1000 * 60 * 10, // 10 mins
   });
 
-  const countries = useMemo(() => countriesQuery.data?.data?.items || [], [countriesQuery.data]);
-  const staffMembers = useMemo(() => usersQuery.data?.data?.items || [], [usersQuery.data]);
+  const countries = useMemo(() => countriesQuery.data?.items || [], [countriesQuery.data]);
+  const staffMembers = useMemo(() => usersQuery.data?.items || [], [usersQuery.data]);
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | string | null }>({
     isOpen: false,
     id: null,
   });
 
-  const delegations = useMemo(() => delegationsQuery.data?.data?.items || [], [delegationsQuery.data]);
+  const delegations = useMemo(() => delegationsQuery.data?.items || [], [delegationsQuery.data]);
   const errorMessage = delegationsQuery.error instanceof Error ? delegationsQuery.error.message : "Không thể tải danh sách đoàn công tác.";
   void role;
 

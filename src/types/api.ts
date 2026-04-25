@@ -1,10 +1,12 @@
 /**
  * Standard API response wrapper (envelope) for successful requests.
+ * Now flattened as per backend requirements.
  * @template T - The type of the data payload.
  */
-export interface ApiEnvelope<T> {
+export type ApiEnvelope<T> = {
     success: boolean;
-    data: T;
+    status: string;
+    message?: string;
     meta?: {
         page: number;
         per_page: number;
@@ -17,10 +19,9 @@ export interface ApiEnvelope<T> {
         sortBy?: string;
         sortDir?: string;
   };
-    message?: string;
     requestId?: string;
     timestamp?: string;
-}
+} & T;
 
 /**
  * Standard API response wrapper for failed requests.

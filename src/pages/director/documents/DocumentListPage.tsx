@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { documentsApi, toDocumentType, toSizeLabel } from "@/api/documentsApi";
+import { documentsApi, toDocumentType, toSizeLabel, type FolderItem, type FileItem } from "@/api/documentsApi";
 
 interface UiDoc {
   id: string;
@@ -34,12 +34,12 @@ export default function DocumentListPage() {
     queryFn: () => documentsApi.listFiles(activeFolderId ? { folderId: activeFolderId } : undefined),
   });
 
-  const folders = foldersQuery.data?.data?.items ?? [];
-  const rawFiles = filesQuery.data?.data?.items ?? [];
+  const folders = foldersQuery.data?.items ?? [];
+  const rawFiles = filesQuery.data?.items ?? [];
 
   const documents: UiDoc[] = useMemo(
     () =>
-      rawFiles.map((file) => ({
+      rawFiles.map((file: FileItem) => ({
         id: file.id,
         name: file.fileName,
         type: toDocumentType(file.fileName),
@@ -95,7 +95,7 @@ export default function DocumentListPage() {
 
   const handleOpenFolder = (folderId: string) => {
     setActiveFolderId(folderId);
-    const folder = folders.find((item) => item.id === folderId);
+    const folder = folders.find((item: FolderItem) => item.id === folderId);
     toast.info(`Đang xem: ${folder?.folderName || "Thư mục"}`);
   };
 
@@ -143,7 +143,7 @@ export default function DocumentListPage() {
     toast.warning(`Chưa có endpoint xóa file. Bỏ qua thao tác xóa: ${docName}`);
   };
 
-  const visibleDocuments = documents.filter((doc) => {
+  const visibleDocuments = documents.filter((doc: UiDoc) => {
     const byType = showPdfOnly ? doc.type === "pdf" : true;
     const bySearch = searchTerm.trim()
       ? doc.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) || doc.owner.toLowerCase().includes(searchTerm.trim().toLowerCase())
@@ -151,7 +151,7 @@ export default function DocumentListPage() {
     return byType && bySearch;
   });
 
-  const activeFolderName = activeFolderId ? folders.find((item) => item.id === activeFolderId)?.folderName : null;
+  const activeFolderName = activeFolderId ? folders.find((item: FolderItem) => item.id === activeFolderId)?.folderName : null;
 
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
@@ -174,7 +174,7 @@ export default function DocumentListPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {folders.map((folder) => (
+        {folders.map((folder: FolderItem) => (
           <div
             key={folder.id}
             onClick={() => handleOpenFolder(folder.id)}
@@ -185,7 +185,7 @@ export default function DocumentListPage() {
             </div>
             <div>
               <h4 className="text-[11px] font-black uppercase tracking-widest text-brand-text-dark">{folder.folderName}</h4>
-              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">{rawFiles.filter((f) => f.folderId === folder.id).length} tài liệu</p>
+              <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">{rawFiles.filter((f: FileItem) => f.folderId === folder.id).length} tài liệu</p>
             </div>
             <ChevronRight className="ml-auto text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" size={16} />
           </div>
@@ -227,7 +227,7 @@ export default function DocumentListPage() {
 
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {visibleDocuments.map((doc) => (
+            {visibleDocuments.map((doc: UiDoc) => (
               <div
                 key={doc.id}
                 className="group relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/20 p-4 text-center transition-all hover:border-primary/20 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 active:scale-95"
@@ -272,7 +272,7 @@ export default function DocumentListPage() {
           </div>
         ) : (
           <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
-            {visibleDocuments.map((doc) => (
+            {visibleDocuments.map((doc: UiDoc) => (
               <div key={doc.id} className="group flex items-center justify-between bg-white px-5 py-4 transition-all hover:bg-slate-50/80 active:bg-slate-100">
                 <div className="flex items-center gap-4">
                   <div className="flex size-8 items-center justify-center rounded border border-slate-100 bg-slate-50 text-slate-400 transition-colors group-hover:text-primary">
@@ -304,7 +304,7 @@ export default function DocumentListPage() {
 
         <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
           <p>
-            Dung lượng: {toSizeLabel(rawFiles.reduce((sum, item) => sum + item.sizeBytes, 0))} / 100GB
+            Dung lượng: {toSizeLabel(rawFiles.reduce((sum: number, item: FileItem) => sum + item.sizeBytes, 0))} / 100GB
           </p>
           <p className="flex items-center gap-2">
             <span className="size-1.5 animate-pulse rounded-full bg-slate-300" />

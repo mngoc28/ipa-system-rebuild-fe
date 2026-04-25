@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { teamsApi, type TeamCreateMemberPayload, type OrgUnitItem } from "@/api/teamsApi";
+import { teamsApi, type TeamCreateMemberPayload, type OrgUnitItem, type TeamMemberItem, type TeamActivityItem } from "@/api/teamsApi";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SelectField } from "@/components/ui/SelectField";
 import {
@@ -53,7 +53,7 @@ export default function TeamsPage() {
     mutationFn: (payload: TeamCreateMemberPayload) => teamsApi.createMember(payload),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["teams"] });
-      const createdName = data.data?.name || "thành viên mới";
+      const createdName = data?.name || "thành viên mới";
       setLastAction(`Đã thêm ${createdName}`);
       setCreateOpen(false);
       setForm(emptyForm());
@@ -63,12 +63,12 @@ export default function TeamsPage() {
     onError: () => toast.error("Không thể thêm thành viên mới."),
   });
 
-  const members = teamsQuery.data?.data?.members ?? [];
-  const activities = teamsQuery.data?.data?.activities ?? [];
-  const summary = teamsQuery.data?.data?.summary;
+  const members = teamsQuery.data?.members ?? [];
+  const activities = teamsQuery.data?.activities ?? [];
+  const summary = teamsQuery.data?.summary;
   const meta = teamsQuery.data?.meta;
   const totalPages = Math.max(1, meta?.totalPages || meta?.total_pages || 1);
-  const units = unitsQuery.data?.data?.items ?? [];
+  const units = unitsQuery.data?.items ?? [];
 
   React.useEffect(() => {
     if (!teamsQuery.isLoading) {
@@ -154,7 +154,7 @@ export default function TeamsPage() {
       {members.length === 0 && !teamsQuery.isLoading && <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm font-medium text-slate-500 shadow-sm">Chưa có thành viên nào trên trang hiện tại.</div>}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {members.map((member) => (
+        {(members as TeamMemberItem[]).map((member) => (
           <div key={member.id} className="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
             <div className="relative mb-4 inline-block">
               <div className="flex size-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md">
@@ -282,7 +282,7 @@ export default function TeamsPage() {
           <div className="w-full space-y-5 rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-md lg:w-80">
             <h4 className="border-b border-white/5 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Nhật ký hoạt động</h4>
             <div className="space-y-4">
-              {activities.map((act, i) => (
+              {(activities as TeamActivityItem[]).map((act, i: number) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                   <div className="min-w-0">

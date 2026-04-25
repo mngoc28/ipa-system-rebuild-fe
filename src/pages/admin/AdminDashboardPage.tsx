@@ -14,7 +14,7 @@ export default function AdminDashboardPage() {
 
     try {
       const response = await axiosClient.post("/api/v1/admin/maintenance/cache-clear");
-      const commandCount = Array.isArray(response.data?.data?.commands) ? response.data.data.commands.length : 0;
+      const commandCount = Array.isArray(response.data?.commands) ? response.data.commands.length : 0;
       toast.success(`Đã chạy ${commandCount} tác vụ dọn cache và cấu hình.`);
     } catch {
       toast.error("Không thể xóa cache hệ thống.");

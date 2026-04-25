@@ -3,7 +3,7 @@ import { ClipboardList, MoreVertical, CheckCircle2, XCircle, Calendar, Clock, Fi
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { approvalsApi, mapApprovalStatus } from "@/api/approvalsApi";
+import { approvalsApi, mapApprovalStatus, type ApprovalItem } from "@/api/approvalsApi";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -70,7 +70,7 @@ export default function ApprovalsPage() {
   });
 
   const approvals: ApprovalUi[] = React.useMemo(() => {
-    const items = approvalsQuery.data?.data?.items ?? [];
+    const items = (approvalsQuery.data?.items ?? []) as ApprovalItem[];
     return items.map((item) => {
       const status = mapApprovalStatus(item.status);
       return {
@@ -87,7 +87,7 @@ export default function ApprovalsPage() {
   }, [approvalsQuery.data]);
 
   const approvalCounts = React.useMemo(() => {
-    const allItems = approvalsCountQuery.data?.data?.items ?? [];
+    const allItems = (approvalsCountQuery.data?.items ?? []) as ApprovalItem[];
     return {
       pending: allItems.filter((item) => mapApprovalStatus(item.status) === "pending").length,
       approved: allItems.filter((item) => mapApprovalStatus(item.status) === "approved").length,
@@ -147,7 +147,7 @@ export default function ApprovalsPage() {
   };
 
   const selectedApproval = approvals.find((item) => item.id === selectedApprovalId) ?? null;
-  const selectedApprovalDetail = approvalDetailQuery.data?.data;
+  const selectedApprovalDetail = approvalDetailQuery.data;
 
   const visibleApprovals = approvals.filter((item) => item.status === activeTab);
 
@@ -328,7 +328,7 @@ export default function ApprovalsPage() {
                   </div>
                   {selectedApprovalDetail?.steps?.length ? (
                     <div className="space-y-3">
-                      {selectedApprovalDetail.steps.map((step, index) => (
+                      {selectedApprovalDetail.steps.map((step, index: number) => (
                         <div key={step.id || index} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
                           <div className="flex items-center justify-between gap-3">
                             <p className="text-xs font-bold text-brand-text-dark">Bước {step.stepOrder ?? index + 1}</p>
@@ -351,7 +351,7 @@ export default function ApprovalsPage() {
                   </div>
                   {selectedApprovalDetail?.history?.length ? (
                     <div className="space-y-3">
-                      {selectedApprovalDetail.history.map((record, index) => (
+                      {selectedApprovalDetail.history.map((record, index: number) => (
                         <div key={`${record.decidedAt || index}-${index}`} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
                           <div className="flex items-center justify-between gap-3">
                             <p className="text-xs font-bold text-brand-text-dark">{record.decision || "decision"}</p>

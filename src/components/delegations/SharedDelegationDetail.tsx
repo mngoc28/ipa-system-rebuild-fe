@@ -30,6 +30,8 @@ import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
 import { useQuery } from "@tanstack/react-query";
 import { masterDataApi } from "@/api/masterDataApi";
 import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
+import type { AdminUser } from "@/api/adminUsersApi";
+import type { MasterDataItem } from "@/api/masterDataApi";
 
 /** API representation of a delegation member. */
 type DelegationMemberApi = {
@@ -171,19 +173,19 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
   const { data: detailData, isLoading, refetch } = useDelegationDetailQuery(id);
   const { updateMutation } = useDelegationsQuery();
   const detailError = detailData === undefined && !isLoading && id ? "Không thể tải thông tin đoàn công tác." : null;
-  const d = detailData?.data as DelegationDetailView | undefined;
+  const d = detailData as DelegationDetailView | undefined;
 
   // Master Data & Users for forms
   const { data: usersData, isLoading: isUsersLoading } = useAdminUsersListQuery({ pageSize: 100 });
-  const userOptions = usersData?.data?.items?.map(u => ({ label: u.fullName, value: String(u.id) })) || [];
+  const userOptions = usersData?.items?.map((u: AdminUser) => ({ label: u.fullName, value: String(u.id) })) || [];
   
-  const ownerUser = usersData?.data?.items?.find(u => String(u.id) === String(d?.owner_user_id));
+  const ownerUser = usersData?.items?.find((u: AdminUser) => String(u.id) === String(d?.owner_user_id));
 
   const { data: locationsData } = useQuery({
     queryKey: ["master-data-locations"],
     queryFn: () => masterDataApi.list("locations"),
   });
-  const locationOptions = (locationsData?.data?.items ?? []).map(l => ({ label: l.name_vi, value: String(l.id) }));
+  const locationOptions = (locationsData?.items ?? []).map((l: MasterDataItem) => ({ label: l.name_vi, value: String(l.id) }));
 
   // Modal States
   const [modalType, setModalType] = useState<"add-member" | "edit-member" | "add-schedule" | "edit-schedule" | "add-checklist" | "edit-checklist" | "edit-outcome" | null>(null);
@@ -748,7 +750,7 @@ export default function SharedDelegationDetail({ role }: SharedDelegationDetailP
                           </div>
                           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                             {item.assignee_user_id && (
-                              <span>👤 Cán bộ: {userOptions.find(u => u.value === String(item.assignee_user_id))?.label || `#${item.assignee_user_id}`}</span>
+                              <span>👤 Cán bộ: {userOptions.find((u: { label: string; value: string }) => u.value === String(item.assignee_user_id))?.label || `#${item.assignee_user_id}`}</span>
                             )}
                           </div>
                         </div>

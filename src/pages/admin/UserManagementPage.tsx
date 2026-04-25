@@ -581,13 +581,67 @@ export default function UserManagementPage() {
         </div>
         
         <div className="flex items-center justify-between border-t border-brand-dark/5 bg-brand-dark/[0.01] px-6 py-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Hiển thị {pagedUsers.length} trên {filteredUsers.length} thành viên</p>
-          <div className="flex gap-1">
-            <button onClick={() => setPage((prev) => Math.max(1, prev - 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/40 disabled:opacity-50" disabled={normalizedPage === 1}>
+          <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">
+            Hiển thị {pagedUsers.length} trên {usersQuery.data?.meta?.total ?? filteredUsers.length} thành viên
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/40 transition-all hover:bg-brand-dark/[0.02] disabled:opacity-30"
+              disabled={normalizedPage === 1}
+            >
               Trước
             </button>
-            <button className="rounded-md bg-primary px-3 py-1 text-[10px] font-black uppercase text-white shadow-sm shadow-primary/20">{normalizedPage}</button>
-            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/60 transition-colors hover:bg-brand-dark/[0.02] disabled:opacity-50" disabled={normalizedPage === totalPages}>Tiếp</button>
+            
+            <div className="flex items-center gap-1">
+              {(() => {
+                const pages = [];
+                const maxVisible = 5;
+                
+                if (totalPages <= maxVisible) {
+                  for (let i = 1; i <= totalPages; i++) pages.push(i);
+                } else {
+                  pages.push(1);
+                  if (normalizedPage > 3) pages.push("...");
+                  
+                  const start = Math.max(2, normalizedPage - 1);
+                  const end = Math.min(totalPages - 1, normalizedPage + 1);
+                  
+                  for (let i = start; i <= end; i++) {
+                    if (!pages.includes(i)) pages.push(i);
+                  }
+                  
+                  if (normalizedPage < totalPages - 2) pages.push("...");
+                  if (!pages.includes(totalPages)) pages.push(totalPages);
+                }
+                
+                return pages.map((p, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => typeof p === "number" && setPage(p)}
+                    disabled={p === "..."}
+                    className={cn(
+                      "flex h-7 min-w-7 items-center justify-center rounded-md text-[10px] font-black transition-all",
+                      p === normalizedPage
+                        ? "bg-primary text-white shadow-sm shadow-primary/20"
+                        : p === "..."
+                        ? "cursor-default text-brand-text-dark/20"
+                        : "border border-brand-dark/10 bg-white text-brand-text-dark/60 hover:bg-brand-dark/[0.02]"
+                    )}
+                  >
+                    {p}
+                  </button>
+                ));
+              })()}
+            </div>
+
+            <button
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              className="rounded-md border border-brand-dark/10 bg-white px-3 py-1 text-[10px] font-black uppercase text-brand-text-dark/60 transition-all hover:bg-brand-dark/[0.02] disabled:opacity-30"
+              disabled={normalizedPage === totalPages}
+            >
+              Tiếp
+            </button>
           </div>
         </div>
       </div>

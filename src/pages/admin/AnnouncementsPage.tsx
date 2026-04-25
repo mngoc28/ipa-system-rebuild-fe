@@ -191,7 +191,7 @@ export default function AnnouncementsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
-                    {announcements?.length === 0 ? (
+                    {announcements?.items?.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-6 py-20 text-center">
                           <div className="flex flex-col items-center justify-center space-y-3">
@@ -209,7 +209,7 @@ export default function AnnouncementsPage() {
                         </td>
                       </tr>
                     ) : (
-                      announcements?.map((item) => (
+                      announcements?.items?.map((item: Announcement) => (
                         <tr key={item.id} className="group transition-all duration-300 animate-in slide-in-from-bottom-2 hover:bg-slate-50/50">
                           <td className="px-6 py-4">
                             <div className="flex flex-col">

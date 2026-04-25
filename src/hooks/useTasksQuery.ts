@@ -30,7 +30,7 @@ export const useTasksListQuery = (options: TasksQueryOptions = {}) => {
     queryFn: () => tasksApi.list(options),
   });
 
-  const tasks = React.useMemo(() => mapTaskItemsToUi(tasksQuery.data?.data?.items ?? []), [tasksQuery.data]);
+  const tasks = React.useMemo(() => mapTaskItemsToUi(tasksQuery.data?.items ?? []), [tasksQuery.data]);
   const meta = tasksQuery.data?.meta;
 
   return { tasksQuery, tasks, meta };

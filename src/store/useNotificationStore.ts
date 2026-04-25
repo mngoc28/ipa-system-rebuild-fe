@@ -43,8 +43,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       ]);
 
       set({
-        unreadCount: notifRes.data?.unreadCount || 0,
-        pendingApprovalsCount: approvalRes ? (approvalRes.data?.pendingCount || 0) : 0,
+        unreadCount: notifRes?.unreadCount || 0,
+        pendingApprovalsCount: approvalRes ? (approvalRes?.pendingCount || 0) : 0,
         lastUpdated: Date.now(),
         isLoading: false
       });

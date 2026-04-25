@@ -133,12 +133,12 @@ export default function UserManagementPage() {
   const { data: unitsData, isLoading: unitsLoading } = useAdminUnitsQuery();
 
   const roleOptions = React.useMemo(() => {
-    const items = rolesData?.data?.items || (Array.isArray(rolesData?.data) ? rolesData.data : []);
+    const items = rolesData?.items || (Array.isArray(rolesData) ? rolesData : []);
     return items.map((r: { name: string; code?: string; id: string | number }) => ({ label: r.name, value: r.code || String(r.id) }));
   }, [rolesData]);
 
   const unitOptions = React.useMemo(() => {
-    const items = unitsData?.data?.items || (Array.isArray(unitsData?.data) ? unitsData.data : []);
+    const items = unitsData?.items || (Array.isArray(unitsData) ? unitsData : []);
     return items.map((u: { unitName?: string; unit_name?: string; id: string | number }) => ({ label: u.unitName || u.unit_name || "Unknown", value: String(u.id) }));
   }, [unitsData]);
   const pageSize = 5;
@@ -158,7 +158,7 @@ export default function UserManagementPage() {
   const adminUserQuery = useAdminUserQuery(editingUserId ?? undefined, editOpen);
 
   const users: DisplayUser[] = React.useMemo(() => {
-    const rawUsers = usersQuery.data?.data?.items || [];
+    const rawUsers = usersQuery.data?.items || [];
     return rawUsers.map((user) => {
       const roleCode = (user.role_codes?.[0] || "admin").toLowerCase();
       const role = roleCode.charAt(0).toUpperCase() + roleCode.slice(1);
@@ -204,7 +204,7 @@ export default function UserManagementPage() {
       return;
     }
 
-    if ((usersQuery.data?.data?.items?.length ?? 0) === 0) {
+    if ((usersQuery.data?.items?.length ?? 0) === 0) {
       setAutoRetriedEmpty(true);
       void usersQuery.refetch();
     }
@@ -235,8 +235,8 @@ export default function UserManagementPage() {
   }, [resetOpen]);
 
   React.useEffect(() => {
-    if (editOpen && adminUserQuery.data?.data) {
-      setEditForm(buildEditFormFromApi(adminUserQuery.data.data));
+    if (editOpen && adminUserQuery.data) {
+      setEditForm(buildEditFormFromApi(adminUserQuery.data));
     }
   }, [editOpen, adminUserQuery.data]);
 
@@ -380,11 +380,11 @@ export default function UserManagementPage() {
     setIsUploadingAvatar(true);
     try {
       const response = await profileApi.updateUserAvatar(selectedUser.id, croppedFile);
-      if (response.data?.avatar_url) {
+      if (response.avatar_url) {
         toast.success("Đã cập nhật ảnh đại diện người dùng.");
         void usersQuery.refetch();
         if (selectedUser) {
-           setSelectedUser({ ...selectedUser, avatar: response.data.avatar_url });
+           setSelectedUser({ ...selectedUser, avatar: response.avatar_url });
         }
       }
     } catch {

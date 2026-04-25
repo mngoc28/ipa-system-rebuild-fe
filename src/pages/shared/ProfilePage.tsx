@@ -83,8 +83,8 @@ export default function ProfilePage() {
     setIsUploading(true);
     try {
       const response = await profileApi.updateAvatar(croppedFile);
-      if (response.data?.avatar_url) {
-        updateUser({ avatar: response.data.avatar_url });
+      if (response.avatar_url) {
+        updateUser({ avatar: response.avatar_url });
         toast.success("Đã cập nhật ảnh đại diện.");
       }
     } catch (error) {

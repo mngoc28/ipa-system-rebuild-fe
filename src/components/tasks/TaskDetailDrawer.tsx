@@ -47,7 +47,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
     queryFn: () => teamsApi.getDashboard(),
   });
 
-  const members = teamData?.data?.members || [];
+  const members = teamData?.members || [];
 
   const [mentionSearch, setMentionSearch] = React.useState({ query: "", index: 0 });
   const [showMentions, setShowMentions] = React.useState(false);
@@ -198,7 +198,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
               {/* Attachments */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tệp đính kèm ({attachmentsData?.data?.length || 0})</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tệp đính kèm ({attachmentsData?.length || 0})</p>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -215,7 +215,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {attachmentsData?.data?.map((file: TaskAttachmentApiItem) => (
+                  {attachmentsData?.map((file: TaskAttachmentApiItem) => (
                     <div key={file.id} className="group relative flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-all hover:border-primary/30 hover:shadow-sm">
                       <div className="flex size-8 items-center justify-center rounded bg-slate-50 text-slate-400">
                         <FileIcon size={16} />
@@ -232,7 +232,7 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                       </button>
                     </div>
                   ))}
-                  {(!attachmentsData?.data || attachmentsData.data.length === 0) && (
+                  {(!attachmentsData || attachmentsData.length === 0) && (
                     <div className="col-span-full rounded-lg border border-dashed border-slate-200 py-4 text-center">
                       <p className="text-xs italic text-slate-400">Chưa có tệp đính kèm.</p>
                     </div>
@@ -242,10 +242,10 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
 
               {/* Comments Section */}
               <div className="space-y-4 pb-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Thảo luận ({commentsData?.data?.length || 0})</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Thảo luận ({commentsData?.length || 0})</p>
                 
                 <div className="space-y-6">
-                  {commentsData?.data?.map((comment: TaskCommentApiItem) => (
+                  {commentsData?.map((comment: TaskCommentApiItem) => (
                     <div key={comment.id} className="flex gap-3">
                       <div className="flex size-8 items-center justify-center overflow-hidden rounded-full border border-slate-100 bg-slate-50 shadow-sm">
                         {comment.commenter?.avatar_url ? <img src={comment.commenter.avatar_url} alt="" className="size-full object-cover" /> : <span className="text-xs font-bold text-slate-400">{comment.commenter?.full_name?.charAt(0) || "U"}</span>}

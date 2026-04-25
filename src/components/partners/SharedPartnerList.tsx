@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SelectField } from "@/components/ui/SelectField";
-import { getPartnerStatusValue, mapPartnerStatus, type PartnerUiItem } from "@/dataHelper/partners.dataHelper";
+import { getPartnerStatusValue, mapPartnerStatus, type PartnerUiItem, type PartnerOptionItem, type PartnerContactItem, type PartnerDetailInteractionItem } from "@/dataHelper/partners.dataHelper";
 import {
   useAddPartnerContactMutation,
   useCreatePartnerMutation,
@@ -143,7 +143,7 @@ export default function SharedPartnerList() {
     });
   };
 
-  const selectedPartnerDetail = partnerDetailQuery.data?.data;
+  const selectedPartnerDetail = partnerDetailQuery.data;
 
   React.useEffect(() => {
     if (isEditModalOpen && selectedPartnerDetail) {
@@ -205,7 +205,7 @@ export default function SharedPartnerList() {
           <div className="mt-4 flex items-center gap-4">
             <p className="text-3xl font-black leading-none tracking-tighter text-brand-text-dark">4.5</p>
             <div className="flex text-amber-500">
-              {[1, 2, 3, 4, 5].map((i) => <Star key={i} fill="currentColor" size={14} />)}
+              {[1, 2, 3, 4, 5].map((i: number) => <Star key={i} fill="currentColor" size={14} />)}
             </div>
           </div>
           <p className="mt-2 text-[9px] font-black uppercase leading-none tracking-widest text-brand-text-dark/40">Dựa trên 150+ phản hồi</p>
@@ -258,7 +258,7 @@ export default function SharedPartnerList() {
           </div>
         ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {partners.map((partner) => (
+            {partners.map((partner: PartnerUiItem) => (
                 <div
                 key={partner.id}
                 className="group relative overflow-hidden rounded-xl border border-brand-dark/5 bg-brand-dark/[0.01] p-5 transition-all hover:border-primary/30 hover:bg-white hover:shadow-xl hover:shadow-brand-dark/5 active:scale-[0.99]"
@@ -402,7 +402,7 @@ export default function SharedPartnerList() {
                      value={formPartner.countryId}
                      onValueChange={(v) => setFormPartner({ ...formPartner, countryId: v })}
                      placeholder="Chọn quốc gia"
-                     options={options.countries.map((country) => ({ label: country.label, value: String(country.id) }))}
+                     options={options.countries.map((country: PartnerOptionItem) => ({ label: country.label, value: String(country.id) }))}
                    />
                  </div>
                  <div className="space-y-2">
@@ -411,7 +411,7 @@ export default function SharedPartnerList() {
                      value={formPartner.sectorId}
                      onValueChange={(v) => setFormPartner({ ...formPartner, sectorId: v })}
                      placeholder="Chọn lĩnh vực"
-                     options={options.sectors.map((sector) => ({ label: sector.label, value: String(sector.id) }))}
+                     options={options.sectors.map((sector: PartnerOptionItem) => ({ label: sector.label, value: String(sector.id) }))}
                    />
                  </div>
                  <div className="space-y-2">
@@ -477,7 +477,7 @@ export default function SharedPartnerList() {
                      value={formPartner.countryId}
                      onValueChange={(v) => setFormPartner({ ...formPartner, countryId: v })}
                      placeholder="Chọn quốc gia"
-                     options={options.countries.map((country) => ({ label: country.label, value: String(country.id) }))}
+                     options={options.countries.map((country: PartnerOptionItem) => ({ label: country.label, value: String(country.id) }))}
                    />
                  </div>
                  <div className="space-y-2">
@@ -486,7 +486,7 @@ export default function SharedPartnerList() {
                      value={formPartner.sectorId}
                      onValueChange={(v) => setFormPartner({ ...formPartner, sectorId: v })}
                      placeholder="Chọn lĩnh vực"
-                     options={options.sectors.map((sector) => ({ label: sector.label, value: String(sector.id) }))}
+                     options={options.sectors.map((sector: PartnerOptionItem) => ({ label: sector.label, value: String(sector.id) }))}
                    />
                  </div>
                  <div className="space-y-2">
@@ -616,7 +616,7 @@ export default function SharedPartnerList() {
                   {(selectedPartnerDetail.contacts ?? []).length === 0 ? (
                     <p className="text-sm font-semibold text-brand-text-dark/40">Chưa có đầu mối liên hệ.</p>
                   ) : (
-                    selectedPartnerDetail.contacts!.map((contact) => (
+                    selectedPartnerDetail.contacts!.map((contact: PartnerContactItem) => (
                       <div key={contact.id} className="rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] p-3">
                         <div className="flex items-center justify-between gap-3">
                           <div>
@@ -643,7 +643,7 @@ export default function SharedPartnerList() {
                   {(selectedPartnerDetail.recentInteractions ?? []).length === 0 ? (
                     <p className="text-sm font-semibold text-brand-text-dark/40">Chưa có lịch sử tương tác.</p>
                   ) : (
-                    selectedPartnerDetail.recentInteractions!.map((interaction) => (
+                    selectedPartnerDetail.recentInteractions!.map((interaction: PartnerDetailInteractionItem) => (
                       <div key={interaction.id} className="rounded-lg border border-brand-dark/5 bg-brand-dark/[0.02] p-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-black text-brand-text-dark">Loại {interaction.interactionType}</p>

@@ -14,9 +14,9 @@ export const useNotificationsQuery = (options?: { pageSize?: number; unreadOnly?
     queryKey: ["notifications", options],
     queryFn: async () => {
       const response = await notificationsApi.list(options);
-      if (response.success && response.data) {
-        setUnreadCount(response.data.unreadCount);
-        return response.data;
+      if (response.success) {
+        setUnreadCount(response.unreadCount);
+        return response;
       }
       throw new Error(response.message || "Failed to fetch notifications");
     },

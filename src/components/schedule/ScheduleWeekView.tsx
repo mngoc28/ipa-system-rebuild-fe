@@ -32,7 +32,7 @@ interface ScheduleWeekViewProps {
   events: UiEvent[];
   isLoading: boolean;
   isError: boolean;
-  errorMessage: string;
+  errorMessage?: string;
   onRefetch: () => void;
   onAction: (mode: "detail" | "edit" | "reschedule" | "delete", event: UiEvent) => void;
   onJoin: (event: UiEvent) => void;

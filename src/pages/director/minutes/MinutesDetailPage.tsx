@@ -5,7 +5,7 @@ import { ChevronLeft, Download, Printer, Share2, Edit3, CheckCircle2, MessageSqu
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
+import { mapMinutesStatus, minutesApi, type MinutesVersion, type MinutesComment, type MinutesApproval } from "@/api/minutesApi";
 import { minutesAttachments, minutesTasks } from "@/dataHelper/minutesDetail.dataHelper";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
@@ -25,7 +25,7 @@ export default function MinutesDetailPage() {
     enabled: Boolean(id),
   });
 
-  const detailData = detailQuery.data?.data;
+  const detailData = detailQuery.data;
   const minutesItem = detailData?.minutes;
   const versions = detailData?.versions ?? [];
   const comments = detailData?.comments ?? [];
@@ -340,7 +340,7 @@ export default function MinutesDetailPage() {
               {activeRightTab === "comments" && (
                 <div className="space-y-6">
                   {comments.length === 0 ? <p className="text-xs font-semibold text-brand-text-dark/40">Chưa có phản hồi nào.</p> : null}
-                  {comments.map((item) => (
+                  {comments.map((item: MinutesComment) => (
                     <div key={item.id} className="flex gap-3">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-black text-white">CM</div>
                       <div className="space-y-1">
@@ -358,7 +358,7 @@ export default function MinutesDetailPage() {
               {activeRightTab === "history" && (
                 <div className="space-y-5">
                   {versionHistory.length === 0 ? <p className="text-xs font-semibold text-brand-text-dark/40">Chưa có phiên bản nào.</p> : null}
-                  {versionHistory.map((version) => (
+                  {versionHistory.map((version: MinutesVersion) => (
                     <div key={version.id} className="rounded-2xl border border-brand-dark/5 bg-brand-dark/[0.02] p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
@@ -376,7 +376,7 @@ export default function MinutesDetailPage() {
                   <div className="space-y-3 border-t border-brand-dark/5 pt-4">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">Phê duyệt</h4>
                     {approvals.length === 0 ? <p className="text-xs font-semibold text-brand-text-dark/40">Chưa có lần phê duyệt nào.</p> : null}
-                    {approvals.map((approval) => (
+                    {approvals.map((approval: MinutesApproval) => (
                       <div key={approval.id} className="flex items-start justify-between gap-3 rounded-2xl border border-brand-dark/5 bg-white p-4">
                         <div className="space-y-1">
                           <p className={cn("text-xs font-black uppercase tracking-widest", approval.decision === "APPROVE" ? "text-emerald-600" : "text-destructive")}>{approval.decision === "APPROVE" ? "Phê duyệt" : "Từ chối"}</p>
@@ -410,7 +410,7 @@ export default function MinutesDetailPage() {
               <span className="text-[10px] font-bold text-brand-text-dark/40">{attachments.length} files</span>
             </h3>
             <div className="space-y-2">
-              {attachments.map((file, index) => (
+              {attachments.map((file: string, index: number) => (
                 <div key={file} className="group flex items-center justify-between rounded-xl p-2 transition-all hover:bg-brand-dark/[0.02]">
                   <div className="flex items-center gap-3">
                     {index % 2 === 0 ? <FileText size={16} className="text-red-500" /> : <History size={16} className="text-blue-500" />}

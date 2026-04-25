@@ -7,10 +7,8 @@ import { useAuthStore } from "@/store/useAuthStore";
 interface AvatarUpdateResponse {
     success: boolean;
     message: string;
-    data: {
-        avatar_url: string;
-        id: string;
-  };
+    avatar_url: string;
+    id: string;
 }
 
 /**
@@ -26,11 +24,10 @@ interface ProfileUpdateData {
 /**
  * Response shape for profile detail update operations.
  */
-interface ProfileUpdateResponse {
+type ProfileUpdateResponse = {
     success: boolean;
     message: string;
-    data: ProfileUpdateData;
-}
+} & ProfileUpdateData;
 
 const getAdminPrefix = () => {
   const role = useAuthStore.getState().user?.role || "staff";

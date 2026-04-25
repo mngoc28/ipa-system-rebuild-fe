@@ -14,36 +14,42 @@ export interface MinutesItemDto {
     currentVersionNo: number;
 }
 
+export interface MinutesVersion {
+  id: string;
+  minutesId: string;
+  versionNo: number;
+  contentText?: string | null;
+  contentJson?: unknown;
+  changeSummary?: string;
+  editedAt?: string;
+}
+
+export interface MinutesComment {
+  id: string;
+  minutesId: string;
+  versionId?: string | null;
+  commentText: string;
+  parentCommentId?: string | null;
+  createdAt?: string;
+}
+
+export interface MinutesApproval {
+  id: string;
+  minutesId: string;
+  decision: "APPROVE" | "REJECT";
+  decisionNote?: string | null;
+  decidedAt?: string;
+  deciderUserId?: string;
+}
+
 /**
  * Comprehensive detailed view of meeting minutes including history and feedback.
  */
 export interface MinutesDetailDto {
-    minutes: MinutesItemDto;
-    versions: Array<{
-    id: string;
-    minutesId: string;
-    versionNo: number;
-    contentText?: string | null;
-    contentJson?: unknown;
-    changeSummary?: string;
-    editedAt?: string;
-  }>;
-    comments: Array<{
-    id: string;
-    minutesId: string;
-    versionId?: string | null;
-    commentText: string;
-    parentCommentId?: string | null;
-    createdAt?: string;
-  }>;
-    approvals: Array<{
-    id: string;
-    minutesId: string;
-    decision: "APPROVE" | "REJECT";
-    decisionNote?: string | null;
-    decidedAt?: string;
-    deciderUserId?: string;
-  }>;
+  minutes: MinutesItemDto;
+  versions: MinutesVersion[];
+  comments: MinutesComment[];
+  approvals: MinutesApproval[];
 }
 
 export interface MinutesListQuery {

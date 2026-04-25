@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { delegationsApi } from "@/api/delegationsApi";
 import { SEARCH_DEBOUNCE_DELAY_MS } from "@/constant";
-import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
+import { mapMinutesStatus, minutesApi, type MinutesItemDto } from "@/api/minutesApi";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -67,7 +67,7 @@ export default function MinutesListPage() {
     queryFn: () => delegationsApi.list({ page: 1 }),
   });
 
-  const firstDelegationId = delegationsQuery.data?.data?.items?.[0]?.id;
+  const firstDelegationId = delegationsQuery.data?.items?.[0]?.id;
 
   const createMinutesMutation = useMutation({
     mutationFn: (payload: { title: string; delegationId: string; content?: string }) => minutesApi.create(payload),
@@ -100,7 +100,7 @@ export default function MinutesListPage() {
     return <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm font-semibold text-destructive">Không thể tải danh sách biên bản.</div>;
   }
 
-  const minutes = (listQuery.data?.data?.items ?? []).map((item) => ({
+  const minutes = (listQuery.data?.items ?? []).map((item: MinutesItemDto) => ({
     id: item.id,
     delegationId: item.delegationId,
     title: item.title,
@@ -111,7 +111,7 @@ export default function MinutesListPage() {
     size: "--",
   }));
 
-  const pagination = listQuery.data?.data?.meta;
+  const pagination = listQuery.data?.meta;
   const totalPages = pagination?.totalPages ?? 1;
   const totalItems = pagination?.total ?? minutes.length;
   const pageLabelStart = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
@@ -158,9 +158,9 @@ export default function MinutesListPage() {
         delegationId: String(firstDelegationId),
       },
       {
-        onSuccess: (response) => {
+        onSuccess: (response: { id: string; currentVersionNo: number }) => {
           clearDraft();
-          const newId = response.data?.id;
+          const newId = response?.id;
           if (newId) {
             navigate(`${newId}`);
             return;
@@ -186,8 +186,8 @@ export default function MinutesListPage() {
         delegationId: String(firstDelegationId),
       },
       {
-        onSuccess: (response) => {
-          const newId = response.data?.id;
+        onSuccess: (response: { id: string; currentVersionNo: number }) => {
+          const newId = response?.id;
           if (newId) {
             navigate(`${newId}`);
             return;
@@ -213,8 +213,8 @@ export default function MinutesListPage() {
         delegationId: String(row.delegationId),
       },
       {
-        onSuccess: (response) => {
-          const newId = response.data?.id;
+        onSuccess: (response: { id: string; currentVersionNo: number }) => {
+          const newId = response?.id;
           if (newId) {
             navigate(`${newId}`);
             return;

@@ -20,9 +20,9 @@ export default function UnitReportsPage() {
   const createRunMutation = useMutation({
     mutationFn: (reportCode: string) => reportsApi.createRun({ report_code: reportCode, params: { scope: "unit" } }),
     onSuccess: (data) => {
-      const runId = data.data.run_id;
+      const runId = data.run_id;
       setActiveRunId(runId);
-      setRunHistory((prev) => [{ run_id: runId, report_code: selectedCode, status: data.data.status }, ...prev]);
+      setRunHistory((prev) => [{ run_id: runId, report_code: selectedCode, status: data.status }, ...prev]);
       toast.success("Đã khởi tạo tiến trình tạo báo cáo.");
     },
     onError: () => toast.error("Không thể khởi tạo báo cáo."),
@@ -33,12 +33,12 @@ export default function UnitReportsPage() {
     queryFn: () => reportsApi.showRun(activeRunId || ""),
     enabled: Boolean(activeRunId),
     refetchInterval: (query) => {
-      const status = String(query.state.data?.data?.status || "").toLowerCase();
+      const status = String(query.state.data?.status || "").toLowerCase();
       return status === "queued" || status === "running" ? 1500 : false;
     },
   });
 
-  const definitions = definitionsQuery.data?.data?.items || [];
+  const definitions = definitionsQuery.data?.items || [];
 
   React.useEffect(() => {
     if (!selectedCode && definitions.length > 0) {
@@ -47,7 +47,7 @@ export default function UnitReportsPage() {
   }, [definitions, selectedCode]);
 
   React.useEffect(() => {
-    const latest = runStatusQuery.data?.data;
+    const latest = runStatusQuery.data;
     if (!latest?.run_id) return;
     setRunHistory((prev) => prev.map((r) => (r.run_id === latest.run_id ? { ...r, status: latest.status } : r)));
   }, [runStatusQuery.data]);
@@ -81,11 +81,11 @@ export default function UnitReportsPage() {
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tiến trình gần nhất</p>
-          <p className="mt-1 text-xl font-black text-brand-text-dark">{runStatusQuery.data?.data?.status || "-"}</p>
+          <p className="mt-1 text-xl font-black text-brand-text-dark">{runStatusQuery.data?.status || "-"}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mã chạy</p>
-          <p className="mt-1 truncate text-sm font-black text-brand-text-dark">{runStatusQuery.data?.data?.run_id || "-"}</p>
+          <p className="mt-1 truncate text-sm font-black text-brand-text-dark">{runStatusQuery.data?.run_id || "-"}</p>
         </div>
       </div>
 

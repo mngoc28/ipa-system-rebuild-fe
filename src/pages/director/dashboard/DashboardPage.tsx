@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
+import { type DashboardTaskItem } from "@/api/dashboardApi";
 
 interface TimelineItem {
   id: string | number;
@@ -49,9 +50,9 @@ export default function DashboardPage() {
   const summaryQuery = useDashboardSummaryQuery(scope);
   const tasksQuery = useDashboardTasksQuery(scope);
 
-  const summary = summaryQuery.data?.data;
+  const summary = summaryQuery.data;
   const city = summary?.city;
-  const taskFeed = tasksQuery.data?.data?.items || [];
+  const taskFeed = tasksQuery.data?.items || [];
   const timelineItems: TimelineItem[] = isAdmin ? onlineUsers : weekSessions.slice(0, 3);
 
   const strategicBrief = React.useMemo(() => {
@@ -224,7 +225,7 @@ export default function DashboardPage() {
                   Chưa có đầu việc từ API.
                 </div>
               )}
-              {taskFeed.map((item) => (
+              {taskFeed.map((item: DashboardTaskItem) => (
                 <div
                   key={item.id}
                   className={cn(
@@ -289,7 +290,7 @@ export default function DashboardPage() {
               <Calendar size={16} className="text-primary" />
             </div>
             <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-brand-dark/5">
-              {timelineItems.map((item) => (
+              {timelineItems.map((item: TimelineItem) => (
                 <div key={item.id} className="group relative pl-10">
                   <div className="absolute left-[8.5px] top-1.5 z-10 size-2 rounded-sm bg-brand-dark/10 shadow-[0_0_0_4px_white] ring-1 ring-brand-dark/5 transition-all group-hover:bg-primary" />
                   <div className="space-y-1">

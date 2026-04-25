@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button";
 import { eventsApi } from "@/api/eventsApi";
 import { adminUsersApi } from "@/api/adminUsersApi";
-import { masterDataApi } from "@/api/masterDataApi";
+import { masterDataApi, MasterDataItem } from "@/api/masterDataApi";
 import { useAuthStore } from "@/store/useAuthStore";
 import ScheduleWeekView from "./ScheduleWeekView";
 import ScheduleMonthView from "./ScheduleMonthView";
@@ -17,6 +17,7 @@ import ScheduleDetailView from "./ScheduleDetailView";
 import ScheduleRescheduleForm from "./ScheduleRescheduleForm";
 import type { EventItem } from "@/api/eventsApi";
 import type { AdminUser } from "@/api/adminUsersApi";
+import type { ApiEnvelope, PaginatedData } from "@/types/api";
 import { 
   startOfWeek, 
   endOfWeek, 
@@ -35,11 +36,7 @@ interface ScheduleHubProps {
 }
 
 type ScheduleEventSource = EventItem;
-type ScheduleEventListResponse = {
-  data?: { items?: ScheduleEventSource[] };
-  items?: ScheduleEventSource[];
-  meta?: { total_pages?: number; totalPages?: number; total?: number };
-};
+type ScheduleEventListResponse = ApiEnvelope<PaginatedData<ScheduleEventSource>>;
 
 export interface UiEvent extends EventItem {
   time: string;
@@ -132,14 +129,14 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
     queryFn: () => adminUsersApi.list({ unitId: user?.unit, pageSize: 100 }),
   });
 
-  const members = useMemo(() => membersQuery.data?.data?.items || [], [membersQuery.data]);
+  const members = useMemo(() => membersQuery.data?.items || [], [membersQuery.data]);
   
   // Global active users for name resolution
   const allUsersQuery = useQuery({
     queryKey: ["active-users"],
     queryFn: () => adminUsersApi.list({ status: "active", pageSize: 100 }),
   });
-  const allUsers = useMemo(() => allUsersQuery.data?.data?.items || [], [allUsersQuery.data]);
+  const allUsers = useMemo(() => allUsersQuery.data?.items || [], [allUsersQuery.data]);
 
   const locationsQuery = useQuery({
     queryKey: ["master-data-locations"],
@@ -149,8 +146,8 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   const locationsData = locationsQuery.data;
 
   const locationOptions = useMemo(() => {
-    const items = locationsData?.data?.items || [];
-    const options = items.map((item) => ({
+    const items = locationsData?.items || [];
+    const options = items.map((item: MasterDataItem) => ({
       value: String(item.id),
       label: item.name_vi || item.name_en || item.code,
     }));
@@ -163,7 +160,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   }, [locationsData]);
 
   const locationLabelMap = useMemo(() => {
-    return locationOptions.reduce<Record<string, string>>((accumulator, option) => {
+    return locationOptions.reduce<Record<string, string>>((accumulator, option: { value: string; label: string }) => {
       accumulator[option.value] = option.label;
       return accumulator;
     }, {});
@@ -236,7 +233,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
 
   const filteredEvents = useMemo(() => {
     const queryData = eventsQuery.data as ScheduleEventListResponse | undefined;
-    const items = queryData?.data?.items || queryData?.items || [];
+    const items = queryData?.items || [];
     let events = items;
 
     if (showOnlyJoined && user?.id) {
@@ -397,7 +394,7 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 className="h-10 w-48 appearance-none rounded-xl border border-slate-200 bg-white pl-4 pr-10 text-[10px] font-black uppercase tracking-widest text-brand-text-dark shadow-sm outline-none transition-all hover:border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
               >
                 <option value="ALL">TẤT CẢ NHÂN VIÊN</option>
-                {members.map((m) => (
+                {members.map((m: AdminUser) => (
                   <option key={m.id} value={m.id}>
                     {m.fullName.toUpperCase()}
                   </option>
@@ -586,8 +583,8 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                </div>
                
                <div className="space-y-3">
-                  {filteredEvents.filter((e) => new Date(e.startAt).getDate() === selectedDay).length > 0 ? (
-                    filteredEvents.filter((e) => new Date(e.startAt).getDate() === selectedDay).map((event) => (
+                  {filteredEvents.filter((e: UiEvent) => new Date(e.startAt).getDate() === selectedDay).length > 0 ? (
+                    filteredEvents.filter((e: UiEvent) => new Date(e.startAt).getDate() === selectedDay).map((event: UiEvent) => (
                       <div key={event.id} className="group relative border-l-2 border-primary/20 py-1 pl-3 transition-all hover:border-primary">
                         <p className="text-[8px] font-black uppercase text-primary/60">{event.time.split(" - ")[0]}</p>
                         <p className="text-[10px] font-bold uppercase leading-tight text-slate-800 transition-colors group-hover:text-primary">{event.title}</p>
@@ -664,7 +661,6 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
                 events={filteredEvents} 
                 isLoading={eventsQuery.isLoading} 
                 isError={eventsQuery.isError} 
-                errorMessage={errorMessage}
                 members={allUsers.length > 0 ? allUsers : members}
                 onRefetch={() => eventsQuery.refetch()}
                 onAction={handleAction}
@@ -881,5 +877,3 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
     </div>
   );
 }
-
-const errorMessage = "Không thể tải lịch công tác.";

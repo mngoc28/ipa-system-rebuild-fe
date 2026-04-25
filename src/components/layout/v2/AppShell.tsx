@@ -24,8 +24,8 @@ export default function AppShell() {
     const fetchLatestUser = async () => {
       try {
         const response = await authApi.me();
-        if (response?.data) {
-          const authUser = response.data;
+        if (response) {
+          const authUser = response;
           
           let fetchedUnit = "";
           if (typeof authUser.unit === "object" && authUser.unit !== null) {

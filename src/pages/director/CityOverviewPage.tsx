@@ -27,6 +27,12 @@ import { cn } from "@/lib/utils";
 import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SelectField } from "@/components/ui/SelectField";
+import { 
+  type DashboardCityProjectItem,
+  type DashboardCityPartnerItem,
+  type DashboardTaskItem,
+  type DashboardCityEventItem,
+} from "@/api/dashboardApi";
 
 const currencyFormatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -50,9 +56,9 @@ export default function CityOverviewPage() {
   const summaryQuery = useDashboardSummaryQuery("director");
   const tasksQuery = useDashboardTasksQuery("director");
 
-  const summary = summaryQuery.data?.data;
+  const summary = summaryQuery.data;
   const city = summary?.city;
-  const taskItems = tasksQuery.data?.data?.items ?? [];
+  const taskItems = tasksQuery.data?.items ?? [];
   const isLoading = summaryQuery.isLoading || tasksQuery.isLoading;
   const isError = summaryQuery.isError || tasksQuery.isError;
 
@@ -96,10 +102,10 @@ export default function CityOverviewPage() {
   }
 
   const stageBreakdown = city?.stageBreakdown ?? [];
-  const totalStages = stageBreakdown.reduce((sum, item) => sum + item.projectCount, 0) || 1;
-  const recentProjects = city?.recentProjects ?? [];
-  const upcomingEvents = city?.upcomingEventsList ?? [];
-  const topPartners = city?.topPartners ?? [];
+  const totalStages = stageBreakdown.reduce((sum: number, item) => sum + item.projectCount, 0) || 1;
+  const recentProjects = (city?.recentProjects ?? []) as DashboardCityProjectItem[];
+  const upcomingEvents = (city?.upcomingEventsList ?? []) as DashboardCityEventItem[];
+  const topPartners = (city?.topPartners ?? []) as DashboardCityPartnerItem[];
   const cityBrief = {
     activeShare:
       (city?.totalPipelineValue ?? 0) > 0 ? Math.round(((city?.activePipelineValue ?? 0) / (city?.totalPipelineValue ?? 0)) * 100) : 0,
@@ -224,13 +230,15 @@ export default function CityOverviewPage() {
                         <YAxis type="category" dataKey="stageName" hide />
                         <Tooltip
                           cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                          content={({ active, payload }) => {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          content={({ active, payload }: { active?: boolean; payload?: readonly any[] }) => {
                             if (active && payload && payload.length) {
+                              const data = payload[0].payload;
                               return (
                                 <div className="rounded-xl border border-white/10 bg-brand-dark/90 p-3 shadow-2xl backdrop-blur-md">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-white/50">{payload[0].payload.stageName}</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-white/50">{data.stageName}</p>
                                   <p className="mt-1 text-sm font-black text-white">{payload[0].value} dự án</p>
-                                  <p className="text-[10px] font-bold text-amber-300">{formatCurrency(payload[0].payload.totalValue)}</p>
+                                  <p className="text-[10px] font-bold text-amber-300">{formatCurrency(data.totalValue)}</p>
                                 </div>
                               );
                             }
@@ -238,7 +246,7 @@ export default function CityOverviewPage() {
                           }}
                         />
                         <Bar dataKey="projectCount" radius={[0, 4, 4, 0]} barSize={12}>
-                          {stageBreakdown.map((_entry, index) => (
+                          {stageBreakdown.map((_entry, index: number) => (
                             <Cell key={`cell-${index}`} fill={stageColors[index % stageColors.length]} />
                           ))}
                         </Bar>
@@ -399,7 +407,7 @@ export default function CityOverviewPage() {
             {taskItems.length === 0 ? (
               <EmptyState label="Chưa có task nào." />
             ) : (
-              taskItems.map((task) => (
+              (taskItems as DashboardTaskItem[]).map((task) => (
                 <div key={task.id} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-3">
@@ -428,7 +436,7 @@ export default function CityOverviewPage() {
             {topPartners.length === 0 ? (
               <EmptyState label="Chưa có dữ liệu partner." />
             ) : (
-              topPartners.map((partner, index) => (
+              topPartners.map((partner, index: number) => (
                 <div key={partner.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-brand-dark text-sm font-black text-white">
                     {String(index + 1).padStart(2, "0")}

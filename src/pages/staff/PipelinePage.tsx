@@ -24,7 +24,7 @@ export default function StaffPipelinePage() {
     queryFn: () => pipelineApi.listProjects(),
   });
 
-  const projects = projectsQuery.data?.data?.items || [];
+  const projects = projectsQuery.data?.items || [];
   
   const filteredProjects = projects.filter(p => 
     p.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

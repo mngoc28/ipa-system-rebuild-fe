@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { useDashboardSummaryQuery, useDashboardTasksQuery } from "@/hooks/useDashboardQuery";
+import { type DashboardTaskItem } from "@/api/dashboardApi";
 
 interface TimelineItem {
   id: string | number;
@@ -49,8 +50,8 @@ export default function DashboardPage() {
   const summaryQuery = useDashboardSummaryQuery(scope);
   const tasksQuery = useDashboardTasksQuery(scope);
 
-  const summary = summaryQuery.data?.data;
-  const taskFeed = tasksQuery.data?.data?.items || [];
+  const summary = summaryQuery.data;
+  const taskFeed = tasksQuery.data?.items || [];
   const timelineItems: TimelineItem[] = isAdmin ? onlineUsers : weekSessions.slice(0, 3);
 
   return (
@@ -132,41 +133,44 @@ export default function DashboardPage() {
                   Chưa có đầu việc từ API.
                 </div>
               )}
-              {taskFeed.map((item) => (
-                <div
-                  key={item.id}
-                  className={cn(
-                    "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
-                    item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
-                  )}
-                >
+              {taskFeed.map((item: DashboardTaskItem) => {
+                const isOverdue = Boolean(item.isOverdue || item.overdue);
+                return (
                   <div
+                    key={item.id}
                     className={cn(
-                      "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
-                      item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
+                      "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
+                      item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
                     )}
                   >
-                    <Clock size={12} />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
-                      {item.priority && (
-                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
-                          {item.priority}
-                        </span>
+                    <div
+                      className={cn(
+                        "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
+                        item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
                       )}
+                    >
+                      <Clock size={12} />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
-                    <div className="mt-3 flex items-center gap-4">
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
-                        <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
-                      </span>
-                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
+                        {item.priority && (
+                          <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
+                            {item.priority}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
+                      <div className="mt-3 flex items-center gap-4">
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
+                          <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
+                        </span>
+                        {isOverdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -197,7 +201,7 @@ export default function DashboardPage() {
               <Calendar size={16} className="text-primary" />
             </div>
             <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-3.5 before:w-px before:bg-brand-dark/5">
-              {timelineItems.map((item) => (
+              {timelineItems.map((item: TimelineItem) => (
                 <div key={item.id} className="group relative pl-10">
                   <div className="absolute left-[8.5px] top-1.5 z-10 size-2 rounded-sm bg-brand-dark/10 shadow-[0_0_0_4px_white] ring-1 ring-brand-dark/5 transition-all group-hover:bg-primary" />
                   <div className="space-y-1">

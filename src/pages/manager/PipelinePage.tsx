@@ -24,9 +24,9 @@ export default function ManagerPipelinePage() {
     queryFn: () => pipelineApi.listProjects(stageFilter ? { stage_id: stageFilter } : {}),
   });
 
-  const projects = projectsQuery.data?.data?.items || [];
+  const projects = projectsQuery.data?.items || [];
   
-  const filteredProjects = projects.filter(p => 
+  const filteredProjects = projects.filter((p: PipelineProject) => 
     p.project_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.project_code.toLowerCase().includes(searchTerm.toLowerCase())
   );

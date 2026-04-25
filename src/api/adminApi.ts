@@ -1,3 +1,4 @@
+import { ApiEnvelope } from "@/types/api";
 import apiClient from "./axiosClient";
 
 /**
@@ -38,8 +39,8 @@ export const adminApi = {
    * @returns Comprehensive operational stats object.
    */
   getOperationalStats: async () => {
-    const response = await apiClient.get<{ data: OperationalStats }>("/api/v1/admin/system-settings/stats");
-    return response.data.data;
+    const response = await apiClient.get<ApiEnvelope<OperationalStats>>("/api/v1/admin/system-settings/stats");
+    return response.data;
   },
 
   /**
@@ -48,10 +49,10 @@ export const adminApi = {
    * @returns Array of announcement records.
    */
   getAnnouncements: async (search?: string) => {
-    const response = await apiClient.get<{ data: Announcement[] }>("/api/v1/admin/announcements", {
+    const response = await apiClient.get<ApiEnvelope<{ items: Announcement[] }>>("/api/v1/admin/announcements", {
       params: { search },
     });
-    return response.data.data;
+    return response.data;
   },
 
   /**
@@ -60,8 +61,8 @@ export const adminApi = {
    * @returns The created announcement object.
    */
   createAnnouncement: async (data: Partial<Announcement>) => {
-    const response = await apiClient.post<{ data: Announcement }>("/api/v1/admin/announcements", data);
-    return response.data.data;
+    const response = await apiClient.post<ApiEnvelope<Announcement>>("/api/v1/admin/announcements", data);
+    return response.data;
   },
 
   /**
@@ -71,8 +72,8 @@ export const adminApi = {
    * @returns The updated announcement object.
    */
   updateAnnouncement: async (id: number, data: Partial<Announcement>) => {
-    const response = await apiClient.patch<{ data: Announcement }>(`/api/v1/admin/announcements/${id}`, data);
-    return response.data.data;
+    const response = await apiClient.patch<ApiEnvelope<Announcement>>(`/api/v1/admin/announcements/${id}`, data);
+    return response.data;
   },
 
   /**

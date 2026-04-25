@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BarChart3, Download, LayoutGrid, Plus, Search, Target, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { pipelineApi, PipelineProject } from "@/api/pipelineApi";
+import { pipelineApi, PipelineProject, type PipelineSummaryStageItem, type PipelineSummaryCountryItem, type PipelineSummarySectorItem } from "@/api/pipelineApi";
 import { ProjectFunnel } from "@/components/pipeline/ProjectFunnel";
 import { SharedProjectList } from "@/components/pipeline/SharedProjectList";
 import { SharedProjectForm } from "@/components/pipeline/SharedProjectForm";
@@ -37,10 +37,10 @@ export default function DirectorPipelinePage() {
     queryFn: () => pipelineApi.listProjects(stageFilter ? { stage_id: stageFilter } : {}),
   });
 
-  const summary = summaryQuery.data?.data;
-  const projects = projectsQuery.data?.data?.items || [];
-  const visibleProjects = projects.filter((project) => !isPlaceholderProject(project.project_code, project.project_name));
-  const filteredProjects = projects.filter((project) => {
+  const summary = summaryQuery.data;
+  const projects = projectsQuery.data?.items || [];
+  const visibleProjects = projects.filter((project: PipelineProject) => !isPlaceholderProject(project.project_code, project.project_name));
+  const filteredProjects = projects.filter((project: PipelineProject) => {
     const keyword = searchTerm.toLowerCase();
     return visibleProjects.includes(project) && (project.project_name.toLowerCase().includes(keyword) || project.project_code.toLowerCase().includes(keyword));
   });
@@ -129,10 +129,10 @@ export default function DirectorPipelinePage() {
 
   const stageFilterItems = [
     { value: "", label: "Tất cả" },
-    ...(summary.stageBreakdown ?? []).map((stage) => ({ value: stage.stageCode, label: projectDataHelper.getStageLabel(stage.stageCode) })),
+    ...(summary.stageBreakdown ?? []).map((stage: PipelineSummaryStageItem) => ({ value: stage.stageCode, label: projectDataHelper.getStageLabel(stage.stageCode) })),
   ];
-  const countryBreakdown = (summary.countryBreakdown ?? []).filter((item) => !isPlaceholderName(item.countryName));
-  const sectorBreakdown = (summary.sectorBreakdown ?? []).filter((item) => !isPlaceholderName(item.sectorName));
+  const countryBreakdown = (summary.countryBreakdown ?? []).filter((item: PipelineSummaryCountryItem) => !isPlaceholderName(item.countryName));
+  const sectorBreakdown = (summary.sectorBreakdown ?? []).filter((item: PipelineSummarySectorItem) => !isPlaceholderName(item.sectorName));
 
   return (
     <div className="space-y-6 duration-700 animate-in fade-in">
@@ -228,7 +228,7 @@ export default function DirectorPipelinePage() {
               {countryBreakdown.length === 0 ? (
                 <EmptyState label="Chưa có dữ liệu quốc gia." />
               ) : (
-                countryBreakdown.map((item) => (
+                countryBreakdown.map((item: PipelineSummaryCountryItem) => (
                   <BreakdownItem key={item.countryName} label={item.countryName} value={`${item.projectCount} dự án`} percent={Math.max(10, Math.round((item.projectCount / Math.max(1, summary.stats.projects)) * 100))} color="bg-blue-600" />
                 ))
               )}
@@ -241,7 +241,7 @@ export default function DirectorPipelinePage() {
               {sectorBreakdown.length === 0 ? (
                 <EmptyState label="Chưa có dữ liệu lĩnh vực." />
               ) : (
-                sectorBreakdown.map((item, index) => (
+                sectorBreakdown.map((item: PipelineSummarySectorItem, index: number) => (
                   <BreakdownItem
                     key={item.sectorName}
                     label={item.sectorName}

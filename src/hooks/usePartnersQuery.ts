@@ -34,7 +34,7 @@ export const usePartnersListQuery = (options: PartnersQueryOptions = {}) => {
     queryFn: () => partnersApi.list(options),
   });
 
-  const partners = React.useMemo(() => mapPartnerItemsToUi(partnersQuery.data?.data?.items ?? []), [partnersQuery.data]);
+  const partners = React.useMemo(() => mapPartnerItemsToUi(partnersQuery.data?.items ?? []), [partnersQuery.data]);
   const meta = partnersQuery.data?.meta;
 
   return { partnersQuery, partners, meta };
@@ -63,7 +63,7 @@ export const usePartnerOptionsQuery = () => {
 
   return {
     optionsQuery,
-    options: (optionsQuery.data?.data ?? { countries: [], sectors: [] }) as PartnerOptionsResponse,
+    options: (optionsQuery.data ?? { countries: [], sectors: [] }) as PartnerOptionsResponse,
   };
 };
 

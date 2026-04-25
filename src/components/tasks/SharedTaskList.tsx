@@ -88,12 +88,12 @@ export default function SharedTaskList() {
     onRestore: (val) => setNewTask(val),
   });
 
-  const memberOptions = (teamData?.data?.members || []).map(m => ({
+  const memberOptions = (teamData?.members || []).map(m => ({
     label: m.name,
     value: String(m.id),
   }));
 
-  const delegationOptions = (delegationsQuery.data?.data?.items || []).map((d: DelegationApiItem) => ({
+  const delegationOptions = (delegationsQuery.data?.items || []).map((d: DelegationApiItem) => ({
     label: d.name || "Đoàn không tên",
     value: String(d.id),
   }));

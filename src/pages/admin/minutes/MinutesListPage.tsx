@@ -9,6 +9,7 @@ import { delegationsApi } from "@/api/delegationsApi";
 import { SEARCH_DEBOUNCE_DELAY_MS } from "@/constant";
 import { mapMinutesStatus, minutesApi } from "@/api/minutesApi";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { type MinutesItemDto } from "@/api/minutesApi";
 
 export default function MinutesListPage() {
   const queryClient = useQueryClient();
@@ -46,7 +47,7 @@ export default function MinutesListPage() {
     queryFn: () => delegationsApi.list({ page: 1 }),
   });
 
-  const firstDelegationId = delegationsQuery.data?.data?.items?.[0]?.id;
+  const firstDelegationId = delegationsQuery.data?.items?.[0]?.id;
 
   const createMinutesMutation = useMutation({
     mutationFn: (payload: { title: string; delegationId: string; content?: string }) => minutesApi.create(payload),
@@ -79,7 +80,7 @@ export default function MinutesListPage() {
     return <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-sm font-semibold text-rose-600">Không thể tải danh sách biên bản.</div>;
   }
 
-  const minutes = (listQuery.data?.data?.items ?? []).map((item) => ({
+  const minutes = ((listQuery.data?.items ?? []) as MinutesItemDto[]).map((item) => ({
     id: item.id,
     delegationId: item.delegationId,
     title: item.title,
@@ -90,7 +91,7 @@ export default function MinutesListPage() {
     size: "--",
   }));
 
-  const pagination = listQuery.data?.data?.meta;
+  const pagination = listQuery.data?.meta;
   const totalPages = pagination?.totalPages ?? 1;
   const totalItems = pagination?.total ?? minutes.length;
   const pageLabelStart = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
@@ -126,7 +127,7 @@ export default function MinutesListPage() {
       },
       {
         onSuccess: (response) => {
-          const newId = response.data?.id;
+          const newId = response.id;
           if (newId) {
             navigate(`${newId}`);
             return;
@@ -152,7 +153,7 @@ export default function MinutesListPage() {
       },
       {
         onSuccess: (response) => {
-          const newId = response.data?.id;
+          const newId = response.id;
           if (newId) {
             navigate(`${newId}`);
             return;
@@ -179,7 +180,7 @@ export default function MinutesListPage() {
       },
       {
         onSuccess: (response) => {
-          const newId = response.data?.id;
+          const newId = response.id;
           if (newId) {
             navigate(`${newId}`);
             return;
@@ -204,8 +205,6 @@ export default function MinutesListPage() {
     setPage(page);
   };
 
-  const visibleMinutes = minutes;
-
   return (
     <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -226,7 +225,6 @@ export default function MinutesListPage() {
         </div>
       </div>
 
-      {/* Templates Feature */}
       <div className="group relative overflow-hidden rounded-xl bg-brand-dark-900 p-6 text-white shadow-lg shadow-brand-dark-900/20">
         <PenTool size={80} className="absolute -bottom-4 -right-4 rotate-12 text-white opacity-10 transition-all duration-700 group-hover:rotate-0" />
         <div className="relative z-10 space-y-4 lg:w-2/3">
@@ -244,7 +242,6 @@ export default function MinutesListPage() {
         </div>
       </div>
 
-      {/* Main List Area */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         {showHistoryPanel && (
           <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -291,9 +288,9 @@ export default function MinutesListPage() {
             <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-12 text-sm font-semibold text-slate-500">
               <LoadingSpinner label="Đang cập nhật danh sách biên bản..." />
             </div>
-          ) : visibleMinutes.length === 0 ? (
+          ) : minutes.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">Không có biên bản phù hợp.</div>
-          ) : visibleMinutes.map((item) => (
+          ) : minutes.map((item) => (
             <div
               key={item.id}
               className="group flex flex-col justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-md lg:flex-row lg:items-center"
@@ -356,7 +353,7 @@ export default function MinutesListPage() {
               Hiển thị {pageLabelStart}-{pageLabelEnd} / {totalItems} biên bản
             </p>
             <div className="flex flex-wrap items-center gap-1">
-              {paginationPages.map((pageNumber) => (
+              {paginationPages.map((pageNumber: number) => (
                 <button
                   key={pageNumber}
                   onClick={() => handlePagination(pageNumber)}

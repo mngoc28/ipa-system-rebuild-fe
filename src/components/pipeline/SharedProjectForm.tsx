@@ -75,10 +75,11 @@ export const SharedProjectForm: React.FC<SharedProjectFormProps> = ({
           masterDataApi.list("sectors"),
           delegationsApi.list({ per_page: 100 }),
         ]);
-        setCountries(countryRes.data.items);
-        setSectors(sectorRes.data.items);
+        setCountries(countryRes.data?.items || []);
+        setSectors(sectorRes.data?.items || []);
+        const delegationItems = delegationRes.data?.items || [];
         setDelegations(
-          (delegationRes.data.items || []).map((d: { id: string | number; code: string; name: string }) => ({
+          delegationItems.map((d) => ({
             value: d.id,
             label: `${d.code} - ${d.name}`,
           }))

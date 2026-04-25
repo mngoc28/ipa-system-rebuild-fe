@@ -3,7 +3,7 @@ import { Bell, CheckCircle2, MessageSquare, Calendar, Trash2, MoreVertical, Chev
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { notificationsApi } from "@/api/notificationsApi";
+import { notificationsApi, type NotificationItem } from "@/api/notificationsApi";
 import { useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -243,7 +243,7 @@ export default function NotificationsPage() {
 
   const notifications: DisplayNotification[] = React.useMemo(() => {
     const items = notificationsQuery.data?.data?.items || [];
-    return items.map((item) => {
+    return items.map((item: NotificationItem) => {
       const type = (item.type === "assignment" || item.type === "approval" || item.type === "meeting" ? item.type : "system") as DisplayNotification["type"];
       const rawTime = item.createdAt || item.readAt || "";
       const time = rawTime ? new Date(rawTime).toLocaleString("vi-VN") : "Vừa xong";

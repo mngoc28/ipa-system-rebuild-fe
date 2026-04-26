@@ -25,6 +25,7 @@ interface StatCardProps {
   note: string;
   icon: React.ReactNode;
   color: "blue" | "emerald" | "rose" | "amber" | "purple";
+  isLoading?: boolean;
 }
 
 interface HighlightCardProps {
@@ -86,31 +87,31 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {isAdmin ? (
           <>
-            <StatCard title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Số lượng tài khoản" icon={<Users size={20} />} color="blue" />
-            <StatCard title="Thời gian vận hành" value={String(summary?.stats.tasks ?? 0)} note="Hệ thống ổn định" icon={<ShieldCheck size={20} />} color="emerald" />
-            <StatCard title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Lượt truy cập" icon={<TrendingUp size={20} />} color="purple" />
-            <StatCard title="Lưu trữ nhật ký" value={String(summary?.overdueTasks.length ?? 0)} note="Bản ghi hệ thống" icon={<Clock size={20} />} color="amber" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Số lượng tài khoản" icon={<Users size={20} />} color="blue" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Thời gian vận hành" value={String(summary?.stats.tasks ?? 0)} note="Hệ thống ổn định" icon={<ShieldCheck size={20} />} color="emerald" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Lượt truy cập" icon={<TrendingUp size={20} />} color="purple" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Lưu trữ nhật ký" value={String(summary?.overdueTasks.length ?? 0)} note="Bản ghi hệ thống" icon={<Clock size={20} />} color="amber" />
           </>
         ) : isDirector ? (
           <>
-            <StatCard title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<TrendingUp size={20} />} color="emerald" />
-            <StatCard title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<Briefcase size={20} />} color="blue" />
-            <StatCard title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<PieChart size={20} />} color="purple" />
-            <StatCard title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Users size={20} />} color="amber" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Tổng vốn đầu tư" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<TrendingUp size={20} />} color="emerald" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Dự án Pipeline" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<Briefcase size={20} />} color="blue" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Chỉ số PCI" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<PieChart size={20} />} color="purple" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Đoàn cấp cao" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Users size={20} />} color="amber" />
           </>
         ) : isManager ? (
           <>
-            <StatCard title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<ClipboardList size={20} />} color="rose" />
-            <StatCard title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="blue" />
-            <StatCard title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<PieChart size={20} />} color="emerald" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<ClipboardList size={20} />} color="rose" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="blue" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<PieChart size={20} />} color="emerald" />
           </>
         ) : (
           <>
-            <StatCard title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<Users size={20} />} color="blue" />
-            <StatCard title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="rose" />
-            <StatCard title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Zap size={20} />} color="emerald" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Đoàn công tác" icon={<Users size={20} />} color="blue" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Đầu việc" icon={<CheckCircle2 size={20} />} color="rose" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Sự kiện" icon={<Calendar size={20} />} color="amber" />
+            <StatCard isLoading={summaryQuery.isLoading} title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Quá hạn" icon={<Zap size={20} />} color="emerald" />
           </>
         )}
       </div>
@@ -128,46 +129,66 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="space-y-4">
-              {taskFeed.length === 0 && (
+              {tasksQuery.isLoading ? (
+                Array.from({ length: 3 }).map((_, idx) => (
+                  <div key={idx} className="flex items-start gap-4 rounded-xl border border-brand-dark/5 bg-white p-4">
+                    <div className="mt-1 size-6 shrink-0 animate-pulse rounded bg-slate-200" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-12 animate-pulse rounded bg-slate-200" />
+                      </div>
+                      <div className="h-3 w-1/3 animate-pulse rounded bg-slate-200" />
+                      <div className="mt-3 flex items-center gap-4">
+                        <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : taskFeed.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-6 text-xs font-semibold text-brand-text-dark/40">
                   Chưa có đầu việc từ API.
                 </div>
-              )}
-              {taskFeed.map((item: DashboardTaskItem) => (
-                <div
-                  key={item.id}
-                  className={cn(
-                    "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
-                    item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
-                      item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
-                    )}
-                  >
-                    <Clock size={12} />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
-                      {item.priority && (
-                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
-                          {item.priority}
-                        </span>
+              ) : (
+                taskFeed.map((item: DashboardTaskItem) => {
+                  const isOverdue = Boolean(item.isOverdue || item.overdue);
+                  return (
+                    <div
+                      key={item.id}
+                      className={cn(
+                        "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
+                        item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
                       )}
+                    >
+                      <div
+                        className={cn(
+                          "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
+                          item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
+                        )}
+                      >
+                        <Clock size={12} />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
+                          {item.priority && (
+                            <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
+                              {item.priority}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
+                        <div className="mt-3 flex items-center gap-4">
+                          <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
+                            <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
+                          </span>
+                          {isOverdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
-                    <div className="mt-3 flex items-center gap-4">
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
-                        <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
-                      </span>
-                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -240,7 +261,7 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, note, icon, color }: StatCardProps) {
+function StatCard({ title, value, note, icon, color, isLoading }: StatCardProps) {
   const colors: Record<StatCardProps["color"], string> = {
     blue: "text-blue-600 bg-white border-blue-100",
     emerald: "text-emerald-600 bg-white border-emerald-100",
@@ -255,7 +276,11 @@ function StatCard({ title, value, note, icon, color }: StatCardProps) {
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}> {icon} </div>
         <div>
           <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{title}</p>
-          <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
+          {isLoading ? (
+            <div className="mt-2 h-8 w-16 animate-pulse rounded bg-slate-200" />
+          ) : (
+            <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
+          )}
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <ArrowUpRight size={14} className="animate-pulse" /> {note}

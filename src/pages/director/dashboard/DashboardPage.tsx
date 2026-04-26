@@ -189,13 +189,26 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-black uppercase tracking-[0.24em] text-brand-text-dark/40">Hành động ưu tiên</p>
-                <span className="text-[10px] font-black uppercase tracking-[0.24em] text-brand-text-dark/40">{strategicBrief.totalProjects} dự án</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.24em] text-brand-text-dark/40">
+                  {isLoading ? (
+                    <span className="inline-block h-3 w-12 animate-pulse rounded bg-slate-200 align-middle" />
+                  ) : (
+                    `${strategicBrief.totalProjects} dự án`
+                  )}
+                </span>
               </div>
-              <p className="text-sm font-semibold leading-6 text-brand-text-dark/80">
-                {strategicBrief.upcomingEvent
-                  ? `Sự kiện gần nhất là ${formatDisplayLabel(strategicBrief.upcomingEvent.title, "sự kiện chưa đặt tên")} vào ${formatDateTime(strategicBrief.upcomingEvent.startAt)}.`
-                  : "Chưa có sự kiện sắp tới đủ dữ liệu để ưu tiên."}
-              </p>
+              {isLoading ? (
+                <div className="space-y-2 py-1">
+                  <div className="h-4 w-[90%] animate-pulse rounded bg-slate-200" />
+                  <div className="h-4 w-[60%] animate-pulse rounded bg-slate-200" />
+                </div>
+              ) : (
+                <p className="text-sm font-semibold leading-6 text-brand-text-dark/80">
+                  {strategicBrief.upcomingEvent
+                    ? `Sự kiện gần nhất là ${formatDisplayLabel(strategicBrief.upcomingEvent.title, "sự kiện chưa đặt tên")} vào ${formatDateTime(strategicBrief.upcomingEvent.startAt)}.`
+                    : "Chưa có sự kiện sắp tới đủ dữ liệu để ưu tiên."}
+                </p>
+              )}
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -226,46 +239,63 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="space-y-4">
-              {taskFeed.length === 0 && (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, idx) => (
+                  <div key={idx} className="flex items-start gap-4 rounded-xl border border-brand-dark/5 bg-white p-4">
+                    <div className="mt-1 size-6 shrink-0 animate-pulse rounded bg-slate-200" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-12 animate-pulse rounded bg-slate-200" />
+                      </div>
+                      <div className="h-3 w-1/3 animate-pulse rounded bg-slate-200" />
+                      <div className="mt-3 flex items-center gap-4">
+                        <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : taskFeed.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-brand-dark/10 bg-brand-dark/[0.02] p-6 text-xs font-semibold text-brand-text-dark/40">
                   Chưa có đầu việc từ API.
                 </div>
-              )}
-              {taskFeed.map((item: DashboardTaskItem) => (
-                <div
-                  key={item.id}
-                  className={cn(
-                    "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
-                    item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
-                  )}
-                >
+              ) : (
+                taskFeed.map((item: DashboardTaskItem) => (
                   <div
+                    key={item.id}
                     className={cn(
-                      "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
-                      item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
+                      "group flex items-start gap-4 rounded-xl border p-4 transition-all hover:border-primary/30 hover:bg-brand-dark/[0.02] hover:shadow-lg hover:shadow-brand-dark/[0.03]",
+                      item.priority === "urgent" ? "border-destructive/20 bg-destructive/5" : "border-brand-dark/5 bg-white",
                     )}
                   >
-                    <Clock size={12} />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
-                      {item.priority && (
-                        <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
-                          {item.priority}
-                        </span>
+                    <div
+                      className={cn(
+                        "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded border shadow-sm",
+                        item.priority === "urgent" ? "border-destructive/40 text-destructive bg-white" : "border-brand-dark/10 text-brand-text-dark/40 bg-white",
                       )}
+                    >
+                      <Clock size={12} />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
-                    <div className="mt-3 flex items-center gap-4">
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
-                        <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
-                      </span>
-                      {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-black uppercase leading-tight tracking-tight text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h4>
+                        {item.priority && (
+                          <span className={cn("rounded px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border shadow-sm", item.priority === "urgent" ? "bg-destructive text-white border-destructive/20" : "bg-brand-dark/5 text-brand-text-dark/40 border-brand-dark/10")}>
+                            {item.priority}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{item.delegation || item.user || "CHUNG"}</p>
+                      <div className="mt-3 flex items-center gap-4">
+                        <span className="flex items-center gap-1.5 text-[10px] font-bold text-brand-text-dark/40">
+                          <Calendar size={12} className="text-brand-text-dark/20" /> {item.deadline || item.time || "N/A"}
+                        </span>
+                        {item.overdue && <span className="text-[9px] font-black tracking-[0.2em] text-destructive">!! QUÁ HẠN XỬ LÝ</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

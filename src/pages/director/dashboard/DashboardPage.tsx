@@ -25,6 +25,7 @@ interface StatCardProps {
   note: string;
   icon: React.ReactNode;
   color: "blue" | "emerald" | "rose" | "amber" | "purple";
+  isLoading?: boolean;
 }
 
 interface HighlightCardProps {
@@ -80,6 +81,8 @@ export default function DashboardPage() {
     };
   }, [city]);
 
+  const isLoading = summaryQuery.isLoading || tasksQuery.isLoading;
+
   return (
     <div className="space-y-8 duration-700 animate-in fade-in">
       {/* Welcome Section */}
@@ -112,31 +115,31 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {isAdmin ? (
           <>
-            <StatCard title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Từ API summary" icon={<Users size={20} />} color="blue" />
-            <StatCard title="System Uptime" value={String(summary?.stats.tasks ?? 0)} note="Task records" icon={<ShieldCheck size={20} />} color="emerald" />
-            <StatCard title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Event records" icon={<TrendingUp size={20} />} color="purple" />
-            <StatCard title="Log Storage" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue tasks" icon={<Clock size={20} />} color="amber" />
+            <StatCard isLoading={isLoading} title="Tổng người dùng" value={String(summary?.stats.delegations ?? 0)} note="Từ API summary" icon={<Users size={20} />} color="blue" />
+            <StatCard isLoading={isLoading} title="System Uptime" value={String(summary?.stats.tasks ?? 0)} note="Task records" icon={<ShieldCheck size={20} />} color="emerald" />
+            <StatCard isLoading={isLoading} title="Traffic định kỳ" value={String(summary?.stats.events ?? 0)} note="Event records" icon={<TrendingUp size={20} />} color="purple" />
+            <StatCard isLoading={isLoading} title="Log Storage" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue tasks" icon={<Clock size={20} />} color="amber" />
           </>
         ) : isDirector ? (
           <>
-            <StatCard title="Tổng vốn đầu tư" value={city ? String(city.totalPipelineValue ?? 0) : "N/A"} note={city ? "Từ city overview" : "Chưa đồng bộ city summary"} icon={<TrendingUp size={20} />} color="emerald" />
-            <StatCard title="Dự án Pipeline" value={city ? String(city.pipelineProjects ?? 0) : "N/A"} note={city ? "Dự án đang theo dõi" : "Chưa đồng bộ city summary"} icon={<Briefcase size={20} />} color="blue" />
-            <StatCard title="Đoàn công tác" value={city ? String(city.activeDelegations ?? 0) : "N/A"} note={city ? "Đang mở" : "Chưa đồng bộ city summary"} icon={<ClipboardList size={20} />} color="purple" />
-            <StatCard title="Sự kiện tới" value={city ? String(city.upcomingEvents ?? 0) : "N/A"} note={city ? "Đã xếp lịch" : "Chưa đồng bộ city summary"} icon={<Calendar size={20} />} color="amber" />
+            <StatCard isLoading={isLoading} title="Tổng vốn đầu tư" value={city ? String(city.totalPipelineValue ?? 0) : "N/A"} note={city ? "Từ city overview" : "Đang đồng bộ..."} icon={<TrendingUp size={20} />} color="emerald" />
+            <StatCard isLoading={isLoading} title="Dự án Pipeline" value={city ? String(city.pipelineProjects ?? 0) : "N/A"} note={city ? "Dự án đang theo dõi" : "Đang đồng bộ..."} icon={<Briefcase size={20} />} color="blue" />
+            <StatCard isLoading={isLoading} title="Đoàn công tác" value={city ? String(city.activeDelegations ?? 0) : "N/A"} note={city ? "Đang mở" : "Đang đồng bộ..."} icon={<ClipboardList size={20} />} color="purple" />
+            <StatCard isLoading={isLoading} title="Sự kiện tới" value={city ? String(city.upcomingEvents ?? 0) : "N/A"} note={city ? "Đã xếp lịch" : "Đang đồng bộ..."} icon={<Calendar size={20} />} color="amber" />
           </>
         ) : isManager ? (
           <>
-            <StatCard title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<ClipboardList size={20} />} color="rose" />
-            <StatCard title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="blue" />
-            <StatCard title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<PieChart size={20} />} color="emerald" />
+            <StatCard isLoading={isLoading} title="Đoàn chờ duyệt" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<ClipboardList size={20} />} color="rose" />
+            <StatCard isLoading={isLoading} title="Việc phòng ban" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="blue" />
+            <StatCard isLoading={isLoading} title="Lịch họp tuần" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
+            <StatCard isLoading={isLoading} title="Báo cáo đơn vị" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<PieChart size={20} />} color="emerald" />
           </>
         ) : (
           <>
-            <StatCard title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<Users size={20} />} color="blue" />
-            <StatCard title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="rose" />
-            <StatCard title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
-            <StatCard title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Zap size={20} />} color="emerald" />
+            <StatCard isLoading={isLoading} title="Đoàn phụ trách" value={String(summary?.stats.delegations ?? 0)} note="Delegations" icon={<Users size={20} />} color="blue" />
+            <StatCard isLoading={isLoading} title="Việc cần làm" value={String(summary?.stats.tasks ?? 0)} note="Tasks" icon={<CheckCircle2 size={20} />} color="rose" />
+            <StatCard isLoading={isLoading} title="Lịch cá nhân" value={String(summary?.stats.events ?? 0)} note="Events" icon={<Calendar size={20} />} color="amber" />
+            <StatCard isLoading={isLoading} title="Tài liệu mới" value={String(summary?.overdueTasks.length ?? 0)} note="Overdue" icon={<Zap size={20} />} color="emerald" />
           </>
         )}
       </div>
@@ -156,23 +159,26 @@ export default function DashboardPage() {
 
             <div className="grid gap-3 md:grid-cols-3">
               <MiniInsight
+                isLoading={isLoading}
                 title="Tỉ trọng pipeline mở"
                 value={city ? `${strategicBrief.activeShare}%` : "N/A"}
-                detail={city ? strategicBrief.pressureLabel : "City summary chưa đồng bộ vào dashboard, mở tổng quan thành phố để xem số thật."}
+                detail={city ? strategicBrief.pressureLabel : "Đang tổng hợp dữ liệu chiến lược"}
                 icon={<Activity size={16} />}
                 tone="emerald"
               />
               <MiniInsight
+                isLoading={isLoading}
                 title="Điểm cần chú ý"
                 value={city ? formatDisplayLabel(strategicBrief.bottleneckStage?.stageName, "Chưa xác định") : "N/A"}
-                detail={city ? (strategicBrief.bottleneckStage ? `${strategicBrief.bottleneckStage.projectCount} dự án trong stage này` : "Chưa có stage đủ dữ liệu") : "Chưa có stage insight từ dashboard summary"}
+                detail={city ? (strategicBrief.bottleneckStage ? `${strategicBrief.bottleneckStage.projectCount} dự án trong stage này` : "Chưa có stage đủ dữ liệu") : "Đang trích xuất dữ liệu pipeline"}
                 icon={<AlertTriangle size={16} />}
                 tone="amber"
               />
               <MiniInsight
+                isLoading={isLoading}
                 title="Đối tác dẫn đầu"
                 value={city ? formatDisplayLabel(strategicBrief.topPartner?.partnerName, "Chưa có partner") : "N/A"}
-                detail={city ? (strategicBrief.topPartner ? `${strategicBrief.topPartner.projectCount} dự án đang nối` : "Chưa có dữ liệu top partner") : "Chưa có partner insight từ dashboard summary"}
+                detail={city ? (strategicBrief.topPartner ? `${strategicBrief.topPartner.projectCount} dự án đang nối` : "Chưa có dữ liệu top partner") : "Đang kiểm tra hồ sơ đối tác"}
                 icon={<Users size={16} />}
                 tone="blue"
               />
@@ -332,7 +338,7 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, note, icon, color }: StatCardProps) {
+function StatCard({ title, value, note, icon, color, isLoading }: StatCardProps) {
   const colors: Record<StatCardProps["color"], string> = {
     blue: "text-blue-600 bg-white border-blue-100",
     emerald: "text-emerald-600 bg-white border-emerald-100",
@@ -347,7 +353,11 @@ function StatCard({ title, value, note, icon, color }: StatCardProps) {
         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all group-hover:scale-110", colors[color])}> {icon} </div>
         <div>
           <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-brand-text-dark/40">{title}</p>
-          <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
+          {isLoading ? (
+            <div className="mt-2 h-8 w-16 animate-pulse rounded bg-slate-200" />
+          ) : (
+            <p className="text-3xl font-black tracking-tighter text-brand-dark">{value}</p>
+          )}
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
           <ArrowUpRight size={14} className="animate-pulse" /> {note}
@@ -357,7 +367,7 @@ function StatCard({ title, value, note, icon, color }: StatCardProps) {
   );
 }
 
-function MiniInsight({ title, value, detail, icon, tone }: { title: string; value: string; detail: string; icon: React.ReactNode; tone: "blue" | "emerald" | "amber" }) {
+function MiniInsight({ title, value, detail, icon, tone, isLoading }: { title: string; value: string; detail: string; icon: React.ReactNode; tone: "blue" | "emerald" | "amber"; isLoading?: boolean }) {
   const toneClasses: Record<typeof tone, string> = {
     blue: "bg-blue-50 text-blue-600 border-blue-100",
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
@@ -368,7 +378,11 @@ function MiniInsight({ title, value, detail, icon, tone }: { title: string; valu
     <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 shadow-sm">
       <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl border", toneClasses[tone])}>{icon}</div>
       <p className="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-brand-text-dark/40">{title}</p>
-      <p className="mt-1 text-sm font-black uppercase tracking-tight text-brand-dark">{value}</p>
+      {isLoading ? (
+        <div className="mb-1 mt-2 h-5 w-16 animate-pulse rounded bg-slate-200" />
+      ) : (
+        <p className="mt-1 text-sm font-black uppercase tracking-tight text-brand-dark">{value}</p>
+      )}
       <p className="mt-1 text-[11px] font-medium leading-5 text-brand-text-dark/60">{detail}</p>
     </div>
   );

@@ -20,12 +20,13 @@ type ApiErrorLike = {
  * Composite hook providing a query for delegations and mutations for CRUD operations.
  * @param query - Optional filtering and sorting parameters for the delegation list.
  */
-export const useDelegationsQuery = (query?: DelegationsQuery) => {
+export const useDelegationsQuery = (query?: DelegationsQuery, enabled = true) => {
   const queryClient = useQueryClient();
 
   const delegationsQuery = useQuery({
     queryKey: ["delegations", query],
     queryFn: () => delegationsApi.list(query),
+    enabled,
   });
 
   const createMutation = useMutation({

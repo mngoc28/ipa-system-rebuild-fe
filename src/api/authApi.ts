@@ -38,6 +38,14 @@ export const authApi = {
   },
 
   /**
+   * Initializes common application state (user profile + counts).
+   */
+  init: async () => {
+    const response = await axiosClient.get<ApiEnvelope<{ user: AuthUser; unreadCount: number; pendingApprovalsCount: number }>>("/api/v1/auth/init");
+    return response.data;
+  },
+
+  /**
    * invalidates the current session and logs the user out.
    */
   logout: async () => {

@@ -36,7 +36,7 @@ export default function NotificationModal() {
   const navigate = useNavigate();
 
   // Queries and Mutations
-  const { data, isLoading, isFetching } = useNotificationsQuery({ pageSize: 15 });
+  const { data, isLoading, isFetching } = useNotificationsQuery({ pageSize: 15 }, isOpen);
   const readMutation = useMarkNotificationReadMutation();
   const readAllMutation = useMarkAllNotificationsReadMutation();
   const deleteReadMutation = useDeleteReadNotificationsMutation();

@@ -5,8 +5,8 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { Toaster } from "sonner";
 import { useAuthStore, getHasFetchedLatestUser, setHasFetchedLatestUserFlag } from "@/store/useAuthStore";
-import { authApi } from "@/api/authApi";
 import { cn } from "@/lib/utils";
+import { useInitQuery } from "@/hooks/useInitQuery";
 
 /**
  * The core application shell that wraps all non-administrative pages.
@@ -18,38 +18,29 @@ export default function AppShell() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { updateUser } = useAuthStore();
 
+  const { data: initData } = useInitQuery(!getHasFetchedLatestUser());
+ 
   useEffect(() => {
-    // Prevent duplicate API calls immediately after login
-    if (getHasFetchedLatestUser()) return;
-    const fetchLatestUser = async () => {
-      try {
-        const response = await authApi.me();
-        if (response) {
-          const authUser = response;
-          
-          let fetchedUnit = "";
-          if (typeof authUser.unit === "object" && authUser.unit !== null) {
-            fetchedUnit = authUser.unit.unit_name || authUser.unit.name || "";
-          } else if (typeof authUser.unit === "string") {
-            fetchedUnit = authUser.unit;
-          }
-
-          updateUser({
-            fullName: authUser.full_name || authUser.fullName || "",
-            email: authUser.email,
-            avatar: authUser.avatar_url || authUser.avatar || "",
-            unit: fetchedUnit,
-            phone: authUser.phone || "",
-          });
-          setHasFetchedLatestUserFlag(true);
-        }
-      } catch {
-        console.error("Failed to sync user data in background");
+    if (initData?.user) {
+      const authUser = initData.user;
+      
+      let fetchedUnit = "";
+      if (typeof authUser.unit === "object" && authUser.unit !== null) {
+        fetchedUnit = authUser.unit.unit_name || authUser.unit.name || "";
+      } else if (typeof authUser.unit === "string") {
+        fetchedUnit = authUser.unit;
       }
-    };
-    
-    fetchLatestUser();
-  }, [updateUser]);
+
+      updateUser({
+        fullName: authUser.full_name || authUser.fullName || "",
+        email: authUser.email,
+        avatar: authUser.avatar_url || authUser.avatar || "",
+        unit: fetchedUnit,
+        phone: authUser.phone || "",
+      });
+      setHasFetchedLatestUserFlag(true);
+    }
+  }, [initData, updateUser]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) {

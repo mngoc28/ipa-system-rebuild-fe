@@ -7,7 +7,7 @@ import { toast } from "sonner";
  * Hook to fetch and manage the user's notification list.
  * Includes automatic state synchronization with the global notification store.
  */
-export const useNotificationsQuery = (options?: { pageSize?: number; unreadOnly?: boolean }) => {
+export const useNotificationsQuery = (options?: { pageSize?: number; unreadOnly?: boolean }, enabled = true) => {
   const { setUnreadCount } = useNotificationStore();
 
   return useQuery({
@@ -21,6 +21,7 @@ export const useNotificationsQuery = (options?: { pageSize?: number; unreadOnly?
       throw new Error(response.message || "Failed to fetch notifications");
     },
     staleTime: 1000 * 60, // 1 minute
+    enabled,
   });
 };
 

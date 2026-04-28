@@ -119,12 +119,12 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen = false, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuthStore();
-  const { unreadCount, pendingApprovalsCount, fetchCounts } = useNotificationStore();
+  const { unreadCount, pendingApprovalsCount } = useNotificationStore();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchCounts();
-  }, [fetchCounts]);
+    // Counts are now handled by useInitQuery in AppShell
+  }, []);
 
   const filteredGroups = useMemo(() => {
     return menuGroups

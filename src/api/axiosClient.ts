@@ -1,4 +1,4 @@
-import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
+import axios, { type AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from "axios";
 import { getAuthToken, useAuthStore } from "@/store/useAuthStore";
 import { getAccessToken, getRefreshToken } from "@/utils/storage";
 import { decodeToken, refreshAccessToken } from "@/utils/tokenUtils";
@@ -8,6 +8,18 @@ import { toast } from "sonner";
  * Configured Axios instance for all API communications.
  * Includes base URL, timeout settings, and standard headers.
  */
+/**
+ * Global registry for active request AbortControllers.
+ * Allows cancelling all pending requests at once (e.g., on logout).
+ */
+const activeRequests = new Set<AbortController>();
+
+export const abortAllRequests = () => {
+  activeRequests.forEach((controller) => controller.abort());
+  activeRequests.clear();
+  console.log("[Axios] All pending requests aborted.");
+};
+
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8001",
   timeout: 30000,
@@ -24,8 +36,23 @@ type RetryableRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
 };
 
+/**
+ * Extended InternalAxiosRequestConfig to include internal tracking properties.
+ */
+interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _abortController?: AbortController;
+}
+
 axiosClient.interceptors.request.use(
   (config) => {
+    // Attach AbortController for global cancellation support
+    const controller = new AbortController();
+    config.signal = controller.signal;
+    activeRequests.add(controller);
+    
+    // Store reference to controller in config to remove it later
+    (config as CustomInternalAxiosRequestConfig)._abortController = controller;
+
     const token = getAuthToken() || getAccessToken();
     const isJwtLikeToken = Boolean(token && decodeToken(token));
 
@@ -43,8 +70,17 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Remove controller from registry on success
+    const controller = (response.config as CustomInternalAxiosRequestConfig)._abortController;
+    if (controller) activeRequests.delete(controller);
+    return response;
+  },
   async (error: AxiosError) => {
+    // Remove controller from registry on error
+    const controller = (error.config as CustomInternalAxiosRequestConfig | undefined)?._abortController;
+    if (controller) activeRequests.delete(controller);
+
     const status = error.response?.status;
     const originalRequest = error.config as RetryableRequestConfig | undefined;
     const requestUrl = originalRequest?.url || "";

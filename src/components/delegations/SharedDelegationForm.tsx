@@ -1,17 +1,17 @@
-import { masterDataApi, MasterDataItem } from "@/api/masterDataApi";
-import { teamsApi, OrgUnitItem } from "@/api/teamsApi";
+import { MasterDataItem } from "@/api/masterDataApi";
+import { OrgUnitItem } from "@/api/teamsApi";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MultiSelectField } from "@/components/ui/MultiSelectField";
 import { SelectField } from "@/components/ui/SelectField";
+import { useSectorsQuery, useLocationsQuery, useUnitsQuery } from "@/hooks/useMasterDataHooks";
 import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
 import { useDelegationDetailQuery, useDelegationsQuery } from "@/hooks/useDelegationsQuery";
 import { useDraftUnsavedGuard } from "@/hooks/useDraftUnsavedGuard";
 import { usePartnerOptionsQuery, usePartnersListQuery } from "@/hooks/usePartnersQuery";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/dateUtils";
-import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { PlainTextarea } from "@/components/ui/textarea";
 import React, { useEffect, useMemo, useState } from "react";
@@ -136,14 +136,21 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
   const { data: detailData, isLoading: isDetailLoading } = useDelegationDetailQuery(id);
-  const { createMutation, updateMutation } = useDelegationsQuery();
-  const { options } = usePartnerOptionsQuery();
-  const { partners } = usePartnersListQuery({ pageSize: 100 });
+  const { createMutation, updateMutation } = useDelegationsQuery(undefined, false);
   
-  const { data: unitsData } = useQuery({
-    queryKey: ["org-units"],
-    queryFn: () => teamsApi.listUnits(),
-  });
+  // 1. Critical Master Data (Small, cached for 1 hour)
+  const { options, optionsQuery } = usePartnerOptionsQuery();
+  const { data: unitsData } = useUnitsQuery();
+  const { data: sectorsData } = useSectorsQuery();
+  const { data: locationsData } = useLocationsQuery();
+
+  // 2. Heavy Data Lists (Staggered/Lazy loaded)
+  // - Fetch partners ONLY after critical options are loaded to avoid queueing
+  const { partners } = usePartnersListQuery({ pageSize: 100 }, optionsQuery.isSuccess);
+
+  // - Fetch users ONLY when entering tabs that actually need them (Checklist/Schedule)
+  const isUserListNeeded = activeTab === "schedule" || activeTab === "checklist";
+  const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 }, optionsQuery.isSuccess && isUserListNeeded);
 
   const unitOptions = React.useMemo(() => 
     (unitsData?.items ?? []).map((u: OrgUnitItem) => ({ label: u.unitName, value: String(u.id) })),
@@ -155,29 +162,21 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     [partners]
   );
 
-  const { data: sectorsData } = useQuery({
-    queryKey: ["master-data-sectors"],
-    queryFn: () => masterDataApi.list("sectors"),
-  });
-
   const sectorOptions = React.useMemo(() => 
     (sectorsData?.items ?? []).map((s: MasterDataItem) => ({ label: s.name_vi || s.name_en || "", value: String(s.id) })),
     [sectorsData]
   );
-
-  const { data: locationsData } = useQuery({
-    queryKey: ["master-data-locations"],
-    queryFn: () => masterDataApi.list("locations"),
-  });
 
   const locationOptions = React.useMemo(() => 
     (locationsData?.items ?? []).map((l: MasterDataItem) => ({ label: l.name_vi || l.name_en || "", value: String(l.id) })),
     [locationsData]
   );
 
-  const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 });
   const countries = options.countries;
-  const userOptions = usersData?.items?.map((u: AdminUser) => ({ label: u.fullName, value: String(u.id) })) || [];
+  const userOptions = React.useMemo(() => 
+    usersData?.items?.map((u: AdminUser) => ({ label: u.fullName, value: String(u.id) })) || [],
+    [usersData]
+  );
   const formError = detailData === undefined && isEdit && !isDetailLoading && id ? "Unable to load delegation record for editing." : null;
 
   const [formData, setFormData] = useState({

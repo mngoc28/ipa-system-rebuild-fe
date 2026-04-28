@@ -12,6 +12,7 @@ interface NotificationState {
   // Actions
   fetchCounts: () => Promise<void>;
   setUnreadCount: (count: number) => void;
+  setPendingApprovalsCount: (count: number) => void;
   incrementUnreadCount: () => void;
   decrementUnreadCount: () => void;
   reset: () => void;
@@ -56,6 +57,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   setUnreadCount: (count: number) => {
     set({ unreadCount: count });
+  },
+  
+  setPendingApprovalsCount: (count: number) => {
+    set({ pendingApprovalsCount: count });
   },
 
   incrementUnreadCount: () => {

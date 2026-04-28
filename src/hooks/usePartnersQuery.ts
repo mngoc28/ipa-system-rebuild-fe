@@ -28,10 +28,11 @@ export interface PartnersQueryOptions {
  * Transforms raw API items into UI-ready items.
  * @param options - Filtering and pagination criteria.
  */
-export const usePartnersListQuery = (options: PartnersQueryOptions = {}) => {
+export const usePartnersListQuery = (options: PartnersQueryOptions = {}, enabled = true) => {
   const partnersQuery = useQuery({
     queryKey: ["partners", options],
     queryFn: () => partnersApi.list(options),
+    enabled,
   });
 
   const partners = React.useMemo(() => mapPartnerItemsToUi(partnersQuery.data?.items ?? []), [partnersQuery.data]);
@@ -59,6 +60,7 @@ export const usePartnerOptionsQuery = () => {
   const optionsQuery = useQuery({
     queryKey: ["partner-options"],
     queryFn: () => partnersApi.options(),
+    staleTime: 1000 * 60 * 60, // 1 hour
   });
 
   return {

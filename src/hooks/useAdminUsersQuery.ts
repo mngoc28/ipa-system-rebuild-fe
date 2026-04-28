@@ -10,11 +10,12 @@ import {
  * Hook to retrieve a paginated list of administrative users with filtering and sorting.
  * @param query - Search, role, status, and pagination parameters.
  */
-export const useAdminUsersListQuery = (query: AdminUsersQuery) => {
+export const useAdminUsersListQuery = (query: AdminUsersQuery, enabled = true) => {
   return useQuery({
     queryKey: ["admin-users", query],
     queryFn: () => adminUsersApi.list(query),
     placeholderData: (previousData) => previousData,
+    enabled,
   });
 };
 

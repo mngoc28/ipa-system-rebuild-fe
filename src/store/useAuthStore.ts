@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { removeRefreshToken } from '@/utils/storage';
 import { authApi } from '@/api/authApi';
+import { abortAllRequests } from '@/api/axiosClient';
 
 export type UserRole = 'Staff' | 'Manager' | 'Director' | 'Admin';
 
@@ -50,20 +51,27 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        try {
-          if (inMemoryToken) {
-            console.log('Logging out from server...');
-            await authApi.logout();
-          }
-        } catch (error) {
-          console.error('Logout API error (possibly session already invalid):', error);
-        } finally {
-          console.log('Clearing local auth state...');
-          inMemoryToken = null;
-          removeRefreshToken();
-          // Also clear access token from storage to be safe
-          localStorage.removeItem('accessToken');
-          set({ user: null, token: null, isAuthenticated: false });
+        console.log('Initiating non-blocking logout...');
+        
+        // 1. Immediately abort all pending API requests to free up browser connections
+        abortAllRequests();
+
+        // 2. Clear local state IMMEDIATELY (Optimistic)
+        inMemoryToken = null;
+        removeRefreshToken();
+        localStorage.removeItem('accessToken');
+        
+        // 3. Update state to reflect unauthenticated status immediately
+        set({ user: null, token: null, isAuthenticated: false });
+
+        // 4. Fire background API call to invalidate session on server (don't await)
+        authApi.logout().catch((error) => {
+          console.warn('Background logout API failed (possibly already invalid):', error);
+        });
+
+        // 5. Force redirect to login page immediately
+        if (window.location.pathname !== '/auth/login') {
+          window.location.href = '/auth/login';
         }
       },
 

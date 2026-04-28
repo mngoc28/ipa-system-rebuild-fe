@@ -5,7 +5,8 @@
  */
 export type ApiEnvelope<T> = {
     success: boolean;
-    status: string;
+    status?: string;
+    api_status?: string;
     message?: string;
     meta?: {
         page: number;

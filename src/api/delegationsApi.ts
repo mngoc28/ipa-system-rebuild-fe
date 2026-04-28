@@ -90,7 +90,7 @@ export const delegationsApi = {
    * @returns Array of comment objects.
    */
   listComments: async (id: string | number) => {
-    const response = await axiosClient.get<ApiEnvelope<DelegationCommentApiItem[]>>(`${getPrefix()}/${id}/comments`);
+    const response = await axiosClient.get<ApiEnvelope<{ items: DelegationCommentApiItem[] }>>(`${getPrefix()}/${id}/comments`);
     return response.data;
   },
 

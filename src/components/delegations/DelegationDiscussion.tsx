@@ -7,6 +7,7 @@ import {
   useUpdateDelegationCommentMutation,
   useDeleteDelegationCommentMutation
 } from "@/hooks/useDelegationsQuery";
+import { useParams } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,7 +55,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { data: commentsData, isLoading } = useDelegationCommentsQuery(delegationId.toString());
+  const { id: urlId } = useParams();
+  const effectiveId = (delegationId || urlId || "").toString();
+  
+  const { data: commentsData, isLoading } = useDelegationCommentsQuery(effectiveId);
   const currentUser = useAuthStore((state) => state.user);
   
   // Fetch system users for tagging - filtered by the current user's unit
@@ -76,10 +80,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
 
   // Auto-scroll to bottom of comments
   useEffect(() => {
-    if (scrollRef.current && commentsData) {
+    if (scrollRef.current && commentsData?.items) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [commentsData]);
+  }, [commentsData?.items]);
 
   // Mention filtering logic - exclude current user and avoid empty names
   const filteredMembers = systemUsers.filter((m: TeamMemberMention) => 
@@ -128,8 +132,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
     e.preventDefault();
     if (!commentContent.trim() || addCommentMutation.isPending) return;
 
+    if (!effectiveId) return;
+
     addCommentMutation.mutate(
-      { id: delegationId.toString(), content: commentContent },
+      { id: effectiveId, content: commentContent },
       {
         onSuccess: () => {
           setCommentContent("");
@@ -156,8 +162,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   const handleSaveEdit = (commentId: number) => {
     if (!editContent.trim() || updateCommentMutation.isPending) return;
     
+    if (!effectiveId) return;
+
     updateCommentMutation.mutate(
-      { id: delegationId.toString(), commentId, content: editContent },
+      { id: effectiveId, commentId, content: editContent },
       {
         onSuccess: () => {
           setEditingCommentId(null);
@@ -170,8 +178,10 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   const handleDeleteComment = (commentId: number) => {
     if (!confirm("Bạn có chắc chắn muốn xóa bình luận này không?")) return;
     
+    if (!effectiveId) return;
+
     deleteCommentMutation.mutate({ 
-      id: delegationId.toString(), 
+      id: effectiveId, 
       commentId 
     });
   };
@@ -213,9 +223,9 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   return (
     <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto rounded-t-xl bg-slate-50/50 p-6">
-        {commentsData && commentsData.length > 0 ? (
+        {commentsData?.items && commentsData.items.length > 0 ? (
           <>
-            {commentsData.map((comment: DelegationCommentApiItem) => {
+            {commentsData.items.map((comment: DelegationCommentApiItem) => {
               const isMe = comment.commenter?.id === currentUser?.id;
               return (
                 <div key={comment.id} className={`group/msg flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
@@ -234,7 +244,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
                         {comment.commenter?.full_name || "Người dùng"}
                       </span>
                       <span className="text-[9px] font-medium text-slate-400">
-                        {format(new Date(comment.created_at), "HH:mm, dd/MM")}
+                        {comment.created_at ? format(new Date(comment.created_at), "HH:mm, dd/MM") : "N/A"}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

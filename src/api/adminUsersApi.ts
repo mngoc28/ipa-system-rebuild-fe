@@ -17,6 +17,18 @@ export interface AdminUser {
     avatar?: string;
 }
 
+export interface AdminRole {
+    id: string;
+    code: string;
+    name: string;
+}
+
+export interface AdminUnit {
+    id: string;
+    unitCode: string;
+    unitName: string;
+}
+
 export interface AdminUsersQuery {
   keyword?: string;
   status?: "active" | "inactive";

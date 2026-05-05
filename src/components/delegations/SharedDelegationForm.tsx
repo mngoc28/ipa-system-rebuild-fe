@@ -1,26 +1,27 @@
+import type { AdminUser } from "@/api/adminUsersApi";
 import { MasterDataItem } from "@/api/masterDataApi";
 import { OrgUnitItem } from "@/api/teamsApi";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { DatePicker } from "@/components/ui/DatePicker";
+import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MultiSelectField } from "@/components/ui/MultiSelectField";
 import { SelectField } from "@/components/ui/SelectField";
-import { useSectorsQuery, useLocationsQuery, useUnitsQuery } from "@/hooks/useMasterDataHooks";
+import { PlainTextarea } from "@/components/ui/textarea";
+import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
+import type { PartnerOptionItem } from "@/dataHelper/partners.dataHelper";
 import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
 import { useDelegationDetailQuery, useDelegationsQuery } from "@/hooks/useDelegationsQuery";
 import { useDraftUnsavedGuard } from "@/hooks/useDraftUnsavedGuard";
+import { useInitQuery } from "@/hooks/useInitQuery";
+import { useLocationsQuery, useSectorsQuery, useUnitsQuery } from "@/hooks/useMasterDataHooks";
 import { usePartnerOptionsQuery, usePartnersListQuery } from "@/hooks/usePartnersQuery";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/dateUtils";
-import { Input } from "@/components/ui/input";
-import { PlainTextarea } from "@/components/ui/textarea";
+import { ArrowLeft, Building2, Calendar, FileText, Save, Send, Users, X } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
-import { ArrowLeft, Building2, Calendar, FileText, Save, Send, Users, X } from "lucide-react";
-import type { AdminUser } from "@/api/adminUsersApi";
-import type { PartnerOptionItem } from "@/dataHelper/partners.dataHelper";
 
 /** Represents a member of a delegation as received from or sent to the API. */
 type DelegationMemberApi = {
@@ -138,23 +139,32 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
   const { data: detailData, isLoading: isDetailLoading } = useDelegationDetailQuery(id);
   const { createMutation, updateMutation } = useDelegationsQuery(undefined, false);
   
+  // Wait for app-init to finish before enabling master data hooks to ensure cache is used
+  const { isSuccess: isInitReady } = useInitQuery();
+  
   // 1. Critical Master Data (Small, cached for 1 hour)
-  const { options, optionsQuery } = usePartnerOptionsQuery();
-  const { data: unitsData } = useUnitsQuery();
-  const { data: sectorsData } = useSectorsQuery();
-  const { data: locationsData } = useLocationsQuery();
+  const { options, optionsQuery } = usePartnerOptionsQuery(isInitReady);
+  const { data: unitsData } = useUnitsQuery(isInitReady);
+  const { data: sectorsData } = useSectorsQuery(isInitReady);
+  const { data: locationsData } = useLocationsQuery(isInitReady);
 
   // 2. Heavy Data Lists (Staggered/Lazy loaded)
   // - Fetch partners ONLY after critical options are loaded to avoid queueing
-  const { partners } = usePartnersListQuery({ pageSize: 100 }, optionsQuery.isSuccess);
+  const { partners } = usePartnersListQuery({ pageSize: 100 }, isInitReady && optionsQuery.isSuccess);
 
   // - Fetch users ONLY when entering tabs that actually need them (Checklist/Schedule)
   const isUserListNeeded = activeTab === "schedule" || activeTab === "checklist";
-  const { data: usersData } = useAdminUsersListQuery({ pageSize: 100 }, optionsQuery.isSuccess && isUserListNeeded);
+  const usersQuery = useAdminUsersListQuery({ pageSize: 100 }, isInitReady && optionsQuery.isSuccess && isUserListNeeded);
+  const staffList = usersQuery.data?.items || [];
 
   const unitOptions = React.useMemo(() => 
-    (unitsData?.items ?? []).map((u: OrgUnitItem) => ({ label: u.unitName, value: String(u.id) })),
+    (unitsData ?? []).map((u: OrgUnitItem) => ({ label: u.unitName || "Unknown", value: String(u.id) })),
     [unitsData]
+  );
+
+  const sectorOptions = React.useMemo(() => 
+    (sectorsData ?? []).map((s: MasterDataItem) => ({ label: s.name_vi || s.name_en || "Unknown", value: String(s.id) })),
+    [sectorsData]
   );
 
   const partnerOptions = React.useMemo(() => 
@@ -162,20 +172,16 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
     [partners]
   );
 
-  const sectorOptions = React.useMemo(() => 
-    (sectorsData?.items ?? []).map((s: MasterDataItem) => ({ label: s.name_vi || s.name_en || "", value: String(s.id) })),
-    [sectorsData]
-  );
-
   const locationOptions = React.useMemo(() => 
-    (locationsData?.items ?? []).map((l: MasterDataItem) => ({ label: l.name_vi || l.name_en || "", value: String(l.id) })),
+    (locationsData ?? []).map((l: MasterDataItem) => ({ label: l.name_vi || l.name_en || "Unknown", value: String(l.id) })),
     [locationsData]
   );
 
   const countries = options.countries;
+
   const userOptions = React.useMemo(() => 
-    usersData?.items?.map((u: AdminUser) => ({ label: u.fullName, value: String(u.id) })) || [],
-    [usersData]
+    (staffList ?? []).map((u: AdminUser) => ({ label: u.fullName || "Unknown", value: String(u.id) })),
+    [staffList]
   );
   const formError = detailData === undefined && isEdit && !isDetailLoading && id ? "Unable to load delegation record for editing." : null;
 
@@ -662,7 +668,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
              </div>
 
              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="delegation-partner" className="text-xs font-bold uppercase text-slate-500">Đối tác (Nhiều đối tác)</label>
+                <label htmlFor="delegation-partner" className="text-xs font-bold uppercase text-slate-500">Đối tác</label>
                 <MultiSelectField 
                   id="delegation-partner"
                   name="partner_ids"
@@ -965,8 +971,8 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                        <h4 className="font-bold text-slate-800">{item.title}</h4>
                         {item.note ? <p className="text-sm text-slate-600">{item.note}</p> : null}
                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                          {item.location_id && <span>📍 {locationOptions.find((l: { label: string; value: string }) => l.value === String(item.location_id))?.label}</span>}
-                          {item.staff_id && <span>👤 Cán bộ phụ trách: {userOptions.find((u: { label: string; value: string }) => u.value === String(item.staff_id))?.label}</span>}
+                          {item.location_id && <span>📍 {locationOptions.find((l: { value: string }) => l.value === String(item.location_id))?.label}</span>}
+                          {item.staff_id && <span>👤 Cán bộ phụ trách: {userOptions.find((u: { value: string }) => u.value === String(item.staff_id))?.label}</span>}
                           {item.logistics_note && <span>🚚 {item.logistics_note}</span>}
                        </div>
                     </div>
@@ -1033,7 +1039,7 @@ export default function SharedDelegationForm({ role }: SharedDelegationFormProps
                           />
                           <div className="flex-1">
                              <p className={cn("text-sm font-medium", item.status === 1 ? "text-slate-400 line-through" : "text-slate-700")}>{item.itemName}</p>
-                             {item.assigneeId && <span className="text-[10px] text-slate-400">👤 {userOptions.find(u => u.value === String(item.assigneeId))?.label}</span>}
+                             {item.assigneeId && <span className="text-[10px] text-slate-400">👤 {userOptions.find((u: { value: string; label: string }) => u.value === String(item.assigneeId))?.label}</span>}
                           </div>
                           <button 
                             onClick={() => setFormData({...formData, checklist_items: formData.checklist_items.filter((_, i) => i !== idx)})}

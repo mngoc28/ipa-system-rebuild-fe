@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AppInitData } from "@/dataHelper/auth.dataHelper";
+import type { ApiEnvelope, PaginatedData } from "@/types/api";
 import {
   adminUsersApi,
   type AdminUsersQuery,
+  type AdminUser,
+  type AdminRole,
+  type AdminUnit,
   type CreateAdminUserPayload,
   type UpdateAdminUserPayload,
 } from "@/api/adminUsersApi";
@@ -11,11 +16,36 @@ import {
  * @param query - Search, role, status, and pagination parameters.
  */
 export const useAdminUsersListQuery = (query: AdminUsersQuery, enabled = true) => {
+  const queryClient = useQueryClient();
+  const initCache = queryClient.getQueryData<ApiEnvelope<AppInitData>>(["app-init"]);
+
+  // If query is for the first page with 100 items and no filters, use init cache as initial data
+  const isSimpleList = query.pageSize === 100 && !query.keyword && !query.unitId && !query.status && (query.page === 1 || !query.page);
+
   return useQuery({
     queryKey: ["admin-users", query],
     queryFn: () => adminUsersApi.list(query),
+    initialData: isSimpleList ? () => {
+      const users = initCache?.masterData?.users as AdminUser[] | undefined;
+      if (users) {
+        return {
+          success: true,
+          message: "Loaded from cache",
+          items: users,
+          meta: {
+            total: users.length,
+            per_page: 100,
+            current_page: 1,
+            total_pages: 1,
+            totalPages: 1
+          }
+        } as unknown as ApiEnvelope<PaginatedData<AdminUser>>;
+      }
+      return undefined;
+    } : undefined,
     placeholderData: (previousData) => previousData,
     enabled,
+    staleTime: 1000 * 60 * 60, // 1 hour
   });
 };
 
@@ -30,6 +60,7 @@ export const useCreateAdminUserMutation = () => {
     mutationFn: (payload: CreateAdminUserPayload) => adminUsersApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["app-init"] }); // Also invalidate init cache to refresh user list
     },
   });
 };
@@ -45,6 +76,7 @@ export const usePatchAdminUserMutation = () => {
     mutationFn: ({ userId, payload }: { userId: string; payload: UpdateAdminUserPayload }) => adminUsersApi.patch(userId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["app-init"] });
     },
   });
 };
@@ -59,6 +91,7 @@ export const useAdminUserQuery = (userId?: string, enabled = true) => {
     queryKey: ["admin-user", userId],
     queryFn: () => adminUsersApi.get(userId || ""),
     enabled: Boolean(userId) && enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -74,6 +107,7 @@ export const useLockAdminUserMutation = () => {
     mutationFn: ({ userId, locked }: { userId: string; locked: boolean }) => adminUsersApi.lock(userId, locked),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["app-init"] });
     },
   });
 };
@@ -89,6 +123,7 @@ export const useDeleteAdminUserMutation = () => {
     mutationFn: (userId: string) => adminUsersApi.delete(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["app-init"] });
     },
   });
 };
@@ -97,9 +132,14 @@ export const useDeleteAdminUserMutation = () => {
  * Hook to retrieve all available system roles for user assignment.
  */
 export const useAdminRolesQuery = () => {
+  const queryClient = useQueryClient();
+  const initCache = queryClient.getQueryData<ApiEnvelope<AppInitData>>(["app-init"]);
+
   return useQuery({
     queryKey: ["admin-roles"],
     queryFn: () => adminUsersApi.listRoles(),
+    initialData: initCache?.masterData?.roles ? { success: true, items: initCache.masterData.roles as AdminRole[] } : undefined,
+    staleTime: 1000 * 60 * 60, // 1 hour
   });
 };
 
@@ -107,9 +147,14 @@ export const useAdminRolesQuery = () => {
  * Hook to retrieve all available organizational units.
  */
 export const useAdminUnitsQuery = () => {
+  const queryClient = useQueryClient();
+  const initCache = queryClient.getQueryData<ApiEnvelope<AppInitData>>(["app-init"]);
+
   return useQuery({
     queryKey: ["admin-units"],
     queryFn: () => adminUsersApi.listUnits(),
+    initialData: initCache?.masterData?.units ? { success: true, items: initCache.masterData.units as AdminUnit[] } : undefined,
+    staleTime: 1000 * 60 * 60, // 1 hour
   });
 };
 

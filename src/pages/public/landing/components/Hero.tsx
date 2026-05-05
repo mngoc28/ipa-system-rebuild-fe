@@ -7,11 +7,11 @@ export default function Hero() {
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1555921015-5532091f6026?q=80&w=2070&auto=format&fit=crop" 
+          src="/landing_image.jpeg" 
           alt="Da Nang City" 
           className="size-full object-cover"
         />
-        <div className="absolute inset-0 bg-brand-dark-900/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 text-center">

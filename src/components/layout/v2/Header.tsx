@@ -2,10 +2,11 @@ import logoBrand from "@/assets/logo-brand.png";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
-import { LogOut, Menu, Plus, Search, User } from "lucide-react";
+import { LogOut, Menu, Plus, User } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { LogoutConfirmModal } from "./LogoutConfirmModal";
+import GlobalSearch from "./GlobalSearch";
 
 /**
  * Shared application header component.
@@ -39,15 +40,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         </div>
 
         {/* Global Search */}
-        <div className="relative hidden w-72 items-center md:flex lg:w-96">
-          <Search className="absolute left-3.5 text-brand-text-dark/40" size={16} />
-          <input
-            type="text"
-            aria-label="Tìm kiếm nội dung"
-            placeholder="Tìm kiếm đoàn công tác, đối tác, tài liệu..."
-            className="h-10 w-full rounded-xl border border-brand-dark/5 bg-brand-dark/[0.02] pl-10 pr-4 text-sm transition-all focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5"
-          />
-        </div>
+        <GlobalSearch />
       </div>
 
       <div className="flex items-center gap-2 lg:gap-3">

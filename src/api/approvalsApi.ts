@@ -7,8 +7,10 @@ import { ApiEnvelope, PaginatedData } from "@/types/api";
 export interface ApprovalItem {
     id: string;
     type: string;
+  typeLabel?: string;
     title?: string;
     requesterId?: string;
+  requesterName?: string;
     approverId?: string;
     status: string;
     createdAt?: string;

@@ -11,12 +11,12 @@ import type { DelegationItem } from "@/dataHelper/ui-system.data";
 import KanbanBoard from "@/components/delegations/KanbanBoard";
 import ListView from "@/components/delegations/ListView";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
-import { masterDataApi } from "@/api/masterDataApi";
-import { adminUsersApi } from "@/api/adminUsersApi";
-import { useQuery } from "@tanstack/react-query";
+import { useCountriesQuery } from "@/hooks/useMasterDataHooks";
+import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
 import { SelectField } from "@/components/ui/SelectField";
 import { RotateCcw, X } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useInitQuery } from "@/hooks/useInitQuery";
 
 /**
  * Props for the SharedDelegationList component.
@@ -29,7 +29,6 @@ interface SharedDelegationListProps {
 /** Checklist item count and completion indicator. */
 type DelegationChecklistItem = { status: number };
 /** Generic selection option for master data filters. */
-type SelectOptionItem = { id: string | number; name_vi?: string; name?: string; fullName?: string };
 
 /**
  * A comprehensive view for managing delegations, supporting both 
@@ -49,6 +48,8 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [staffFilter, setStaffFilter] = useState<string>("all");
 
+  const { isSuccess: isInitReady } = useInitQuery();
+
   const { delegationsQuery, deleteMutation, updateMutation } = useDelegationsQuery({
     direction: activeTab === "inbound" ? 1 : 2,
     search: searchTerm,
@@ -58,20 +59,11 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
     owner_user_id: staffFilter !== "all" ? Number(staffFilter) : undefined,
   });
 
-  const countriesQuery = useQuery({
-    queryKey: ["master-data", "countries"],
-    queryFn: () => masterDataApi.list("countries"),
-    staleTime: 1000 * 60 * 30, // 30 mins
-  });
+  const countriesQuery = useCountriesQuery(isInitReady);
+  const usersQuery = useAdminUsersListQuery({ pageSize: 100 }, isInitReady);
 
-  const usersQuery = useQuery({
-    queryKey: ["admin", "users", { pageSize: 100 }],
-    queryFn: () => adminUsersApi.list({ pageSize: 100 }),
-    staleTime: 1000 * 60 * 10, // 10 mins
-  });
-
-  const countries = useMemo(() => countriesQuery.data?.items || [], [countriesQuery.data]);
-  const staffMembers = useMemo(() => usersQuery.data?.items || [], [usersQuery.data]);
+  const countries = useMemo(() => countriesQuery.data || [], [countriesQuery.data]);
+  const staffMembers = useMemo(() => (usersQuery.data as unknown as { items: unknown[] })?.items || [], [usersQuery.data]);
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | string | null }>({
     isOpen: false,
@@ -351,7 +343,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
                 onValueChange={setCountryFilter}
                 options={[
                   { label: "Tất cả quốc gia", value: "all" },
-                  ...countries.map((c: SelectOptionItem) => ({ label: c.name_vi || c.name || "Unknown", value: String(c.id) })),
+                  ...((countries as { name_vi?: string; name?: string; id: string | number }[]) || []).map((c) => ({ label: c.name_vi || c.name || "Unknown", value: String(c.id) })),
                 ]}
                 placeholder="Quốc gia"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"
@@ -366,7 +358,7 @@ export default function SharedDelegationList({ role }: SharedDelegationListProps
                 onValueChange={setStaffFilter}
                 options={[
                   { label: "Tất cả cán bộ", value: "all" },
-                  ...staffMembers.map((u: SelectOptionItem & { fullName: string }) => ({ label: u.fullName, value: String(u.id) })),
+                  ...((staffMembers as { fullName?: string; full_name?: string; id: string | number }[]) || []).map((u) => ({ label: u.fullName || u.full_name || "Unknown", value: String(u.id) })),
                 ]}
                 placeholder="Cán bộ"
                 triggerClassName="bg-white py-2 px-3 text-xs font-bold"

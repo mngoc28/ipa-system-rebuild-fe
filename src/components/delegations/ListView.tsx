@@ -161,7 +161,14 @@ export default function ListView({ delegations, onDelete, role }: ListViewProps)
                 <td className="whitespace-nowrap px-6 py-4">
                   <div className="flex -space-x-1.5">
                     <div className="size-7 overflow-hidden rounded-full border-2 border-white bg-brand-dark/10">
-                      <img src={item.staff.avatar} alt={item.staff.name} className="size-full object-cover" />
+                      <img
+                        src={item.staff.avatar}
+                        alt={item.staff.name}
+                        className="size-full object-cover"
+                        onError={(event) => {
+                          event.currentTarget.src = `https://i.pravatar.cc/150?u=${encodeURIComponent(item.staff.name || String(item.id))}`;
+                        }}
+                      />
                     </div>
                     <div className="flex size-7 items-center justify-center rounded-full border-2 border-white bg-brand-dark/[0.04] text-[9px] font-black text-brand-text-dark/40">+2</div>
                   </div>

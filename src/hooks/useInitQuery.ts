@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { authApi } from "@/api/authApi";
 import { getAuthToken } from "@/store/useAuthStore";
+import { getAccessToken } from "@/utils/storage";
 import { isJwtToken } from "@/utils/tokenUtils";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useEffect } from "react";
@@ -10,7 +11,7 @@ import { useEffect } from "react";
  * Replaces separate calls to /me, /notifications/count, and /approvals/summary.
  */
 export const useInitQuery = (enabled = true) => {
-  const authToken = getAuthToken();
+  const authToken = getAuthToken() || getAccessToken();
   const { setUnreadCount, setPendingApprovalsCount } = useNotificationStore();
 
   const query = useQuery({
@@ -20,7 +21,7 @@ export const useInitQuery = (enabled = true) => {
       return response;
     },
     enabled: enabled && isJwtToken(authToken),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 60, // 1 hour for master data
   });
 
   // Sync with stores when data arrives

@@ -129,11 +129,11 @@ export default function LoginPage() {
         <div className="absolute inset-0 z-0">
           <img 
             className="size-full object-cover brightness-50 contrast-125" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdvmaQVFgFiYfS03odpVko0lSI8HS3ffl5sxvKJGDEe8uLq7p2eV_CquvvvmJYbHqHR09I_2fwkczFcmQyuu4yhoGBaOYM3HZz_50QIq7Lq8S6jjUy4QWtPLTkyWEetaOLTId-ShTFh0B_dQvLndVEwd1tqiTOkVNLDml0dU10NclFPQjoHpZ_dyYAB2hpbhFB3N4HmSVynGEnKApctxlYUPiO0OTnL33R3C_832kvEiQtK4Ssato8OwHEmrunQoicP4gBk6t0a00"
+            src="/login_image.png"
             alt="Da Nang Skyline"
           />
           {/* Decorative overlay for branding column */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#003fb1]/90 to-[#003fb1]/40 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-brand-dark/80 to-brand-dark/30"></div>
         </div>
 
         <div className="relative z-10 w-full space-y-12 px-16">

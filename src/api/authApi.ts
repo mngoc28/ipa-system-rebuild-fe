@@ -1,5 +1,5 @@
 import axiosClient from "@/api/axiosClient";
-import type { ChangePasswordFirstTimePayload, AuthUser, LoginPayload, LoginResponse } from "@/dataHelper/auth.dataHelper";
+import type { ChangePasswordFirstTimePayload, AuthUser, LoginPayload, LoginResponse, AppInitData } from "@/dataHelper/auth.dataHelper";
 import { ApiEnvelope } from "@/types/api";
 
 /**
@@ -41,7 +41,7 @@ export const authApi = {
    * Initializes common application state (user profile + counts).
    */
   init: async () => {
-    const response = await axiosClient.get<ApiEnvelope<{ user: AuthUser; unreadCount: number; pendingApprovalsCount: number }>>("/api/v1/auth/init");
+    const response = await axiosClient.get<ApiEnvelope<AppInitData>>("/api/v1/auth/init");
     return response.data;
   },
 

@@ -184,8 +184,16 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                 <div className="flex flex-wrap gap-2">
                   {task.assignees.length > 0 ? task.assignees.map(user => (
                     <div key={user.id} className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm">
-                      <div className="flex size-5 items-center justify-center overflow-hidden rounded-full bg-slate-100">
-                        {user.avatar ? <img src={user.avatar} alt="" className="size-full object-cover" /> : <span className="text-[8px] font-bold text-slate-400">{user.name.charAt(0)}</span>}
+                      <div className="relative flex size-5 items-center justify-center overflow-hidden rounded-full bg-slate-100">
+                        <span className="text-[8px] font-bold text-slate-400">{user.name.charAt(0)}</span>
+                        {user.avatar && (
+                          <img 
+                            src={user.avatar} 
+                            alt="" 
+                            className="absolute inset-0 size-full object-cover" 
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                          />
+                        )}
                       </div>
                       <span className="text-[10px] font-bold text-slate-700">{user.name}</span>
                     </div>
@@ -247,8 +255,16 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                 <div className="space-y-6">
                   {commentsData?.map((comment: TaskCommentApiItem) => (
                     <div key={comment.id} className="flex gap-3">
-                      <div className="flex size-8 items-center justify-center overflow-hidden rounded-full border border-slate-100 bg-slate-50 shadow-sm">
-                        {comment.commenter?.avatar_url ? <img src={comment.commenter.avatar_url} alt="" className="size-full object-cover" /> : <span className="text-xs font-bold text-slate-400">{comment.commenter?.full_name?.charAt(0) || "U"}</span>}
+                      <div className="relative flex size-8 items-center justify-center overflow-hidden rounded-full border border-slate-100 bg-slate-50 shadow-sm">
+                        <span className="text-xs font-bold text-slate-400">{comment.commenter?.full_name?.charAt(0) || "U"}</span>
+                        {comment.commenter?.avatar_url && (
+                          <img 
+                            src={comment.commenter.avatar_url} 
+                            alt="" 
+                            className="absolute inset-0 size-full object-cover" 
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                          />
+                        )}
                       </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center justify-between">
@@ -280,8 +296,16 @@ export default function TaskDetailDrawer({ task, open, onOpenChange }: TaskDetai
                       className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
                       onClick={() => insertMention(member)}
                     >
-                      <div className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-slate-100">
-                        {member.avatarUrl ? <img src={member.avatarUrl} alt="" className="size-full object-cover" /> : <span className="text-[8px] font-bold text-slate-400">{member.name.charAt(0)}</span>}
+                      <div className="relative flex size-6 items-center justify-center overflow-hidden rounded-full bg-slate-100">
+                        <span className="text-[8px] font-bold text-slate-400">{member.name.charAt(0)}</span>
+                        {member.avatarUrl && (
+                          <img 
+                            src={member.avatarUrl} 
+                            alt="" 
+                            className="absolute inset-0 size-full object-cover" 
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                          />
+                        )}
                       </div>
                       <span className="flex-1 truncate">{member.name}</span>
                     </button>

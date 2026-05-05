@@ -24,7 +24,8 @@ import type { DelegationCommentApiItem } from "@/api/delegationsApi";
 /** Represents a team member that can be mentioned in a discussion. */
 type TeamMemberMention = {
     id: string;
-    name: string;
+    fullName: string;
+    avatarUrl?: string | null;
 };
 
 // A simple textarea that resizes to fit its content
@@ -52,6 +53,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   const [mentionQuery, setMentionQuery] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<string | number | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [debouncedMentionQuery, setDebouncedMentionQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -60,18 +62,27 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
   
   const { data: commentsData, isLoading } = useDelegationCommentsQuery(effectiveId);
   const currentUser = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedMentionQuery(mentionQuery.trim());
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [mentionQuery]);
   
-  // Fetch system users for tagging - filtered by the current user's unit
+  // Fetch lightweight users for tagging only when mention dropdown is open
   const { data: teamData } = useQuery({
-    queryKey: ["team-members", mentionQuery, currentUser?.primary_unit_id],
-    queryFn: () => teamsApi.getDashboard({ 
-      pageSize: 100, 
-      search: mentionQuery,
-      unitId: currentUser?.primary_unit_id 
+    queryKey: ["mention-members", debouncedMentionQuery, currentUser?.primary_unit_id],
+    queryFn: () => teamsApi.getMentionMembers({
+      pageSize: 20,
+      search: debouncedMentionQuery,
+      unitId: currentUser?.primary_unit_id,
     }),
-    enabled: !!currentUser,
+    enabled: showMentions && !!currentUser,
+    staleTime: 1000 * 60 * 5,
   });
-  const systemUsers = teamData?.members || [];
+  const systemUsers = teamData?.items || [];
 
   const addCommentMutation = useAddDelegationCommentMutation();
   const updateCommentMutation = useUpdateDelegationCommentMutation();
@@ -87,7 +98,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
 
   // Mention filtering logic - exclude current user and avoid empty names
   const filteredMembers = systemUsers.filter((m: TeamMemberMention) => 
-    m.name && 
+    m.fullName && 
     m.id?.toString() !== currentUser?.id?.toString()
   ) || [];
 
@@ -120,7 +131,7 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
     if (atSignIndex !== -1) {
       const newText =
         commentContent.slice(0, atSignIndex) +
-        `@[${member.name}] ` +
+        `@[${member.fullName}] ` +
         textAfterCursor;
       setCommentContent(newText);
       setShowMentions(false);
@@ -229,13 +240,17 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
               const isMe = comment.commenter?.id === currentUser?.id;
               return (
                 <div key={comment.id} className={`group/msg flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
-                  <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
-                    {comment.commenter?.avatar_url ? (
-                      <img src={comment.commenter.avatar_url} alt="" className="size-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-bold text-slate-400">
-                        {comment.commenter?.full_name?.charAt(0) || "U"}
-                      </span>
+                  <div className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+                    <span className="text-xs font-bold text-slate-400">
+                      {comment.commenter?.full_name?.charAt(0) || "U"}
+                    </span>
+                    {comment.commenter?.avatar_url && (
+                      <img 
+                        src={comment.commenter.avatar_url} 
+                        alt="" 
+                        className="absolute inset-0 size-full object-cover" 
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
                     )}
                   </div>
                   <div className={`relative flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[80%]`}>
@@ -346,17 +361,27 @@ export default function DelegationDiscussion({ delegationId }: DelegationDiscuss
             <div className="max-h-48 overflow-auto">
               {filteredMembers.map((member) => (
                 <button
-                  key={member.id || member.name}
+                  key={member.id || member.fullName}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
                   onClick={(e) => {
                     e.preventDefault();
                     insertMention(member);
                   }}
                 >
-                  <div className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">
-                    <span className="text-[8px] font-bold text-slate-400">{member.name.charAt(0)}</span>
+                  <div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">
+                    <span className="text-[8px] font-bold text-slate-400">
+                      {member.fullName.charAt(0)}
+                    </span>
+                    {member.avatarUrl && (
+                      <img 
+                        src={member.avatarUrl} 
+                        alt="" 
+                        className="absolute inset-0 size-full object-cover" 
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
+                    )}
                   </div>
-                  <span className="flex-1 truncate">{member.name}</span>
+                  <span className="flex-1 truncate">{member.fullName}</span>
                 </button>
               ))}
             </div>

@@ -53,6 +53,12 @@ export interface TeamCreateMemberPayload {
   unitId?: number;
 }
 
+export interface MentionMemberItem {
+  id: string;
+  fullName: string;
+  avatarUrl?: string | null;
+}
+
 export const teamsApi = {
   getDashboard: async (query?: { unitId?: number; page?: number; pageSize?: number; search?: string }) => {
     const { user } = useAuthStore.getState();
@@ -76,6 +82,16 @@ export const teamsApi = {
     const rolePrefix = user?.role?.toLowerCase() || 'staff';
 
     const response = await axiosClient.get<ApiEnvelope<{ items: OrgUnitItem[] }>>(`/api/v1/${rolePrefix}/teams/units`);
+    return response.data;
+  },
+  getMentionMembers: async (query?: { unitId?: number; search?: string; pageSize?: number }) => {
+    const { user } = useAuthStore.getState();
+    const rolePrefix = user?.role?.toLowerCase() || 'staff';
+
+    const response = await axiosClient.get<ApiEnvelope<{ items: MentionMemberItem[] }>>(`/api/v1/${rolePrefix}/teams/mentions`, {
+      params: query,
+    });
+
     return response.data;
   },
 };

@@ -146,7 +146,14 @@ export default function KanbanCard({ item, isOverlay, onDelete, color, role }: K
         <div className="mt-1 flex items-center justify-between border-t border-brand-dark/5 pt-2.5">
           <div className="flex items-center gap-1.5">
             <div className="size-6 overflow-hidden rounded-full border border-white shadow-sm">
-              <img src={item.staff.avatar} alt={item.staff.name} className="size-full object-cover" />
+              <img
+                src={item.staff.avatar}
+                alt={item.staff.name}
+                className="size-full object-cover"
+                onError={(event) => {
+                  event.currentTarget.src = `https://i.pravatar.cc/150?u=${encodeURIComponent(item.staff.name || String(item.id))}`;
+                }}
+              />
             </div>
             <span className="text-[10px] font-black uppercase tracking-wider text-brand-text-dark">{item.staff.name.split(" ").pop()}</span>
           </div>

@@ -73,3 +73,20 @@ export interface ChangePasswordFirstTimePayload {
     newPassword: string;
     confirmPassword: string;
 }
+
+/**
+ * Common application state returned by the init endpoint.
+ */
+export interface AppInitData {
+    user: AuthUser;
+    unreadCount: number;
+    pendingApprovalsCount: number;
+    masterData?: {
+        users?: unknown[]; 
+        roles?: unknown[];
+        units?: unknown[];
+        sectors?: unknown[];
+        locations?: unknown[];
+        countries?: unknown[];
+    };
+}

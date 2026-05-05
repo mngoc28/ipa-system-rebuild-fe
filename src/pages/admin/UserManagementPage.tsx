@@ -6,6 +6,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SelectField } from "@/components/ui/SelectField";
 import { profileApi } from "@/api/profileApi";
 import { AvatarCropper } from "@/components/shared/AvatarCropper";
+import { AdminUser } from "@/api/adminUsersApi";
 import {
   useAdminUserQuery,
   useAdminUsersListQuery,
@@ -159,7 +160,7 @@ export default function UserManagementPage() {
 
   const users: DisplayUser[] = React.useMemo(() => {
     const rawUsers = usersQuery.data?.items || [];
-    return rawUsers.map((user) => {
+    return rawUsers.map((user: AdminUser) => {
       const roleCode = (user.role_codes?.[0] || "admin").toLowerCase();
       const role = roleCode.charAt(0).toUpperCase() + roleCode.slice(1);
       return {

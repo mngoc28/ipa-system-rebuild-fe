@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { AppInitData } from "@/dataHelper/auth.dataHelper";
+import type { ApiEnvelope } from "@/types/api";
 import { toast } from "sonner";
 import { partnersApi } from "@/api/partnersApi";
 import {
@@ -56,10 +58,25 @@ export const usePartnerDetailQuery = (id?: string) => {
 /**
  * Hook to retrieve available dropdown options (countries, sectors) for partner forms.
  */
-export const usePartnerOptionsQuery = () => {
+export const usePartnerOptionsQuery = (enabled = true) => {
+  const queryClient = useQueryClient();
+  const initCache = queryClient.getQueryData<ApiEnvelope<AppInitData>>(["app-init"]);
+
   const optionsQuery = useQuery({
     queryKey: ["partner-options"],
     queryFn: () => partnersApi.options(),
+    initialData: () => {
+      const countries = initCache?.masterData?.countries as unknown as { id: string | number; name_vi?: string; name_en?: string }[] | undefined;
+      const sectors = initCache?.masterData?.sectors as unknown as { id: string | number; name_vi?: string; name_en?: string }[] | undefined;
+      if (countries && sectors) {
+        return {
+          countries: (countries || []).map((c) => ({ label: c.name_vi || c.name_en || "Unknown", value: String(c.id) })),
+          sectors: (sectors || []).map((s) => ({ label: s.name_vi || s.name_en || "Unknown", value: String(s.id) })),
+        } as unknown as ApiEnvelope<PartnerOptionsResponse>;
+      }
+      return undefined;
+    },
+    enabled,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 

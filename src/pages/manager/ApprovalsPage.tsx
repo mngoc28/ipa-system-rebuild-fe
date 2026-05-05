@@ -13,11 +13,20 @@ interface ApprovalUi {
   title: string;
   requester: string;
   type: string;
+  typeLabel: string;
   deadline: string;
   priority: "High" | "Medium" | "Low";
   date: string;
   status: "pending" | "approved" | "rejected";
 }
+
+const typeLabelByCode = (type?: string): string => {
+  const normalized = (type || "").toUpperCase();
+  if (normalized === "DELEGATION_APPROVAL") return "Đoàn công tác";
+  if (normalized === "MINUTES_APPROVAL") return "Biên bản";
+  if (normalized === "EVENT_APPROVAL") return "Lịch làm việc";
+  return "Phê duyệt";
+};
 
 const priorityByType = (type?: string): "High" | "Medium" | "Low" => {
   const normalized = (type || "").toUpperCase();
@@ -76,8 +85,9 @@ export default function ApprovalsPage() {
       return {
         id: item.id,
         title: item.title || `Yêu cầu ${item.type || "approval"}`,
-        requester: item.requesterId || "N/A",
+        requester: item.requesterName || item.requesterId || "N/A",
         type: item.type || "APPROVAL",
+        typeLabel: item.typeLabel || typeLabelByCode(item.type),
         deadline: item.dueAt ? new Date(item.dueAt).toLocaleDateString("vi-VN") : "Trong ngày",
         priority: priorityByType(item.type),
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString("vi-VN") : "--",
@@ -204,8 +214,8 @@ export default function ApprovalsPage() {
                   {item.type.toUpperCase().includes("MINUTES") ? <FileText size={20} /> : <ClipboardList size={20} />}
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.type}</p>
-                  <h3 className="text-sm font-bold leading-snug text-brand-text-dark transition-colors group-hover:text-primary">{item.title}</h3>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{item.typeLabel}</p>
+                  <h3 className="text-sm font-bold leading-snug text-brand-text-dark transition-colors group-hover:text-primary">Phê duyệt {item.typeLabel}</h3>
                 </div>
               </div>
               <button type="button" aria-label={`Xem chi tiết yêu cầu ${item.title}`} title={`Xem chi tiết yêu cầu ${item.title}`} onClick={() => handleRowOptions(item.id)} className="p-1.5 text-slate-300 transition-all hover:text-slate-600">

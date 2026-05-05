@@ -7,8 +7,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { eventsApi } from "@/api/eventsApi";
-import { adminUsersApi } from "@/api/adminUsersApi";
-import { masterDataApi, MasterDataItem } from "@/api/masterDataApi";
+import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
+import { useLocationsQuery } from "@/hooks/useMasterDataHooks";
+import { MasterDataItem } from "@/api/masterDataApi";
+import { useInitQuery } from "@/hooks/useInitQuery";
 import { useAuthStore } from "@/store/useAuthStore";
 import ScheduleWeekView from "./ScheduleWeekView";
 import ScheduleMonthView from "./ScheduleMonthView";
@@ -106,6 +108,8 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   const effectiveOrganizerId = isStaff ? undefined : (managementView === "PERSONAL" ? user?.id : (selectedStaffId === "ALL" ? undefined : selectedStaffId));
   const effectiveUnitId = (managementView === "TEAM" && selectedStaffId === "ALL" && !isStaff) ? user?.unit : undefined;
 
+  const { isSuccess: isInitReady } = useInitQuery();
+
   const eventsQuery = useQuery({
     queryKey: ["events", effectiveOrganizerId, effectiveUnitId, eventTypeFilter, statusFilter, debouncedSearch, currentPage, viewMode, referenceDate],
     queryFn: () =>
@@ -124,35 +128,23 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   });
 
   // Task: Fetch Unit Members for Filtering
-  const membersQuery = useQuery({
-    queryKey: ["unit-members", user?.unit],
-    queryFn: () => adminUsersApi.list({ unitId: user?.unit, pageSize: 100 }),
-  });
-
-  const members = useMemo(() => membersQuery.data?.items || [], [membersQuery.data]);
+  const membersQuery = useAdminUsersListQuery({ unitId: user?.unit, pageSize: 100 }, isInitReady);
+  const members = useMemo(() => (membersQuery.data as unknown as { items: AdminUser[] })?.items || [], [membersQuery.data]);
   
   // Global active users for name resolution
-  const allUsersQuery = useQuery({
-    queryKey: ["active-users"],
-    queryFn: () => adminUsersApi.list({ status: "active", pageSize: 100 }),
-  });
-  const allUsers = useMemo(() => allUsersQuery.data?.items || [], [allUsersQuery.data]);
+  const allUsersQuery = useAdminUsersListQuery({ status: "active", pageSize: 100 }, isInitReady);
+  const allUsers = useMemo(() => (allUsersQuery.data as unknown as { items: AdminUser[] })?.items || [], [allUsersQuery.data]);
 
-  const locationsQuery = useQuery({
-    queryKey: ["master-data-locations"],
-    queryFn: () => masterDataApi.list("locations"),
-  });
-
-  const locationsData = locationsQuery.data;
+  const locationsQuery = useLocationsQuery(isInitReady);
+  const locationsData = locationsQuery.data || [];
 
   const locationOptions = useMemo(() => {
-    const items = locationsData?.items || [];
-    const options = items.map((item: MasterDataItem) => ({
+    const options = locationsData.map((item: MasterDataItem) => ({
       value: String(item.id),
-      label: item.name_vi || item.name_en || item.code,
+      label: item.name_vi || item.name_en || item.code || "Unknown",
     }));
 
-    if (!options.some((item) => item.value === "IPA_DA_NANG")) {
+    if (!options.some((item: { value: string }) => item.value === "IPA_DA_NANG")) {
       options.unshift({ value: "IPA_DA_NANG", label: "Trung tâm Hành chính Đà Nẵng" });
     }
 
@@ -160,9 +152,9 @@ export default function ScheduleHub({ role }: ScheduleHubProps) {
   }, [locationsData]);
 
   const locationLabelMap = useMemo(() => {
-    return locationOptions.reduce<Record<string, string>>((accumulator, option: { value: string; label: string }) => {
-      accumulator[option.value] = option.label;
-      return accumulator;
+    return locationOptions.reduce((acc: Record<string, string>, option: { value: string; label: string }) => {
+      acc[option.value] = option.label;
+      return acc;
     }, {});
   }, [locationOptions]);
 

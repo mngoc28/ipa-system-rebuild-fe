@@ -21,8 +21,9 @@ import {
 } from "@/hooks/useTasksQuery";
 import type { TaskUiItem, TaskStatus } from "@/dataHelper/tasks.dataHelper";
 import TaskDetailDrawer from "./TaskDetailDrawer";
-import { teamsApi } from "@/api/teamsApi";
-import { useQuery } from "@tanstack/react-query";
+import { AdminUser } from "@/api/adminUsersApi";
+import { useAdminUsersListQuery } from "@/hooks/useAdminUsersQuery";
+import { useInitQuery } from "@/hooks/useInitQuery";
 import { useDelegationsQuery } from "@/hooks/useDelegationsQuery";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import type { DelegationApiItem } from "@/dataHelper/delegations.dataHelper";
@@ -47,18 +48,16 @@ export default function SharedTaskList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlTaskId = searchParams.get("taskId");
 
+  const { isSuccess: isInitReady } = useInitQuery();
+
   const { tasks, tasksQuery, meta } = useTasksListQuery({
     search: searchTerm,
     status: statusFilter,
     page: page,
   });
 
-  const { data: teamData } = useQuery({
-    queryKey: ["team-members-for-tasks"],
-    queryFn: () => teamsApi.getDashboard(),
-  });
-
-  const { delegationsQuery } = useDelegationsQuery({ per_page: 100 });
+  const membersQuery = useAdminUsersListQuery({ pageSize: 100 }, isInitReady);
+  const { delegationsQuery } = useDelegationsQuery({ per_page: 100 }, isInitReady);
 
   const createMutation = useCreateTaskMutation();
   const updateMutation = useUpdateTaskMutation();
@@ -88,8 +87,8 @@ export default function SharedTaskList() {
     onRestore: (val) => setNewTask(val),
   });
 
-  const memberOptions = (teamData?.members || []).map(m => ({
-    label: m.name,
+  const memberOptions = ((membersQuery.data as unknown as { items: AdminUser[] })?.items || []).map((m: AdminUser) => ({
+    label: m.fullName,
     value: String(m.id),
   }));
 
